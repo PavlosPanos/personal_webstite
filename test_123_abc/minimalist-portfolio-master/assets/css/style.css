@@ -158,10 +158,10 @@ article {
 }
 
 .separator {
-  width: 100%;
+  width: 1010%;
   height: 1px;
   background: var(--jet);
-  margin: 16px 0;
+  margin: 10px 0;
 }
 
 .icon-box {
@@ -310,7 +310,7 @@ main {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: 15px;
+  gap: 10px;
 }
 
 .avatar-box {
@@ -334,6 +334,17 @@ main {
   text-align: center;
   width: max-content;
   padding: 3px 12px;
+  border-radius: 8px;
+}
+
+.info-content .title-2 {
+  color: var(--white-1);
+  background: var(--onyx);
+  font-size: var(--fs-8);
+  font-weight: var(--fw-300);
+  text-align: center;
+  width: 100%;
+  padding: 3px 10px;
   border-radius: 8px;
 }
 
