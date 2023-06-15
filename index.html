@@ -1021,18 +1021,39 @@
 
         <section class="contact-form">
           <h3 class="h3 form-title">Contact Form</h3>
-          <form action="https://formsubmit.co/pavlospanos@hotmail.com" method="POST" class="form">
-            <div class="input-wrapper">
-              <input type="text" name="fullname" class="form-input" placeholder="Full name" required data-form-input>
-              <input type="email" name="_replyto" class="form-input" placeholder="Email address" required data-form-input>
-            </div>
-            <textarea name="message" class="form-input" placeholder="Your Message" required data-form-input></textarea>
-            <button class="form-btn" type="submit" data-form-btn>
-              <ion-icon name="paper-plane"></ion-icon>
-              <span>Send Message</span>
-            </button>
-          </form>
+          <div class="container">
+            <form id="contact-form" action="https://formsubmit.co/pavlospanos@hotmail.com" method="POST" class="form">
+              <div class="input-wrapper">
+                <input type="text" name="fullname" class="form-input" placeholder="Full name" required>
+                <input type="email" name="_replyto" class="form-input" placeholder="Email address" required>
+                <textarea name="message" class="form-input" placeholder="Your Message" required></textarea>
+              </div>
+              <button class="form-btn" type="submit">
+                <ion-icon name="paper-plane"></ion-icon>
+                <span>Send Message</span>
+              </button>
+            </form>
+          </div>
         </section>
+        
+        <script>
+          document.getElementById('contact-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+            var form = event.target;
+            var messageInput = form.querySelector('textarea[name="message"]');
+            var replyToInput = form.querySelector('input[name="_replyto"]');
+            var message = messageInput.value;
+            var email = replyToInput.value;
+            messageInput.value = message + '\n\n' + email;
+            form.submit();
+          });
+        </script>
+        
+        
+        
+        
+        
+        
         
         
         
