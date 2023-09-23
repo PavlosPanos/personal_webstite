@@ -1040,6 +1040,10 @@ main {
 
 .blog-posts { margin-bottom: 10px; }
 
+.h2.article-title-Blog {
+  font-size: 26px;
+}
+
 .blog-posts-list {
   display: grid;
   grid-template-columns: 1fr;
@@ -1562,7 +1566,6 @@ textarea.form-input::-webkit-resizer { display: none; }
   .sidebar, article { width: 700px; }
 
   .has-scrollbar::-webkit-scrollbar-button { width: 100px; }
-
 
 
   /**
