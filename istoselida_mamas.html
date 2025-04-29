@@ -3,59 +3,55 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Χρυσάνθη</title>
+  <title>Χρυσάνθη - Εσώρουχα Αθήνα</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Roboto', sans-serif;
       margin: 0;
-      background-color: #fff8f8;
+      background-color: #fffafc;
       color: #333;
     }
-
     header {
       background-color: #c2185b;
       color: white;
       padding: 2rem 1rem;
       text-align: center;
     }
-
     nav {
       background-color: #f8bbd0;
       text-align: center;
       padding: 1rem;
     }
-
     nav a {
       color: #333;
       text-decoration: none;
       margin: 0 1rem;
       font-weight: bold;
     }
-
+    nav a:hover {
+      text-decoration: underline;
+    }
     section {
       padding: 2rem;
       max-width: 1000px;
       margin: auto;
     }
-
     h2 {
       color: #c2185b;
     }
-
     .gallery {
       display: flex;
       flex-wrap: wrap;
       gap: 1rem;
       justify-content: center;
     }
-
     .gallery img {
       width: 300px;
       height: auto;
       border-radius: 8px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-
     footer {
       background-color: #c2185b;
       color: white;
@@ -63,31 +59,96 @@
       padding: 1rem;
       margin-top: 2rem;
     }
+    .slideshow-container {
+      position: relative;
+      max-width: 1000px;
+      margin: auto;
+    }
+    .mySlides {
+      display: none;
+    }
+    .mySlides img {
+      width: 100%;
+      border-radius: 10px;
+    }
+    .prev, .next {
+      cursor: pointer;
+      position: absolute;
+      top: 50%;
+      width: auto;
+      padding: 16px;
+      margin-top: -22px;
+      color: white;
+      font-weight: bold;
+      font-size: 18px;
+      transition: 0.6s ease;
+      border-radius: 0 3px 3px 0;
+      user-select: none;
+    }
+    .next {
+      right: 0;
+      border-radius: 3px 0 0 3px;
+    }
+    .prev:hover, .next:hover {
+      background-color: rgba(0,0,0,0.8);
+    }
+    .sub-nav {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .sub-nav a {
+      margin: 0 10px;
+      color: #c2185b;
+    }
   </style>
 </head>
 <body>
   <header>
     <h1>Χρυσάνθη</h1>
-    <p>Εσώρουχα με στυλ και ποιότητα</p>
+    <p>Εσώρουχα με στυλ και ποιότητα - Οδός Κεδρινού 66, Αμπελόκηποι</p>
   </header>
 
   <nav>
     <a href="#about">Σχετικά</a>
     <a href="#products">Προϊόντα</a>
+    <a href="#slideshow">Συλλογή</a>
     <a href="#contact">Επικοινωνία</a>
   </nav>
 
   <section id="about">
     <h2>Σχετικά με εμάς</h2>
-    <p>Η Χρυσάνθη είναι ένα κατάστημα εσωρούχων που βρίσκεται στους Αμπελόκηπους, στην Οδό Κεδρινού 66. Προσφέρουμε κομψά και ποιοτικά εσώρουχα για κάθε γυναίκα που θέλει να νιώθει όμορφη και άνετη.</p>
+    <p>Η Χρυσάνθη είναι ένα boutique κατάστημα εσωρούχων που ιδρύθηκε με στόχο να προσφέρει κομψότητα, άνεση και αυτοπεποίθηση σε κάθε γυναίκα. Από κλασικά σχέδια μέχρι μοντέρνες δημιουργίες, τα εσώρουχά μας επιλέγονται με φροντίδα για την ποιότητα και την αισθητική τους.</p>
   </section>
 
   <section id="products">
     <h2>Τα προϊόντα μας</h2>
+    <div class="sub-nav">
+      <a href="#">Σουτιέν</a> |
+      <a href="#">Σλιπ</a> |
+      <a href="#">Νυχτικά</a> |
+      <a href="#">Σετ</a>
+    </div>
     <div class="gallery">
-      <img src="https://www.yourdomain.com/images/lingerie1.jpg" alt="Εσώρουχα 1">
-      <img src="https://www.yourdomain.com/images/lingerie2.jpg" alt="Εσώρουχα 2">
-      <img src="https://www.yourdomain.com/images/lingerie3.jpg" alt="Εσώρουχα 3">
+      <img src="https://images.pexels.com/photos/6311600/pexels-photo-6311600.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Προϊόν 1">
+      <img src="https://images.pexels.com/photos/1182526/pexels-photo-1182526.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Προϊόν 2">
+      <img src="https://images.pexels.com/photos/6311612/pexels-photo-6311612.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Προϊόν 3">
+    </div>
+  </section>
+
+  <section id="slideshow">
+    <h2>Προτεινόμενα</h2>
+    <div class="slideshow-container">
+      <div class="mySlides fade">
+        <img src="https://images.pexels.com/photos/6858242/pexels-photo-6858242.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="Slide 1">
+      </div>
+      <div class="mySlides fade">
+        <img src="https://images.pexels.com/photos/6311594/pexels-photo-6311594.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="Slide 2">
+      </div>
+      <div class="mySlides fade">
+        <img src="https://images.pexels.com/photos/3758059/pexels-photo-3758059.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="Slide 3">
+      </div>
+      <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+      <a class="next" onclick="plusSlides(1)">&#10095;</a>
     </div>
   </section>
 
@@ -95,11 +156,32 @@
     <h2>Επικοινωνία</h2>
     <p><strong>Διεύθυνση:</strong> Οδός Κεδρινού 66, Αμπελόκηποι, Αθήνα</p>
     <p><strong>Τηλέφωνο:</strong> 210-1234567</p>
+    <p><strong>Email:</strong> info@chrysanthi.gr</p>
     <p><strong>Ώρες λειτουργίας:</strong> Δευτέρα - Σάββατο: 10:00 - 18:00</p>
   </section>
 
   <footer>
-    <p>© 2025 Χρυσάνθη | Όλα τα δικαιώματα διατηρούνται</p>
+    <p>© 2025 Χρυσάνθη | Σχεδιασμός: Οικογένεια</p>
   </footer>
+
+  <script>
+    let slideIndex = 1;
+    showSlides(slideIndex);
+
+    function plusSlides(n) {
+      showSlides(slideIndex += n);
+    }
+
+    function showSlides(n) {
+      let i;
+      let slides = document.getElementsByClassName("mySlides");
+      if (n > slides.length) {slideIndex = 1}    
+      if (n < 1) {slideIndex = slides.length}
+      for (i = 0; i < slides.length; i++) {
+          slides[i].style.display = "none";  
+      }
+      slides[slideIndex-1].style.display = "block";  
+    }
+  </script>
 </body>
 </html>
