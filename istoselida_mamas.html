@@ -99,6 +99,7 @@
     .sub-nav a {
       margin: 0 10px;
       color: #c2185b;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -123,15 +124,13 @@
   <section id="products">
     <h2>Τα προϊόντα μας</h2>
     <div class="sub-nav">
-      <a href="#">Σουτιέν</a> |
-      <a href="#">Σλιπ</a> |
-      <a href="#">Νυχτικά</a> |
-      <a href="#">Σετ</a>
+      <a onclick="showCategory('bras')">Σουτιέν</a> |
+      <a onclick="showCategory('slips')">Σλιπ</a> |
+      <a onclick="showCategory('nightwear')">Νυχτικά</a> |
+      <a onclick="showCategory('sets')">Σετ</a>
     </div>
-    <div class="gallery">
-      <img src="https://images.pexels.com/photos/6311600/pexels-photo-6311600.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Προϊόν 1">
-      <img src="https://images.pexels.com/photos/1182526/pexels-photo-1182526.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Προϊόν 2">
-      <img src="https://images.pexels.com/photos/6311612/pexels-photo-6311612.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Προϊόν 3">
+    <div class="gallery" id="gallery">
+      <!-- Εδώ θα φορτώνονται οι εικόνες -->
     </div>
   </section>
 
@@ -182,6 +181,38 @@
       }
       slides[slideIndex-1].style.display = "block";  
     }
+
+    const categories = {
+      bras: [
+        "https://images.pexels.com/photos/6311600/pexels-photo-6311600.jpeg?auto=compress&cs=tinysrgb&w=600",
+        "https://images.pexels.com/photos/1182526/pexels-photo-1182526.jpeg?auto=compress&cs=tinysrgb&w=600"
+      ],
+      slips: [
+        "https://images.pexels.com/photos/6311612/pexels-photo-6311612.jpeg?auto=compress&cs=tinysrgb&w=600",
+        "https://images.pexels.com/photos/1030903/pexels-photo-1030903.jpeg?auto=compress&cs=tinysrgb&w=600"
+      ],
+      nightwear: [
+        "https://images.pexels.com/photos/6858242/pexels-photo-6858242.jpeg?auto=compress&cs=tinysrgb&w=600",
+        "https://images.pexels.com/photos/6311594/pexels-photo-6311594.jpeg?auto=compress&cs=tinysrgb&w=600"
+      ],
+      sets: [
+        "https://images.pexels.com/photos/3758059/pexels-photo-3758059.jpeg?auto=compress&cs=tinysrgb&w=600",
+        "https://images.pexels.com/photos/4197563/pexels-photo-4197563.jpeg?auto=compress&cs=tinysrgb&w=600"
+      ]
+    };
+
+    function showCategory(category) {
+      const gallery = document.getElementById('gallery');
+      gallery.innerHTML = '';
+      categories[category].forEach(src => {
+        const img = document.createElement('img');
+        img.src = src;
+        gallery.appendChild(img);
+      });
+    }
+
+    // Default category
+    showCategory('bras');
   </script>
 </body>
 </html>
