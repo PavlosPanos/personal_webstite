@@ -5,7 +5,6 @@ function showSection(sectionId) {
     document.getElementById(sectionId).classList.add('active');
   }
   
-  // Sample gallery images (you can replace with your own)
   const galleries = {
     exterior: [
       "https://images.pexels.com/photos/3965546/pexels-photo-3965546.jpeg",
@@ -28,8 +27,8 @@ function showSection(sectionId) {
   }
   
   const brandImages = {
-    "Calvin Klein": ["https://via.placeholder.com/200x250?text=Calvin+Klein+1", "https://via.placeholder.com/200x250?text=Calvin+Klein+2"],
-    "Victoria's Secret": ["https://via.placeholder.com/200x250?text=VS+1", "https://via.placeholder.com/200x250?text=VS+2"],
+    "Calvin Klein": ["https://via.placeholder.com/200x250?text=Calvin+Klein+1"],
+    "Victoria's Secret": ["https://via.placeholder.com/200x250?text=VS+1"],
     "Intimissimi": ["https://via.placeholder.com/200x250?text=Intimissimi+1"],
     "Tezenis": ["https://via.placeholder.com/200x250?text=Tezenis+1"],
     "La Perla": ["https://via.placeholder.com/200x250?text=La+Perla+1"],
@@ -52,7 +51,12 @@ function showSection(sectionId) {
     }
   }
   
-  // Default section on load
+  // BURGER MENU FUNCTION
+  function toggleMenu() {
+    const navList = document.querySelector('nav ul');
+    navList.classList.toggle('show');
+  }
+  
   document.addEventListener("DOMContentLoaded", () => {
     showSection('home');
     loadGallery('exterior');
