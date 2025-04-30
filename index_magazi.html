@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Χρυσάνθη - Κατάστημα Εσωρούχων</title>
+  <link rel="stylesheet" href="style_magazi.css">
+</head>
+<body>
+
+  <header>
+    <h1>Χρυσάνθη</h1>
+    <p>Εσώρουχα με στυλ και ποιότητα</p>
+    <nav>
+      <ul>
+        <li><a href="#" onclick="showSection('home')">Αρχική</a></li>
+        <li><a href="#" onclick="showSection('info')">Πληροφορίες</a></li>
+        <li><a href="#" onclick="showSection('gallery')">Φωτογραφίες</a></li>
+        <li><a href="#" onclick="showSection('products')">Προϊόντα</a></li>
+        <li><a href="#" onclick="showSection('contact')">Επικοινωνία</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section id="home" class="section active">
+      <h2>Καλώς ήρθατε στη Χρυσάνθη</h2>
+      <p>Το κατάστημα εσωρούχων Χρυσάνθη βρίσκεται στην καρδιά των Αμπελοκήπων και προσφέρει διαλεγμένα προϊόντα υψηλής ποιότητας και αισθητικής.</p>
+    </section>
+
+    <section id="info" class="section">
+      <h2>Πληροφορίες</h2>
+      <p><strong>Διεύθυνση:</strong> Οδός Κεδρινού 66, Αμπελόκηποι, Αθήνα</p>
+      <p><strong>Ιστορία:</strong> Το κατάστημα ιδρύθηκε το 2005 με αγάπη για τη γυναικεία φροντίδα και εμφάνιση. Από τότε, προσφέρει κορυφαίες επιλογές με εξειδίκευση στα εσώρουχα πολυτελείας.</p>
+    </section>
+
+    <section id="gallery" class="section">
+      <h2>Φωτογραφίες</h2>
+      <div class="gallery-buttons">
+        <button onclick="loadGallery('exterior')">Εξωτερικό</button>
+        <button onclick="loadGallery('interior')">Εσωτερικός Χώρος</button>
+      </div>
+      <div id="galleryImages" class="gallery-grid"></div>
+    </section>
+
+    <section id="products" class="section">
+      <h2>Προϊόντα - Εταιρίες Εσωρούχων</h2>
+      <ul class="brand-list">
+        <li onclick="loadBrand('Calvin Klein')">Calvin Klein</li>
+        <li onclick="loadBrand('Victoria\'s Secret')">Victoria's Secret</li>
+        <li onclick="loadBrand('Intimissimi')">Intimissimi</li>
+        <li onclick="loadBrand('Tezenis')">Tezenis</li>
+        <li onclick="loadBrand('La Perla')">La Perla</li>
+        <li onclick="loadBrand('Triumph')">Triumph</li>
+        <li onclick="loadBrand('Chantelle')">Chantelle</li>
+        <li onclick="loadBrand('Hunkemöller')">Hunkemöller</li>
+        <li onclick="loadBrand('Agent Provocateur')">Agent Provocateur</li>
+        <li onclick="loadBrand('Oysho')">Oysho</li>
+      </ul>
+      <div id="brandGallery" class="gallery-grid"></div>
+    </section>
+
+    <section id="contact" class="section">
+      <h2>Επικοινωνία</h2>
+      <p>📧 Email: <a href="mailto:info@chrysanthi.gr">info@chrysanthi.gr</a></p>
+      <form>
+        <label for="name">Όνομα:</label><br>
+        <input type="text" id="name" name="name"><br>
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email"><br>
+        <label for="message">Μήνυμα:</label><br>
+        <textarea id="message" name="message" rows="5"></textarea><br>
+        <button type="submit" disabled>Αποστολή (μη λειτουργικό ακόμα)</button>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 Χρυσάνθη - Κατάστημα Εσωρούχων</p>
+  </footer>
+
+  <script src="script_magazi.js"></script>
+</body>
+</html>

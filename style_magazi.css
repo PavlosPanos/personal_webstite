@@ -1,0 +1,104 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    background: #fffdfd;
+    color: #333;
+  }
+  
+  header {
+    background-color: #b71c1c;
+    color: white;
+    text-align: center;
+    padding: 1.5rem;
+  }
+  
+  nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    background-color: #ffcdd2;
+    margin: 0;
+  }
+  
+  nav ul li {
+    cursor: pointer;
+    padding: 0.8rem 1rem;
+  }
+  
+  nav ul li:hover {
+    background-color: #e57373;
+  }
+  
+  main {
+    padding: 2rem;
+    max-width: 1000px;
+    margin: auto;
+  }
+  
+  .section {
+    display: none;
+  }
+  
+  .section.active {
+    display: block;
+  }
+  
+  .gallery-buttons {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  .gallery-buttons button {
+    margin: 0 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #f8bbd0;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .gallery-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+  }
+  
+  .gallery-grid img {
+    width: 200px;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+  
+  .brand-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    list-style: none;
+    padding: 0;
+    margin-bottom: 1rem;
+    justify-content: center;
+  }
+  
+  .brand-list li {
+    background-color: #e1bee7;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  form input, form textarea {
+    width: 100%;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+  }
+  
+  footer {
+    text-align: center;
+    background-color: #b71c1c;
+    color: white;
+    padding: 1rem;
+    margin-top: 2rem;
+  }
