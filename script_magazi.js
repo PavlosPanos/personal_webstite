@@ -1,4 +1,4 @@
-// Show section when menu item is clicked
+// Show selected section
 function showSection(sectionId) {
   document.querySelectorAll('.section').forEach(section => {
     section.classList.remove('active');
@@ -6,13 +6,13 @@ function showSection(sectionId) {
   document.getElementById(sectionId).classList.add('active');
 }
 
-// Toggle mobile menu
+// Burger menu toggle
 function toggleMenu() {
   const navList = document.querySelector('nav ul');
   navList.classList.toggle('show');
 }
 
-// Define galleries with image paths
+// Gallery image sets
 const galleries = {
   exterior: [
     "website_images/exterior1.jpg",
@@ -24,7 +24,7 @@ const galleries = {
   ]
 };
 
-// Define brand image sets
+// Brand image sets
 const brandImages = {
   "Calvin Klein": ["website_images/ck1.jpg"],
   "Victoria's Secret": ["website_images/vs1.jpg"],
@@ -38,7 +38,7 @@ const brandImages = {
   "Oysho": ["website_images/oysho1.jpg"]
 };
 
-// Load images into gallery section
+// Load selected gallery
 function loadGallery(type) {
   const gallery = document.getElementById("galleryImages");
   gallery.innerHTML = '';
@@ -50,7 +50,7 @@ function loadGallery(type) {
   updateLightboxBindings();
 }
 
-// Load brand images into brandGallery
+// Load selected brand images
 function loadBrand(brand) {
   const gallery = document.getElementById("brandGallery");
   gallery.innerHTML = '';
@@ -62,8 +62,7 @@ function loadBrand(brand) {
   updateLightboxBindings();
 }
 
-// ===== LIGHTBOX FUNCTIONALITY =====
-
+// Lightbox logic
 let currentImageIndex = 0;
 let currentImageSet = [];
 
@@ -80,8 +79,10 @@ function updateLightboxBindings() {
 
 function openLightbox(index) {
   currentImageIndex = index;
-  document.getElementById("lightboxImage").src = currentImageSet[index].src;
-  document.getElementById("lightbox").style.display = "block";
+  const lightbox = document.getElementById("lightbox");
+  const img = document.getElementById("lightboxImage");
+  img.src = currentImageSet[currentImageIndex].src;
+  lightbox.style.display = "block";
 }
 
 function closeLightbox() {
@@ -100,7 +101,17 @@ function prevImage(e) {
   openLightbox(currentImageIndex);
 }
 
-// Initialize default state when page loads
+// Keyboard support
+document.addEventListener("keydown", (e) => {
+  const isOpen = document.getElementById("lightbox").style.display === "block";
+  if (!isOpen) return;
+
+  if (e.key === "ArrowRight") nextImage(e);
+  if (e.key === "ArrowLeft") prevImage(e);
+  if (e.key === "Escape") closeLightbox();
+});
+
+// Initial load
 document.addEventListener("DOMContentLoaded", () => {
   showSection('home');
   loadGallery('exterior');
