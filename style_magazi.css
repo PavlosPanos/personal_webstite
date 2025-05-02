@@ -1,161 +1,220 @@
 body {
-    font-family: 'Segoe UI', sans-serif;
-    margin: 0;
-    background: #fffdfd;
-    color: #333;
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  background: #fffdfd;
+  color: #333;
+}
+
+header {
+  background-color: #b71c1c;
+  color: white;
+  text-align: center;
+  padding: 1.5rem;
+}
+
+nav ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  background-color: #ffcdd2;
+  margin: 0;
+}
+
+nav ul li {
+  cursor: pointer;
+  padding: 0.8rem 1rem;
+}
+
+nav ul li:hover {
+  background-color: #e57373;
+}
+
+main {
+  padding: 2rem;
+  max-width: 1000px;
+  margin: auto;
+}
+
+.section {
+  display: none;
+}
+
+.section.active {
+  display: block;
+}
+
+.gallery-buttons {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.gallery-buttons button {
+  margin: 0 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #f8bbd0;
+  border: none;
+  cursor: pointer;
+}
+
+.gallery-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.gallery-grid img {
+  width: 200px;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  cursor: pointer;
+}
+
+.brand-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  list-style: none;
+  padding: 0;
+  margin-bottom: 1rem;
+  justify-content: center;
+}
+
+.brand-list li {
+  background-color: #e1bee7;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+form input,
+form textarea {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+}
+
+footer {
+  text-align: center;
+  background-color: #b71c1c;
+  color: white;
+  padding: 1rem;
+  margin-top: 2rem;
+}
+
+/* 🔽 Burger Menu Styles */
+.burger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 1rem;
+}
+
+.burger div {
+  width: 25px;
+  height: 3px;
+  background-color: #333;
+}
+
+/* 🔽 Responsive Design */
+@media screen and (max-width: 768px) {
+  nav {
+    position: relative;
   }
-  
-  header {
-    background-color: #b71c1c;
-    color: white;
-    text-align: center;
-    padding: 1.5rem;
-  }
-  
-  nav ul {
-    list-style: none;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    background-color: #ffcdd2;
-    margin: 0;
-  }
-  
-  nav ul li {
-    cursor: pointer;
-    padding: 0.8rem 1rem;
-  }
-  
-  nav ul li:hover {
-    background-color: #e57373;
-  }
-  
-  main {
-    padding: 2rem;
-    max-width: 1000px;
-    margin: auto;
-  }
-  
-  .section {
-    display: none;
-  }
-  
-  .section.active {
-    display: block;
-  }
-  
-  .gallery-buttons {
-    text-align: center;
-    margin-bottom: 1rem;
-  }
-  
-  .gallery-buttons button {
-    margin: 0 0.5rem;
-    padding: 0.5rem 1rem;
-    background-color: #f8bbd0;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .gallery-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    justify-content: center;
-  }
-  
-  .gallery-grid img {
-    width: 200px;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  }
-  
-  .brand-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    list-style: none;
-    padding: 0;
-    margin-bottom: 1rem;
-    justify-content: center;
-  }
-  
-  .brand-list li {
-    background-color: #e1bee7;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  form input, form textarea {
-    width: 100%;
-    margin-bottom: 1rem;
-    padding: 0.5rem;
-  }
-  
-  footer {
-    text-align: center;
-    background-color: #b71c1c;
-    color: white;
-    padding: 1rem;
-    margin-top: 2rem;
-  }
-  
-  /* --- BURGER MENU --- */
+
   .burger {
-    display: none;
+    display: flex;
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  nav ul {
     flex-direction: column;
-    gap: 5px;
-    cursor: pointer;
+    display: none;
+    position: absolute;
+    top: 3.5rem;
+    right: 0;
+    background-color: #ffcdd2;
+    width: 100%;
+  }
+
+  nav ul.show {
+    display: flex;
+  }
+
+  nav ul li {
+    border-bottom: 1px solid #e57373;
     padding: 1rem;
   }
-  
-  .burger div {
-    width: 25px;
-    height: 3px;
-    background-color: #333;
+
+  .gallery-grid,
+  .brand-list {
+    flex-direction: column;
+    align-items: center;
   }
-  
-  @media screen and (max-width: 768px) {
-    nav {
-      position: relative;
-    }
-  
-    .burger {
-      display: flex;
-      position: absolute;
-      top: 0;
-      right: 0;
-    }
-  
-    nav ul {
-      flex-direction: column;
-      display: none;
-      position: absolute;
-      top: 3.5rem;
-      right: 0;
-      background-color: #ffcdd2;
-      width: 100%;
-    }
-  
-    nav ul.show {
-      display: flex;
-    }
-  
-    nav ul li {
-      border-bottom: 1px solid #e57373;
-      padding: 1rem;
-    }
-  
-    .gallery-grid, .brand-list {
-      flex-direction: column;
-      align-items: center;
-    }
-  
-    .gallery-grid img {
-      width: 90%;
-      max-width: 300px;
-    }
+
+  .gallery-grid img {
+    cursor: pointer;
+    touch-action: manipulation;
   }
+}
+
+/* 🔍 Lightbox Styles */
+.lightbox {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  padding-top: 60px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
+.lightbox-img {
+  display: block;
+  margin: auto;
+  max-width: 90%;
+  max-height: 80vh;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  color: white;
+  font-size: 40px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.lightbox-controls {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+@media screen and (max-width: 600px) {
+  .lightbox-img {
+    max-width: 95%;
+    max-height: 70vh;
+  }
+
+  .lightbox-prev,
+  .lightbox-next {
+    font-size: 40px;
+  }
+
+  .lightbox-close {
+    font-size: 30px;
+    top: 10px;
+    right: 20px;
+  }
+}

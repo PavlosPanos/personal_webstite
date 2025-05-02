@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="el">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Χρυσάνθη - Κατάστημα Εσωρούχων</title>
-  <link rel="stylesheet" href="style_magazi.css">
+  <link rel="stylesheet" href="style_magazi.css" />
 </head>
 <body>
 
@@ -13,9 +13,7 @@
     <p>Εσώρουχα με στυλ και ποιότητα</p>
     <nav>
       <div class="burger" onclick="toggleMenu()">
-        <div></div>
-        <div></div>
-        <div></div>
+        <div></div><div></div><div></div>
       </div>
       <ul>
         <li><a href="#" onclick="showSection('home')">Αρχική</a></li>
@@ -37,6 +35,15 @@
       <h2>Πληροφορίες</h2>
       <p><strong>Διεύθυνση:</strong> Οδός Κεδρινού 66, Αμπελόκηποι, Αθήνα</p>
       <p><strong>Ιστορία:</strong> Το κατάστημα ιδρύθηκε το 2005 με αγάπη για τη γυναικεία φροντίδα και εμφάνιση. Από τότε, προσφέρει κορυφαίες επιλογές με εξειδίκευση στα εσώρουχα πολυτελείας.</p>
+      <h3>Πού θα μας βρείτε:</h3>
+      <iframe
+        src="https://www.google.com/maps?q=Οδός+Κεδρινού+66,+Αμπελόκηποι,+Αθήνα&output=embed"
+        width="100%"
+        height="300"
+        style="border:0;"
+        allowfullscreen=""
+        loading="lazy"
+      ></iframe>
     </section>
 
     <section id="gallery" class="section">
@@ -69,12 +76,12 @@
       <h2>Επικοινωνία</h2>
       <p>📧 Email: <a href="mailto:info@chrysanthi.gr">info@chrysanthi.gr</a></p>
       <form>
-        <label for="name">Όνομα:</label><br>
-        <input type="text" id="name" name="name"><br>
-        <label for="email">Email:</label><br>
-        <input type="email" id="email" name="email"><br>
-        <label for="message">Μήνυμα:</label><br>
-        <textarea id="message" name="message" rows="5"></textarea><br>
+        <label for="name">Όνομα:</label><br />
+        <input type="text" id="name" name="name" /><br />
+        <label for="email">Email:</label><br />
+        <input type="email" id="email" name="email" /><br />
+        <label for="message">Μήνυμα:</label><br />
+        <textarea id="message" name="message" rows="5"></textarea><br />
         <button type="submit" disabled>Αποστολή (μη λειτουργικό ακόμα)</button>
       </form>
     </section>
@@ -83,6 +90,16 @@
   <footer>
     <p>© 2025 Χρυσάνθη - Κατάστημα Εσωρούχων</p>
   </footer>
+
+  <!-- Lightbox Modal -->
+  <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+    <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+    <img class="lightbox-img" id="lightboxImage" src="" />
+    <div class="lightbox-controls">
+      <span class="lightbox-prev" onclick="prevImage(event)">&#10094;</span>
+      <span class="lightbox-next" onclick="nextImage(event)">&#10095;</span>
+    </div>
+  </div>
 
   <script src="script_magazi.js"></script>
 </body>
