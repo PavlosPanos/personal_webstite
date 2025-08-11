@@ -372,6 +372,13 @@
                                 <button type="submit" class="w-full bg-red-500 text-white font-bold py-2 px-4 rounded-md hover:bg-red-600 transition-colors">Log Consumption</button>
                             </form>
                         </div>
+                        ${isAdmin ? `
+                        <div class="bg-white p-6 rounded-lg shadow-md mt-8 border-t-4 border-red-500">
+                            <h3 class="text-xl font-semibold mb-4 text-red-700">Danger Zone</h3>
+                            <p class="text-sm text-gray-600 mb-4">This will permanently delete all coffee types, purchase history, and reset the total amount spent to zero. It will not affect member contributions or payment rounds.</p>
+                            <button id="reset-coffee-data-btn" class="w-full bg-red-600 text-white font-bold py-2 px-4 rounded-md hover:bg-red-700 transition-colors">Reset All Coffee Data</button>
+                        </div>
+                        ` : ''}
                     </div>
                     <div class="bg-white p-6 rounded-lg shadow-md">
                         <h3 class="text-xl font-semibold mb-4">Inventory History</h3>
@@ -506,6 +513,7 @@
             document.getElementById('log-consumption-form')?.addEventListener('submit', handleLogConsumption);
             document.querySelectorAll('#add-stock-options button').forEach(btn => btn.addEventListener('click', (e) => handleCoffeeSelection(e.currentTarget.dataset.coffee)));
             document.querySelectorAll('.delete-tx-btn').forEach(btn => btn.addEventListener('click', (e) => handleDeleteTransaction(e.currentTarget.dataset.id)));
+            document.getElementById('reset-coffee-data-btn')?.addEventListener('click', handleResetCoffeeData);
         };
         const attachPaymentsEventListeners = () => {
             document.getElementById('start-round-form')?.addEventListener('submit', handleStartNewRound);
@@ -724,6 +732,29 @@
             } catch (error) { console.error("Error marking as paid:", error); }
         };
 
+        const handleResetCoffeeData = async () => {
+            if (!isAdmin) return;
+            if (!confirm("ARE YOU SURE?\n\nThis will delete ALL coffee types, ALL purchase and consumption history, and reset the total spent to $0. This action cannot be undone.")) {
+                return;
+            }
+            try {
+                const batch = writeBatch(db);
+                const coffeeTypesQuery = query(collection(db, getCollectionPath('coffeeTypes')));
+                const coffeeTypesSnapshot = await getDocs(coffeeTypesQuery);
+                coffeeTypesSnapshot.forEach(doc => batch.delete(doc.ref));
+                const historyQuery = query(collection(db, getCollectionPath('inventoryHistory')));
+                const historySnapshot = await getDocs(historyQuery);
+                historySnapshot.forEach(doc => batch.delete(doc.ref));
+                const financialsRef = doc(db, getCollectionPath('financials'), 'summary');
+                batch.update(financialsRef, { totalSpent: 0 });
+                await batch.commit();
+                alert("All coffee data has been successfully reset.");
+            } catch (error) {
+                console.error("Error resetting coffee data:", error);
+                alert("An error occurred while resetting data. Please check the console.");
+            }
+        };
+
         const generateStats = () => {
             const monthlyExpensesCtx = document.getElementById('monthly-expenses-chart');
             if (!monthlyExpensesCtx) return;
@@ -790,14 +821,6 @@
             }
 
             // Authenticated listeners
-            listeners.push(onSnapshot(query(collection(db, getCollectionPath('users'))), s => {
-                appState.members = s.docs.map(d => ({ id: d.id, ...d.data() }));
-                if (!isAdmin) {
-                    appState.userProfile = appState.members.find(m => m.email === currentUser.email);
-                }
-                if(document.getElementById('app-container')) renderCurrentView();
-            }));
-            
             listeners.push(onSnapshot(query(collection(db, getCollectionPath('coffeeTypes'))), s => {
                 appState.coffeeTypes = s.docs.map(d => ({ id: d.id, ...d.data() }));
                 if(document.getElementById('app-container')) renderCurrentView();
@@ -812,6 +835,14 @@
                 appState.inventoryHistory = s.docs.map(d => ({ id: d.id, ...d.data() }));
                 appState.inventoryHistory.sort((a, b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0));
                 if(document.getElementById('app-container')) renderCurrentView(); 
+            }));
+
+            listeners.push(onSnapshot(query(collection(db, getCollectionPath('users'))), s => {
+                appState.members = s.docs.map(d => ({ id: d.id, ...d.data() }));
+                if (!isAdmin) {
+                    appState.userProfile = appState.members.find(m => m.email === currentUser.email);
+                }
+                if(document.getElementById('app-container')) renderCurrentView();
             }));
 
             // Admin-only listeners
