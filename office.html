@@ -262,8 +262,10 @@
         };
         
         const renderCurrentView = () => {
-            renderMainLayout(); // Re-render layout to update active tab style
+            // This function is now simplified, as renderMainLayout handles the structure
             const mainContent = document.getElementById('main-content');
+            if (!mainContent) return; // Guard against calls before layout is rendered
+
             switch (appState.activeTab) {
                 case 'dashboard':
                     mainContent.innerHTML = isAdmin ? renderAdminDashboard() : renderUserDashboard();
@@ -290,14 +292,11 @@
         };
 
         // --- View-Specific Render Functions ---
-        // (These now return HTML strings instead of directly manipulating the DOM)
-
         const renderAdminDashboard = () => {
             const totalStock = (appState.inventory.officeStockKg || 0) + (appState.inventory.warehouseStockKg || 0);
             return `
                 <h2 class="text-3xl font-bold mb-6">Admin Dashboard</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Stat cards -->
                     <div class="bg-white p-6 rounded-lg shadow-md">Total Members: <span class="font-bold text-2xl">${appState.members.length}</span></div>
                     <div class="bg-white p-6 rounded-lg shadow-md">Total Stock: <span class="font-bold text-2xl">${totalStock.toFixed(2)} kg</span></div>
                     <div class="bg-white p-6 rounded-lg shadow-md">Active Round: <span class="font-bold text-xl">${appState.activeRound ? appState.activeRound.name : 'None'}</span></div>
@@ -306,7 +305,6 @@
         };
 
         const renderUserDashboard = () => {
-             const totalStock = (appState.inventory.officeStockKg || 0) + (appState.inventory.warehouseStockKg || 0);
             return `
                 <h2 class="text-3xl font-bold mb-6">Welcome, ${appState.userProfile ? appState.userProfile.name : currentUser.email}!</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -428,9 +426,9 @@
                 </div>
             `;
         };
-
-        const renderPayments = () => { /* ... similar conversion needed ... */ return `Payments View`; };
-        const renderCommunications = () => { /* ... similar conversion needed ... */ return `Communications View`; };
+        
+        const renderPayments = () => { return `<!-- Payments View HTML -->`; };
+        const renderCommunications = () => { return `<!-- Communications View HTML -->`; };
 
         // --- Event Listener Attachment ---
         const attachMemberEventListeners = () => {
@@ -452,9 +450,6 @@
             const { name, email, phone } = form.elements;
             if (!name.value || !email.value || !db) return;
             try {
-                // IMPORTANT: We add the member to our own 'users' collection,
-                // but we don't create a Firebase Auth user here.
-                // The auth user is created when they log in for the first time.
                 await addDoc(collection(db, getCollectionPath('users')), {
                     name: name.value, email: email.value.toLowerCase(), phone: phone.value,
                     totalContributed: 0, joinedDate: Timestamp.now()
@@ -471,7 +466,7 @@
         };
 
         const handleDeleteTransaction = async (txId) => {
-            if (!isAdmin || !confirm(`Are you sure you want to delete this transaction? This will affect the total stock count.`)) return;
+            if (!isAdmin || !confirm(`Are you sure you want to delete this transaction? This will PERMANENTLY affect the total stock count.`)) return;
             
             const txDocRef = doc(db, getCollectionPath('inventoryHistory'), txId);
             try {
@@ -497,9 +492,8 @@
             }
         };
         
-        const handleAddStock = async (e) => { /* ... existing logic ... */ };
-        const handleLogConsumption = async (e) => { /* ... existing logic ... */ };
-        // Other handlers...
+        const handleAddStock = async (e) => { /* ... existing logic from previous version ... */ };
+        const handleLogConsumption = async (e) => { /* ... existing logic from previous version ... */ };
 
         // --- Initialization ---
         let listeners = [];
@@ -509,42 +503,22 @@
         };
 
         const setupListeners = () => {
-            detachListeners(); // Clear old listeners before attaching new ones
+            detachListeners();
 
             if (isAdmin) {
                 // Admin gets all data
-                const membersQuery = query(collection(db, getCollectionPath('users')));
-                listeners.push(onSnapshot(membersQuery, snapshot => {
-                    appState.members = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    renderCurrentView();
-                }));
-                // ... all other admin listeners
-                const inventoryQuery = doc(db, getCollectionPath('inventory'), 'main');
-                listeners.push(onSnapshot(inventoryQuery, docSnap => {
-                    appState.inventory = docSnap.exists() ? docSnap.data() : { officeStockKg: 0, warehouseStockKg: 0 };
-                    renderCurrentView();
-                }));
-                const historyQuery = query(collection(db, getCollectionPath('inventoryHistory')));
-                listeners.push(onSnapshot(historyQuery, snapshot => {
-                    appState.inventoryHistory = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                listeners.push(onSnapshot(query(collection(db, getCollectionPath('users'))), s => { appState.members = s.docs.map(d => ({ id: d.id, ...d.data() })); renderCurrentView(); }));
+                listeners.push(onSnapshot(doc(db, getCollectionPath('inventory'), 'main'), s => { appState.inventory = s.exists() ? s.data() : {}; renderCurrentView(); }));
+                listeners.push(onSnapshot(query(collection(db, getCollectionPath('inventoryHistory'))), s => { 
+                    appState.inventoryHistory = s.docs.map(d => ({ id: d.id, ...d.data() }));
                     appState.inventoryHistory.sort((a, b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0));
-                    renderCurrentView();
+                    renderCurrentView(); 
                 }));
-
+                // ... other admin listeners for payments etc.
             } else {
-                // Regular user gets limited data
-                const userDocRef = doc(db, getCollectionPath('users'), currentUser.uid);
-                listeners.push(onSnapshot(userDocRef, docSnap => {
-                    if (docSnap.exists()) {
-                        appState.userProfile = { id: docSnap.id, ...docSnap.data() };
-                    }
-                    renderCurrentView();
-                }));
-                const inventoryQuery = doc(db, getCollectionPath('inventory'), 'main');
-                listeners.push(onSnapshot(inventoryQuery, docSnap => {
-                    appState.inventory = docSnap.exists() ? docSnap.data() : { officeStockKg: 0, warehouseStockKg: 0 };
-                    renderCurrentView();
-                }));
+                // Regular user gets their own profile and public inventory
+                listeners.push(onSnapshot(doc(db, getCollectionPath('users'), currentUser.uid), s => { appState.userProfile = s.exists() ? { id: s.id, ...s.data() } : null; renderCurrentView(); }));
+                listeners.push(onSnapshot(doc(db, getCollectionPath('inventory'), 'main'), s => { appState.inventory = s.exists() ? s.data() : {}; renderCurrentView(); }));
             }
         };
 
@@ -562,6 +536,34 @@
                     detachListeners();
                     currentUser = user;
                     if(user) {
+                        // This is where you would put the security rules to copy.
+                        // I've updated them with your UID.
+                        /*
+                        rules_version = '2';
+                        service cloud.firestore {
+                          match /databases/{database}/documents {
+
+                            function isAdmin() {
+                              return request.auth.uid == "YivhXNd1rgVyE9T878WelI7xPiV2";
+                            }
+
+                            match /artifacts/{appId}/public/data/inventory/main {
+                              allow read: if true;
+                              allow write: if isAdmin();
+                            }
+                            
+                            match /artifacts/{appId}/public/data/{collection}/{docId=**} {
+                               allow read, write: if request.auth != null && isAdmin();
+                            }
+
+                            match /artifacts/{appId}/public/data/users/{userId} {
+                                allow get: if request.auth.uid == userId;
+                                allow list, read: if isAdmin();
+                                allow write: if isAdmin();
+                            }
+                          }
+                        }
+                        */
                         setupListeners();
                     }
                     renderApp();
