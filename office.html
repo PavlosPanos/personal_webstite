@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coffee Club Manager</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -229,13 +230,14 @@
             const navIcons = {
                 dashboard: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
                 members: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+                stats: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>`,
                 inventory: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>`,
                 payments: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><line x1="12" y1="2" x2="12" y2="22"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>`,
                 communications: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><path d="m22 2-7 20-4-9-9-4Z"/><path d="m22 2-11 11"/></svg>`
             };
             const navItems = isAdmin 
-                ? ['dashboard', 'members', 'inventory', 'payments', 'communications']
-                : ['dashboard', 'members'];
+                ? ['dashboard', 'members', 'stats', 'inventory', 'payments', 'communications']
+                : ['dashboard', 'members', 'stats'];
             navMenu.innerHTML = navItems.map(tab => `
                 <button data-tab="${tab}" class="nav-button flex items-center w-full text-left p-3 my-1 rounded-lg transition-colors duration-200 ${appState.activeTab === tab ? 'bg-amber-500 text-gray-900' : 'hover:bg-gray-700'}">${navIcons[tab]}<span class="capitalize hidden md:inline">${tab}</span></button>
             `).join('');
@@ -243,6 +245,7 @@
             switch (appState.activeTab) {
                 case 'dashboard': mainContent.innerHTML = renderDashboard(); break;
                 case 'members': mainContent.innerHTML = renderMembers(); attachMemberEventListeners(); break;
+                case 'stats': mainContent.innerHTML = renderStats(); attachStatsEventListeners(); break;
                 case 'inventory': mainContent.innerHTML = renderInventory(); attachInventoryEventListeners(); break;
                 case 'payments': mainContent.innerHTML = renderPayments(); attachPaymentsEventListeners(); break;
                 case 'communications': mainContent.innerHTML = renderCommunications(); attachCommunicationsEventListeners(); break;
@@ -457,6 +460,42 @@
                 </div>`;
         };
 
+        const renderStats = () => {
+            return `
+                <h2 class="text-3xl font-bold mb-6">Club Statistics</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold mb-4">Total Contributions</h3>
+                        <div class="overflow-x-auto max-h-96">
+                            <table class="w-full text-left">
+                                <thead><tr class="border-b"><th class="p-2">Name</th><th class="p-2 text-right">Amount</th></tr></thead>
+                                <tbody>
+                                    ${appState.members.map(member => `
+                                        <tr class="border-b hover:bg-gray-50">
+                                            <td class="p-2 font-medium">${member.name}</td>
+                                            <td class="p-2 text-right font-semibold">$${(member.totalContributed || 0).toFixed(2)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold mb-4">Monthly Coffee Expenses</h3>
+                        <canvas id="monthly-expenses-chart"></canvas>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold mb-4">Weekly Consumption</h3>
+                        <div id="weekly-consumption"></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold mb-4">Monthly Consumption</h3>
+                        <div id="monthly-consumption"></div>
+                    </div>
+                </div>
+            `;
+        };
+
         // --- Event Listener Attachment ---
         const attachMemberEventListeners = () => {
             document.getElementById('add-member-form')?.addEventListener('submit', handleAddMember);
@@ -480,6 +519,9 @@
         const attachCommunicationsEventListeners = () => {
             document.getElementById('draft-newsletter-btn')?.addEventListener('click', handleDraftNewsletter);
             document.getElementById('draft-reminder-btn')?.addEventListener('click', handleDraftReminder);
+        };
+        const attachStatsEventListeners = () => {
+            generateStats();
         };
 
         // --- Data Handlers (CRUD & AI) ---
@@ -681,6 +723,56 @@
                 await batch.commit();
             } catch (error) { console.error("Error marking as paid:", error); }
         };
+
+        const generateStats = () => {
+            const monthlyExpensesCtx = document.getElementById('monthly-expenses-chart');
+            if (!monthlyExpensesCtx) return;
+
+            const monthlyExpenses = appState.inventoryHistory
+                .filter(h => h.type === 'purchase' && h.date)
+                .reduce((acc, h) => {
+                    const month = new Date(h.date.toDate()).toLocaleString('default', { month: 'short', year: '2-digit' });
+                    acc[month] = (acc[month] || 0) + h.totalCost;
+                    return acc;
+                }, {});
+
+            new Chart(monthlyExpensesCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(monthlyExpenses),
+                    datasets: [{
+                        label: 'Total Spent',
+                        data: Object.values(monthlyExpenses),
+                        backgroundColor: 'rgba(251, 191, 36, 0.6)',
+                        borderColor: 'rgba(251, 191, 36, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: { scales: { y: { beginAtZero: true } } }
+            });
+
+            const weeklyConsumption = appState.inventoryHistory
+                .filter(h => h.type === 'consumption' && h.date)
+                .reduce((acc, h) => {
+                    const date = new Date(h.date.toDate());
+                    const year = date.getFullYear();
+                    const week = Math.ceil((((date - new Date(year, 0, 1)) / 86400000) + new Date(year, 0, 1).getDay() + 1) / 7);
+                    const weekKey = `W${week}, ${year}`;
+                    acc[weekKey] = (acc[weekKey] || 0) + h.amountKg;
+                    return acc;
+                }, {});
+
+            const monthlyConsumption = appState.inventoryHistory
+                .filter(h => h.type === 'consumption' && h.date)
+                .reduce((acc, h) => {
+                    const month = new Date(h.date.toDate()).toLocaleString('default', { month: 'long', year: 'numeric' });
+                    acc[month] = (acc[month] || 0) + h.amountKg;
+                    return acc;
+                }, {});
+
+            document.getElementById('weekly-consumption').innerHTML = `<table class="w-full text-left"><thead><tr class="border-b"><th class="p-2">Week</th><th class="p-2 text-right">Consumed (kg)</th></tr></thead><tbody>${Object.entries(weeklyConsumption).map(([key, value]) => `<tr><td class="p-2">${key}</td><td class="p-2 text-right">${value.toFixed(2)}</td></tr>`).join('')}</tbody></table>`;
+            document.getElementById('monthly-consumption').innerHTML = `<table class="w-full text-left"><thead><tr class="border-b"><th class="p-2">Month</th><th class="p-2 text-right">Consumed (kg)</th></tr></thead><tbody>${Object.entries(monthlyConsumption).map(([key, value]) => `<tr><td class="p-2">${key}</td><td class="p-2 text-right">${value.toFixed(2)}</td></tr>`).join('')}</tbody></table>`;
+        };
         
         // --- Initialization ---
         let listeners = [];
@@ -715,14 +807,15 @@
                 appState.financials = s.exists() ? s.data() : { totalCollected: 0, totalSpent: 0 };
                 if(document.getElementById('app-container')) renderCurrentView();
             }));
+            
+            listeners.push(onSnapshot(query(collection(db, getCollectionPath('inventoryHistory'))), s => { 
+                appState.inventoryHistory = s.docs.map(d => ({ id: d.id, ...d.data() }));
+                appState.inventoryHistory.sort((a, b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0));
+                if(document.getElementById('app-container')) renderCurrentView(); 
+            }));
 
             // Admin-only listeners
             if (isAdmin) {
-                listeners.push(onSnapshot(query(collection(db, getCollectionPath('inventoryHistory'))), s => { 
-                    appState.inventoryHistory = s.docs.map(d => ({ id: d.id, ...d.data() }));
-                    appState.inventoryHistory.sort((a, b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0));
-                    if(document.getElementById('app-container')) renderCurrentView(); 
-                }));
                 listeners.push(onSnapshot(query(collection(db, getCollectionPath('paymentRounds'))), s => {
                     appState.paymentRounds = s.docs.map(d => ({ id: d.id, ...d.data() }));
                     appState.paymentRounds.sort((a, b) => (b.startDate?.toMillis() || 0) - (a.startDate?.toMillis() || 0));
