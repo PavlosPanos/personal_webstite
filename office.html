@@ -336,7 +336,7 @@
                         <div class="bg-white p-6 rounded-lg shadow-md">
                             <h3 class="text-xl font-semibold mb-4 text-green-700">Add Purchased Coffee</h3>
                             <div id="add-stock-options" class="flex space-x-2 mb-4">
-                                <button data-coffee="tchibo_0.5kg" class="flex-1 bg-gray-200 hover:bg-gray-300 p-2 rounded-md text-sm">Tchibo 0.5Kg</button>
+                                <button data-coffee="tchibo_0_5kg" class="flex-1 bg-gray-200 hover:bg-gray-300 p-2 rounded-md text-sm">Tchibo 0.5Kg</button>
                                 <button data-coffee="tchibo_1kg" class="flex-1 bg-gray-200 hover:bg-gray-300 p-2 rounded-md text-sm">Tchibo 1Kg</button>
                                 <button data-coffee="custom" class="flex-1 bg-gray-200 hover:bg-gray-300 p-2 rounded-md text-sm">Custom</button>
                             </div>
@@ -688,11 +688,11 @@
             // Public listeners that run regardless of auth state
             listeners.push(onSnapshot(query(collection(db, getCollectionPath('coffeeTypes'))), s => {
                 appState.coffeeTypes = s.docs.map(d => ({ id: d.id, ...d.data() }));
-                if (!currentUser) { renderApp(); }
+                if (!currentUser) renderApp();
             }));
             listeners.push(onSnapshot(doc(db, getCollectionPath('financials'), 'summary'), s => {
                 appState.financials = s.exists() ? s.data() : { totalCollected: 0, totalSpent: 0 };
-                if (!currentUser) { renderApp(); }
+                if (!currentUser) renderApp();
             }));
 
             // Authenticated listeners
@@ -756,7 +756,7 @@
                 onAuthStateChanged(auth, user => {
                     detachListeners();
                     currentUser = user;
-                    setupListeners();
+                    setupListeners(); 
                     renderApp();
                 });
 
