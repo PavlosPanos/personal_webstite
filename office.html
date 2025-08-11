@@ -403,7 +403,10 @@
         const renderPayments = () => {
              const paidMemberIds = new Set(appState.activeRoundPayments.map(p => p.userId));
              const unpaidMembers = appState.members.filter(m => !paidMemberIds.has(m.id));
-             const paidMembers = appState.members.filter(m => paidMemberIds.has(m.id));
+             const paidMembers = appState.activeRoundPayments.map(p => {
+                const member = appState.members.find(m => m.id === p.userId);
+                return { ...member, ...p };
+             });
 
             return `
                 <h2 class="text-3xl font-bold mb-6">Payment Rounds</h2>
@@ -412,18 +415,25 @@
                         <h3 class="text-xl font-semibold mb-4">Active Round: ${appState.activeRound ? appState.activeRound.name : 'None'}</h3>
                         ${appState.activeRound ? `
                             <div>
-                                <p class="mb-4">Mark members as paid for <strong>$${appState.activeRound.amountPerPerson.toFixed(2)}</strong></p>
+                                <p class="mb-4">Mark members as paid. Default contribution is <strong>$${appState.activeRound.amountPerPerson.toFixed(2)}</strong>.</p>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <h4 class="font-bold mb-2">Unpaid (${unpaidMembers.length})</h4>
                                         <ul class="space-y-2 max-h-80 overflow-y-auto pr-2">
-                                            ${unpaidMembers.map(member => `<li class="flex justify-between items-center bg-red-50 p-2 rounded-md"><span>${member.name}</span><button data-id="${member.id}" data-name="${member.name}" data-total="${member.totalContributed || 0}" class="mark-paid-btn bg-green-500 text-white text-xs font-bold py-1 px-2 rounded hover:bg-green-600">Mark Paid</button></li>`).join('')}
+                                            ${unpaidMembers.map(member => `
+                                                <li class="flex justify-between items-center bg-red-50 p-2 rounded-md">
+                                                    <span>${member.name}</span>
+                                                    <div class="flex items-center space-x-2">
+                                                        <input type="number" step="0.01" value="${appState.activeRound.amountPerPerson.toFixed(2)}" class="w-20 p-1 border rounded-md text-sm" id="amount-${member.id}">
+                                                        <button data-id="${member.id}" data-name="${member.name}" class="mark-paid-btn bg-green-500 text-white text-xs font-bold py-1 px-2 rounded hover:bg-green-600">Paid</button>
+                                                    </div>
+                                                </li>`).join('')}
                                         </ul>
                                     </div>
                                     <div>
                                         <h4 class="font-bold mb-2">Paid (${paidMembers.length})</h4>
                                         <ul class="space-y-2 max-h-80 overflow-y-auto pr-2">
-                                            ${paidMembers.map(member => `<li class="flex justify-between items-center bg-green-50 p-2 rounded-md text-gray-500"><span>${member.name}</span><span>Paid</span></li>`).join('')}
+                                            ${paidMembers.map(member => `<li class="flex justify-between items-center bg-green-50 p-2 rounded-md text-gray-500"><span>${member.name}</span><span>Paid $${(member.amountPaid || 0).toFixed(2)}</span></li>`).join('')}
                                         </ul>
                                     </div>
                                 </div>
@@ -437,7 +447,7 @@
                             <div class="flex items-center space-x-2">
                                 <input name="name" id="round-name-input" type="text" placeholder="Round Name (e.g., August 2025)" required class="flex-grow p-2 border rounded-md" />
                             </div>
-                            <input name="amount" type="number" step="0.01" placeholder="Amount per person" required class="w-full p-2 border rounded-md" />
+                            <input name="amount" type="number" step="0.01" placeholder="Default Amount per person" required class="w-full p-2 border rounded-md" />
                             <button type="submit" class="w-full bg-amber-500 text-white font-bold py-2 px-4 rounded-md hover:bg-amber-600 transition-colors">Start New Round</button>
                         </form>
                         <h4 class="font-bold mt-6 mb-2">Past Rounds</h4>
@@ -519,8 +529,9 @@
             document.getElementById('start-round-form')?.addEventListener('submit', handleStartNewRound);
             document.querySelectorAll('.mark-paid-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    const { id, name, total } = e.currentTarget.dataset;
-                    handleMarkAsPaid(id, name, parseFloat(total));
+                    const { id, name } = e.currentTarget.dataset;
+                    const amount = parseFloat(document.getElementById(`amount-${id}`).value);
+                    handleMarkAsPaid(id, name, amount);
                 });
             });
         };
@@ -714,13 +725,15 @@
             } catch (error) { console.error("Error starting new round:", error); }
         };
         
-        const handleMarkAsPaid = async (memberId, memberName, memberTotalContributed) => {
-            if (!db || !appState.activeRound) return;
-            const amount = appState.activeRound.amountPerPerson;
+        const handleMarkAsPaid = async (memberId, memberName, amount) => {
+            if (!db || !appState.activeRound || !amount || amount <= 0) {
+                alert("Please enter a valid amount.");
+                return;
+            }
             try {
                 const batch = writeBatch(db);
                 const paymentRef = doc(db, `${getCollectionPath('paymentRounds')}/${appState.activeRound.id}/payments`, memberId);
-                batch.set(paymentRef, { status: 'paid', paymentDate: Timestamp.now(), memberName });
+                batch.set(paymentRef, { status: 'paid', paymentDate: Timestamp.now(), memberName, amountPaid: amount });
                 
                 const memberRef = doc(db, getCollectionPath('users'), memberId);
                 batch.update(memberRef, { totalContributed: increment(amount) });
@@ -815,35 +828,32 @@
         const setupListeners = () => {
             detachListeners();
             
-            if (!currentUser) {
-                // No listeners needed for public view, data is fetched on demand
-                return;
-            }
-
-            // Authenticated listeners
+            // Public listeners that run regardless of auth state
             listeners.push(onSnapshot(query(collection(db, getCollectionPath('coffeeTypes'))), s => {
                 appState.coffeeTypes = s.docs.map(d => ({ id: d.id, ...d.data() }));
-                if(document.getElementById('app-container')) renderCurrentView();
+                if (!currentUser) renderApp();
             }));
-
             listeners.push(onSnapshot(doc(db, getCollectionPath('financials'), 'summary'), s => {
                 appState.financials = s.exists() ? s.data() : { totalCollected: 0, totalSpent: 0 };
-                if(document.getElementById('app-container')) renderCurrentView();
-            }));
-            
-            listeners.push(onSnapshot(query(collection(db, getCollectionPath('inventoryHistory'))), s => { 
-                appState.inventoryHistory = s.docs.map(d => ({ id: d.id, ...d.data() }));
-                appState.inventoryHistory.sort((a, b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0));
-                if(document.getElementById('app-container')) renderCurrentView(); 
+                if (!currentUser) renderApp();
             }));
 
-            listeners.push(onSnapshot(query(collection(db, getCollectionPath('users'))), s => {
-                appState.members = s.docs.map(d => ({ id: d.id, ...d.data() }));
-                if (!isAdmin) {
-                    appState.userProfile = appState.members.find(m => m.email === currentUser.email);
-                }
-                if(document.getElementById('app-container')) renderCurrentView();
-            }));
+            // Authenticated listeners
+            if (currentUser) {
+                listeners.push(onSnapshot(query(collection(db, getCollectionPath('users'))), s => {
+                    appState.members = s.docs.map(d => ({ id: d.id, ...d.data() }));
+                    if (!isAdmin) {
+                        appState.userProfile = appState.members.find(m => m.email === currentUser.email);
+                    }
+                    if(document.getElementById('app-container')) renderCurrentView();
+                }));
+                
+                listeners.push(onSnapshot(query(collection(db, getCollectionPath('inventoryHistory'))), s => { 
+                    appState.inventoryHistory = s.docs.map(d => ({ id: d.id, ...d.data() }));
+                    appState.inventoryHistory.sort((a, b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0));
+                    if(document.getElementById('app-container')) renderCurrentView(); 
+                }));
+            }
 
             // Admin-only listeners
             if (isAdmin) {
