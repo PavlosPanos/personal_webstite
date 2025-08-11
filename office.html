@@ -91,9 +91,7 @@
             coffeeTypes: [],
             financials: { totalCollected: 0, totalSpent: 0 },
             inventoryHistory: [],
-            paymentRounds: [],
-            activeRound: null,
-            activeRoundPayments: [],
+            payments: [],
             activeTab: 'dashboard',
             userProfile: null,
         };
@@ -232,14 +230,14 @@
                 members: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
                 stats: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>`,
                 inventory: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>`,
-                payments: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><line x1="12" y1="2" x2="12" y2="22"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>`,
-                communications: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><path d="m22 2-7 20-4-9-9-4Z"/><path d="m22 2-11 11"/></svg>`
+                payments_log: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><line x1="12" y1="2" x2="12" y2="22"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>`,
+                my_payments: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><line x1="12" y1="2" x2="12" y2="22"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>`
             };
             const navItems = isAdmin 
-                ? ['dashboard', 'members', 'stats', 'inventory', 'payments', 'communications']
-                : ['dashboard', 'members', 'stats'];
+                ? ['dashboard', 'members', 'stats', 'inventory', 'payments_log']
+                : ['dashboard', 'members', 'stats', 'my_payments'];
             navMenu.innerHTML = navItems.map(tab => `
-                <button data-tab="${tab}" class="nav-button flex items-center w-full text-left p-3 my-1 rounded-lg transition-colors duration-200 ${appState.activeTab === tab ? 'bg-amber-500 text-gray-900' : 'hover:bg-gray-700'}">${navIcons[tab]}<span class="capitalize hidden md:inline">${tab}</span></button>
+                <button data-tab="${tab}" class="nav-button flex items-center w-full text-left p-3 my-1 rounded-lg transition-colors duration-200 ${appState.activeTab === tab ? 'bg-amber-500 text-gray-900' : 'hover:bg-gray-700'}">${navIcons[tab]}<span class="capitalize hidden md:inline">${tab.replace('_', ' ')}</span></button>
             `).join('');
 
             switch (appState.activeTab) {
@@ -247,8 +245,8 @@
                 case 'members': mainContent.innerHTML = renderMembers(); attachMemberEventListeners(); break;
                 case 'stats': mainContent.innerHTML = renderStats(); attachStatsEventListeners(); break;
                 case 'inventory': mainContent.innerHTML = renderInventory(); attachInventoryEventListeners(); break;
-                case 'payments': mainContent.innerHTML = renderPayments(); attachPaymentsEventListeners(); break;
-                case 'communications': mainContent.innerHTML = renderCommunications(); attachCommunicationsEventListeners(); break;
+                case 'payments_log': mainContent.innerHTML = renderPaymentsLog(); attachPaymentsEventListeners(); break;
+                case 'my_payments': mainContent.innerHTML = renderMyPayments(); break;
                 default: mainContent.innerHTML = renderDashboard();
             }
         };
@@ -400,84 +398,67 @@
                 </div>`;
         };
         
-        const renderPayments = () => {
-             const paidMemberIds = new Set(appState.activeRoundPayments.map(p => p.userId));
-             const unpaidMembers = appState.members.filter(m => !paidMemberIds.has(m.id));
-             const paidMembers = appState.activeRoundPayments.map(p => {
-                const member = appState.members.find(m => m.id === p.userId);
-                return { ...member, ...p };
-             });
-
+        const renderPaymentsLog = () => {
             return `
-                <h2 class="text-3xl font-bold mb-6">Payment Rounds</h2>
+                <h2 class="text-3xl font-bold mb-6">Payments Log</h2>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
-                        <h3 class="text-xl font-semibold mb-4">Active Round: ${appState.activeRound ? appState.activeRound.name : 'None'}</h3>
-                        ${appState.activeRound ? `
-                            <div>
-                                <p class="mb-4">Mark members as paid. Default contribution is <strong>$${appState.activeRound.amountPerPerson.toFixed(2)}</strong>.</p>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <h4 class="font-bold mb-2">Unpaid (${unpaidMembers.length})</h4>
-                                        <ul class="space-y-2 max-h-80 overflow-y-auto pr-2">
-                                            ${unpaidMembers.map(member => `
-                                                <li class="flex justify-between items-center bg-red-50 p-2 rounded-md">
-                                                    <span>${member.name}</span>
-                                                    <div class="flex items-center space-x-2">
-                                                        <input type="number" step="0.01" value="${appState.activeRound.amountPerPerson.toFixed(2)}" class="w-20 p-1 border rounded-md text-sm" id="amount-${member.id}">
-                                                        <button data-id="${member.id}" data-name="${member.name}" class="mark-paid-btn bg-green-500 text-white text-xs font-bold py-1 px-2 rounded hover:bg-green-600">Paid</button>
-                                                    </div>
-                                                </li>`).join('')}
-                                        </ul>
-                                    </div>
-                                    <div>
-                                        <h4 class="font-bold mb-2">Paid (${paidMembers.length})</h4>
-                                        <ul class="space-y-2 max-h-80 overflow-y-auto pr-2">
-                                            ${paidMembers.map(member => `<li class="flex justify-between items-center bg-green-50 p-2 rounded-md text-gray-500"><span>${member.name}</span><span>Paid $${(member.amountPaid || 0).toFixed(2)}</span></li>`).join('')}
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="mt-6">
-                                    <button id="end-round-btn" class="w-full bg-red-500 text-white font-bold py-2 px-4 rounded-md hover:bg-red-600">End Current Round</button>
-                                </div>
-                            </div>
-                        ` : `<p class="text-gray-500">Start a new round to begin collecting payments.</p>`}
+                        <h3 class="text-xl font-semibold mb-4">Recent Payments</h3>
+                        <div class="overflow-x-auto max-h-96">
+                            <table class="w-full text-left">
+                                <thead><tr class="border-b"><th class="p-2">Date</th><th class="p-2">Name</th><th class="p-2 text-right">Amount</th></tr></thead>
+                                <tbody>
+                                    ${appState.payments.map(p => `
+                                        <tr class="border-b hover:bg-gray-50">
+                                            <td class="p-2 text-sm text-gray-500">${new Date(p.date.toDate()).toLocaleString()}</td>
+                                            <td class="p-2 font-medium">${p.memberName}</td>
+                                            <td class="p-2 text-right font-semibold">$${(p.amount || 0).toFixed(2)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <div class="bg-white p-6 rounded-lg shadow-md">
-                        <h3 class="text-xl font-semibold mb-4">Manage Rounds</h3>
-                        <form id="start-round-form" class="space-y-4 mb-6">
-                            <h4 class="font-bold">Start a New Round</h4>
-                            <div class="flex items-center space-x-2">
-                                <input name="name" id="round-name-input" type="text" placeholder="Round Name (e.g., August 2025)" required class="flex-grow p-2 border rounded-md" />
+                        <h3 class="text-xl font-semibold mb-4">Add a Payment</h3>
+                        <form id="add-payment-form" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Select Member</label>
+                                <select name="memberId" class="w-full p-2 border rounded-md mt-1">
+                                    ${appState.members.map(m => `<option value="${m.id}">${m.name}</option>`).join('')}
+                                </select>
                             </div>
-                            <input name="amount" type="number" step="0.01" placeholder="Default Amount per person" required class="w-full p-2 border rounded-md" />
-                            <button type="submit" class="w-full bg-amber-500 text-white font-bold py-2 px-4 rounded-md hover:bg-amber-600 transition-colors">Start New Round</button>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Amount Paid ($)</label>
+                                <input name="amount" type="number" step="0.01" placeholder="e.g., 15.00" required class="w-full p-2 border rounded-md mt-1" />
+                            </div>
+                            <button type="submit" class="w-full bg-green-500 text-white font-bold py-2 px-4 rounded-md hover:bg-green-600 transition-colors">Log Payment</button>
                         </form>
-                        <h4 class="font-bold mt-6 mb-2">Past Rounds</h4>
-                        <ul class="space-y-2 max-h-48 overflow-y-auto">
-                            ${appState.paymentRounds.filter(r => !r.isActive).map(round => `<li class="text-sm p-2 bg-gray-100 rounded-md">${round.name} - $${round.amountPerPerson.toFixed(2)}</li>`).join('')}
-                        </ul>
                     </div>
-                </div>`;
+                </div>
+            `;
         };
-        const renderCommunications = () => {
+
+        const renderMyPayments = () => {
+            const myPayments = appState.payments.filter(p => p.memberId === appState.userProfile?.id);
             return `
-                <h2 class="text-3xl font-bold mb-6">Communications</h2>
-                <p class="mb-8 text-gray-600">Use the buttons below to generate email drafts using AI. You can then copy the content and send it manually.</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="bg-white p-6 rounded-lg shadow-md flex flex-col items-center text-center">
-                        <h3 class="text-xl font-semibold mb-2">Monthly Newsletter</h3>
-                        <p class="text-gray-500 mb-4 flex-grow">Send an update to all members about current stock levels and recent consumption.</p>
-                        <button id="draft-newsletter-btn" class="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition-colors">✨ Draft Newsletter with AI</button>
+                <h2 class="text-3xl font-bold mb-6">My Payment Statement</h2>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead><tr class="border-b"><th class="p-2">Date</th><th class="p-2 text-right">Amount Paid</th></tr></thead>
+                            <tbody>
+                                ${myPayments.length > 0 ? myPayments.map(p => `
+                                    <tr class="border-b hover:bg-gray-50">
+                                        <td class="p-2 text-sm text-gray-500">${new Date(p.date.toDate()).toLocaleString()}</td>
+                                        <td class="p-2 text-right font-semibold">$${(p.amount || 0).toFixed(2)}</td>
+                                    </tr>
+                                `).join('') : '<tr><td colspan="2" class="p-4 text-center text-gray-500">You have not made any payments yet.</td></tr>'}
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="bg-white p-6 rounded-lg shadow-md flex flex-col items-center text-center">
-                        <h3 class="text-xl font-semibold mb-2">Payment Reminder</h3>
-                        <p class="text-gray-500 mb-4 flex-grow">Notify members that a new payment round has begun.</p>
-                        <button id="draft-reminder-btn" ${!appState.activeRound ? 'disabled' : ''} class="w-full bg-green-500 text-white font-bold py-2 px-4 rounded-md hover:bg-green-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed">
-                            ${appState.activeRound ? '✨ Draft Reminder with AI' : 'No Active Round'}
-                        </button>
-                    </div>
-                </div>`;
+                </div>
+            `;
         };
 
         const renderStats = () => {
@@ -515,6 +496,7 @@
                 </div>
             `;
         };
+        const renderCommunications = () => { return `<!-- Communications View HTML -->`; };
 
         // --- Event Listener Attachment ---
         const attachMemberEventListeners = () => {
@@ -529,20 +511,9 @@
             document.getElementById('reset-coffee-data-btn')?.addEventListener('click', handleResetCoffeeData);
         };
         const attachPaymentsEventListeners = () => {
-            document.getElementById('start-round-form')?.addEventListener('submit', handleStartNewRound);
-            document.getElementById('end-round-btn')?.addEventListener('click', handleEndRound);
-            document.querySelectorAll('.mark-paid-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const { id, name } = e.currentTarget.dataset;
-                    const amount = parseFloat(document.getElementById(`amount-${id}`).value);
-                    handleMarkAsPaid(id, name, amount);
-                });
-            });
+            document.getElementById('add-payment-form')?.addEventListener('submit', handleAddPayment);
         };
-        const attachCommunicationsEventListeners = () => {
-            document.getElementById('draft-newsletter-btn')?.addEventListener('click', handleDraftNewsletter);
-            document.getElementById('draft-reminder-btn')?.addEventListener('click', handleDraftReminder);
-        };
+        const attachCommunicationsEventListeners = () => { /* ... */ };
         const attachStatsEventListeners = () => {
             generateStats();
         };
@@ -710,34 +681,33 @@
             } catch (error) { console.error("Error logging consumption:", error); }
         };
 
-        const handleStartNewRound = async (e) => {
+        const handleAddPayment = async (e) => {
             e.preventDefault();
             const form = e.target;
-            const { name, amount } = form.elements;
-            if (!name.value || !amount.value || !db) return;
-            try {
-                const batch = writeBatch(db);
-                appState.paymentRounds.filter(r => r.isActive).forEach(oldRound => {
-                    batch.update(doc(db, getCollectionPath('paymentRounds'), oldRound.id), { isActive: false });
-                });
-                batch.set(doc(collection(db, getCollectionPath('paymentRounds'))), {
-                    name: name.value, amountPerPerson: parseFloat(amount.value),
-                    startDate: Timestamp.now(), isActive: true
-                });
-                await batch.commit();
-                form.reset();
-            } catch (error) { console.error("Error starting new round:", error); }
-        };
-        
-        const handleMarkAsPaid = async (memberId, memberName, amount) => {
-            if (!db || !appState.activeRound || !amount || amount <= 0) {
-                alert("Please enter a valid amount.");
+            const memberId = form.elements.memberId.value;
+            const amount = parseFloat(form.elements.amount.value);
+
+            if (!memberId || !amount || amount <= 0) {
+                alert("Please select a member and enter a valid amount.");
                 return;
             }
+
+            const member = appState.members.find(m => m.id === memberId);
+            if (!member) {
+                alert("Selected member not found.");
+                return;
+            }
+
             try {
                 const batch = writeBatch(db);
-                const paymentRef = doc(db, `${getCollectionPath('paymentRounds')}/${appState.activeRound.id}/payments`, memberId);
-                batch.set(paymentRef, { status: 'paid', paymentDate: Timestamp.now(), memberName, amountPaid: amount });
+                
+                const paymentRef = doc(collection(db, getCollectionPath('payments')));
+                batch.set(paymentRef, {
+                    memberId: member.id,
+                    memberName: member.name,
+                    amount: amount,
+                    date: serverTimestamp()
+                });
                 
                 const memberRef = doc(db, getCollectionPath('users'), memberId);
                 batch.update(memberRef, { totalContributed: increment(amount) });
@@ -746,19 +716,13 @@
                 batch.set(financialsRef, { totalCollected: increment(amount) }, { merge: true });
 
                 await batch.commit();
-            } catch (error) { console.error("Error marking as paid:", error); }
-        };
-
-        const handleEndRound = async () => {
-            if (!appState.activeRound || !confirm("Are you sure you want to end this payment round?")) return;
-            try {
-                const roundRef = doc(db, getCollectionPath('paymentRounds'), appState.activeRound.id);
-                await updateDoc(roundRef, { isActive: false });
+                form.reset();
             } catch (error) {
-                console.error("Error ending round:", error);
+                console.error("Error adding payment:", error);
+                alert("Failed to add payment.");
             }
         };
-
+        
         const handleResetCoffeeData = async () => {
             if (!isAdmin) return;
             if (!confirm("ARE YOU SURE?\n\nThis will delete ALL coffee types, ALL purchase and consumption history, and reset the total spent to $0. This action cannot be undone.")) {
@@ -867,38 +831,17 @@
                     appState.inventoryHistory.sort((a, b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0));
                     if(document.getElementById('app-container')) renderCurrentView(); 
                 }));
-            }
 
-            // Admin-only listeners
-            if (isAdmin) {
-                listeners.push(onSnapshot(query(collection(db, getCollectionPath('paymentRounds'))), s => {
-                    appState.paymentRounds = s.docs.map(d => ({ id: d.id, ...d.data() }));
-                    appState.paymentRounds.sort((a, b) => (b.startDate?.toMillis() || 0) - (a.startDate?.toMillis() || 0));
-                    const newActiveRound = appState.paymentRounds.find(r => r.isActive) || null;
-                    if (newActiveRound?.id !== appState.activeRound?.id) {
-                        appState.activeRound = newActiveRound;
-                        setupActiveRoundListener();
-                    } else {
-                        appState.activeRound = newActiveRound;
-                    }
+                const paymentsQuery = isAdmin 
+                    ? query(collection(db, getCollectionPath('payments')))
+                    : query(collection(db, getCollectionPath('payments')), where("memberId", "==", currentUser.uid));
+                
+                listeners.push(onSnapshot(paymentsQuery, s => {
+                    appState.payments = s.docs.map(d => ({ id: d.id, ...d.data() }));
+                    appState.payments.sort((a, b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0));
                     if(document.getElementById('app-container')) renderCurrentView();
                 }));
             }
-        };
-
-        let activeRoundUnsubscribe;
-        const setupActiveRoundListener = () => {
-            if (activeRoundUnsubscribe) activeRoundUnsubscribe();
-            if (!appState.activeRound) {
-                appState.activeRoundPayments = [];
-                if(document.getElementById('app-container')) renderCurrentView();
-                return;
-            }
-            const paymentsPath = `${getCollectionPath('paymentRounds')}/${appState.activeRound.id}/payments`;
-            activeRoundUnsubscribe = onSnapshot(query(collection(db, paymentsPath)), s => {
-                appState.activeRoundPayments = s.docs.map(d => ({ userId: d.id, ...d.data() }));
-                if(document.getElementById('app-container')) renderCurrentView();
-            });
         };
 
         const init = () => {
