@@ -122,7 +122,7 @@
 
         // --- Gemini API Call Helper ---
         const callGemini = async (prompt, buttonElement) => {
-            const originalButtonText = buttonElement.innerHTML;
+            const originalButtonHTML = buttonElement.innerHTML;
             buttonElement.disabled = true;
             buttonElement.innerHTML = `<div class="spinner mx-auto"></div>`;
 
@@ -153,7 +153,7 @@
                 return null;
             } finally {
                 buttonElement.disabled = false;
-                buttonElement.innerHTML = originalButtonText;
+                buttonElement.innerHTML = originalButtonHTML;
             }
         };
 
@@ -222,7 +222,7 @@
                     } catch (createError) {
                         showError('login-error', `Registration failed: ${createError.message}`);
                     }
-                } else if (error.code === 'auth/wrong-password'){
+                } else if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential'){
                      showError('login-error', 'Incorrect password. Remember, the default password is "ILoveCoffee".');
                 } else {
                     showError('login-error', `Login failed: ${error.message}`);
@@ -234,10 +234,6 @@
 
         // --- Main App Layout & Navigation ---
         const renderMainLayout = () => {
-            const navItems = isAdmin 
-                ? ['dashboard', 'members', 'inventory', 'payments', 'communications']
-                : ['dashboard', 'members'];
-
             appRoot.innerHTML = `
                 <div id="app-container" class="flex flex-col md:flex-row">
                     <aside class="bg-gray-800 text-white w-full md:w-64 p-4 md:min-h-screen flex flex-col">
@@ -391,7 +387,7 @@
         };
         
         const renderPayments = () => {
-             const paidMemberIds = new Set(appState.activeRoundPayments.filter(p => p.status === 'paid').map(p => p.userId));
+             const paidMemberIds = new Set(appState.activeRoundPayments.map(p => p.userId));
              const unpaidMembers = appState.members.filter(m => !paidMemberIds.has(m.id));
              const paidMembers = appState.members.filter(m => paidMemberIds.has(m.id));
 
@@ -653,7 +649,7 @@
         const handleDraftReminder = async (e) => {
             if (!appState.activeRound) return;
             const btn = e.target;
-            const paidMemberIds = new Set(appState.activeRoundPayments.filter(p => p.status === 'paid').map(p => p.userId));
+            const paidMemberIds = new Set(appState.activeRoundPayments.map(p => p.userId));
             const unpaidMembers = appState.members.filter(m => !paidMemberIds.has(m.id)).map(m => m.name);
             const prompt = `Draft a short, friendly, and slightly humorous reminder email for an office coffee club. The payment round is called "${appState.activeRound.name}" and the amount is $${appState.activeRound.amountPerPerson.toFixed(2)}. The following people still need to pay: ${unpaidMembers.join(', ')}. Gently nudge them to pay up so we can keep the coffee flowing. Format as a simple HTML email body.`;
             const draft = await callGemini(prompt, btn);
@@ -679,19 +675,19 @@
                     const self = appState.members.find(m => m.email === currentUser.email);
                     if (self) appState.userProfile = self;
                 }
-                renderCurrentView();
+                if(document.getElementById('app-container')) renderCurrentView();
             }));
             
             listeners.push(onSnapshot(doc(db, getCollectionPath('inventory'), 'main'), s => {
                 appState.inventory = s.exists() ? s.data() : {};
-                renderCurrentView();
+                if(document.getElementById('app-container')) renderCurrentView();
             }));
 
             if (isAdmin) {
                 listeners.push(onSnapshot(query(collection(db, getCollectionPath('inventoryHistory'))), s => { 
                     appState.inventoryHistory = s.docs.map(d => ({ id: d.id, ...d.data() }));
                     appState.inventoryHistory.sort((a, b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0));
-                    renderCurrentView(); 
+                    if(document.getElementById('app-container')) renderCurrentView(); 
                 }));
                 listeners.push(onSnapshot(query(collection(db, getCollectionPath('paymentRounds'))), s => {
                     appState.paymentRounds = s.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -703,7 +699,7 @@
                     } else {
                         appState.activeRound = newActiveRound;
                     }
-                    renderCurrentView();
+                    if(document.getElementById('app-container')) renderCurrentView();
                 }));
             }
         };
@@ -713,13 +709,13 @@
             if (activeRoundUnsubscribe) activeRoundUnsubscribe();
             if (!appState.activeRound) {
                 appState.activeRoundPayments = [];
-                renderCurrentView();
+                if(document.getElementById('app-container')) renderCurrentView();
                 return;
             }
             const paymentsPath = `${getCollectionPath('paymentRounds')}/${appState.activeRound.id}/payments`;
             activeRoundUnsubscribe = onSnapshot(query(collection(db, paymentsPath)), s => {
                 appState.activeRoundPayments = s.docs.map(d => ({ userId: d.id, ...d.data() }));
-                renderCurrentView();
+                if(document.getElementById('app-container')) renderCurrentView();
             });
         };
 
@@ -738,9 +734,8 @@
                     currentUser = user;
                     if(user) {
                         setupListeners();
-                    } else {
-                        renderApp();
                     }
+                    renderApp();
                 });
 
                 modalCloseBtn.addEventListener('click', closeModal);
