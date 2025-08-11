@@ -51,7 +51,7 @@
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { 
             getFirestore, collection, doc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot,
-            query, where, writeBatch, Timestamp, getDoc, serverTimestamp, increment
+            query, where, writeBatch, Timestamp, getDoc, getDocs, serverTimestamp, increment
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- IMPORTANT: Configuration ---
@@ -247,9 +247,9 @@
                 return `
                     <tr class="border-b hover:bg-gray-50 ${isSelf ? 'bg-amber-50 font-bold' : ''}">
                         <td class="p-2">${member.name}</td>
-                        <td class="p-2 text-gray-600">${isSelf ? member.email : '******'}</td>
-                        <td class="p-2 text-gray-600 hidden md:table-cell">${isSelf ? member.phone : '******'}</td>
-                        <td class="p-2 text-right">${isSelf ? '$' + (member.totalContributed || 0).toFixed(2) : '******'}</td>
+                        <td class="p-2 text-gray-600">${isSelf || isAdmin ? member.email : '******'}</td>
+                        <td class="p-2 text-gray-600 hidden md:table-cell">${isSelf || isAdmin ? member.phone : '******'}</td>
+                        <td class="p-2 text-right">${isSelf || isAdmin ? '$' + (member.totalContributed || 0).toFixed(2) : '******'}</td>
                         ${isAdmin ? `<td class="p-2 text-center"><button data-id="${member.id}" class="delete-member-btn text-red-500 hover:text-red-700 p-1"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button></td>` : ''}
                     </tr>`;
             }).join('');
@@ -280,18 +280,88 @@
                 </div>`;
         };
 
-        const renderInventory = () => { /* Unchanged from previous version */ return `<!-- Inventory View HTML -->`; };
-        const renderPayments = () => { /* Unchanged from previous version */ return `<!-- Payments View HTML -->`; };
-        const renderCommunications = () => { /* Unchanged from previous version */ return `<!-- Communications View HTML -->`; };
+        const renderInventory = () => {
+            return `
+                <h2 class="text-3xl font-bold mb-6">Inventory Management</h2>
+                 <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-center">
+                    <div class="bg-white p-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500">Office Stock</p>
+                        <p class="text-2xl font-bold">${(appState.inventory.officeStockKg || 0).toFixed(2)} kg</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-md">
+                        <p class="text-sm text-gray-500">Warehouse Stock</p>
+                        <p class="text-2xl font-bold">${(appState.inventory.warehouseStockKg || 0).toFixed(2)} kg</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h3 class="text-xl font-semibold mb-4 text-green-700">Add Purchased Coffee</h3>
+                            <form id="add-stock-form" class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Amount Purchased (kg)</label>
+                                    <input name="amount" type="number" step="0.1" placeholder="e.g., 1.0" required class="w-full p-2 border rounded-md mt-1" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Add to</label>
+                                    <select name="location" class="w-full p-2 border rounded-md mt-1">
+                                        <option value="office">Office</option>
+                                        <option value="warehouse">Warehouse</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="w-full bg-green-500 text-white font-bold py-2 px-4 rounded-md hover:bg-green-600 transition-colors">Add Stock</button>
+                            </form>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h3 class="text-xl font-semibold mb-4 text-red-700">Log Consumed Coffee</h3>
+                            <form id="log-consumption-form" class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Amount Consumed (kg)</label>
+                                    <input name="consumption" type="number" step="0.1" placeholder="e.g., 0.5" required class="w-full p-2 border rounded-md mt-1" />
+                                </div>
+                                <p class="text-xs text-gray-500">This will be subtracted from the Office stock.</p>
+                                <button type="submit" class="w-full bg-red-500 text-white font-bold py-2 px-4 rounded-md hover:bg-red-600 transition-colors">Log Consumption</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold mb-4">History</h3>
+                        <ul class="space-y-3 max-h-96 overflow-y-auto pr-2">
+                            ${appState.inventoryHistory.map(log => `
+                                <li class="flex justify-between items-center text-sm border-b pb-2">
+                                    <div>
+                                        <span class="font-semibold ${log.type === 'purchase' ? 'text-green-600' : 'text-red-600'}">${log.type.charAt(0).toUpperCase() + log.type.slice(1)}</span>
+                                        <span class="text-gray-500 text-xs block">${log.date ? new Date(log.date.toDate()).toLocaleString() : '...'}</span>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="font-semibold">${log.amountKg.toFixed(2)} kg ${log.location ? `(${log.location})` : ''}</span>
+                                        ${isAdmin ? `<button data-id="${log.id}" class="delete-tx-btn text-gray-400 hover:text-red-600 ml-2 p-1 text-xs">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                        </button>` : ''}
+                                    </div>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        };
+        
+        const renderPayments = () => { return `<!-- Payments View HTML -->`; };
+        const renderCommunications = () => { return `<!-- Communications View HTML -->`; };
 
         // --- Event Listener Attachment ---
         const attachMemberEventListeners = () => {
             document.getElementById('add-member-form')?.addEventListener('submit', handleAddMember);
             document.querySelectorAll('.delete-member-btn').forEach(btn => btn.addEventListener('click', (e) => handleDeleteMember(e.currentTarget.dataset.id)));
         };
-        const attachInventoryEventListeners = () => { /* Unchanged from previous version */ };
-        const attachPaymentsEventListeners = () => { /* Unchanged from previous version */ };
-        const attachCommunicationsEventListeners = () => { /* Unchanged from previous version */ };
+        const attachInventoryEventListeners = () => {
+            document.getElementById('add-stock-form')?.addEventListener('submit', handleAddStock);
+            document.getElementById('log-consumption-form')?.addEventListener('submit', handleLogConsumption);
+            document.querySelectorAll('.delete-tx-btn').forEach(btn => btn.addEventListener('click', (e) => handleDeleteTransaction(e.currentTarget.dataset.id)));
+        };
+        const attachPaymentsEventListeners = () => { /* ... */ };
+        const attachCommunicationsEventListeners = () => { /* ... */ };
 
         // --- Data Handlers (CRUD) ---
         const handleAddMember = async (e) => {
@@ -301,7 +371,7 @@
             if (!name.value || !email.value || !db) return;
             try {
                 const userQuery = query(collection(db, getCollectionPath('users')), where("email", "==", email.value.toLowerCase()));
-                const querySnapshot = await getDoc(userQuery);
+                const querySnapshot = await getDocs(userQuery); // FIX: Use getDocs for queries
                 if (!querySnapshot.empty) {
                     alert("A member with this email already exists.");
                     return;
@@ -314,10 +384,97 @@
             } catch (error) { console.error("Error adding member:", error); }
         };
 
-        const handleDeleteMember = async (memberId) => { /* Unchanged */ };
-        const handleDeleteTransaction = async (txId) => { /* Unchanged */ };
-        const handleAddStock = async (e) => { /* Unchanged */ };
-        const handleLogConsumption = async (e) => { /* Unchanged */ };
+        const handleDeleteMember = async (memberId) => {
+             if (!isAdmin || !confirm(`Are you sure? This will delete the member's record but NOT their login.`)) return;
+            try {
+                await deleteDoc(doc(db, getCollectionPath('users'), memberId));
+            } catch (error) { console.error("Error deleting member:", error); }
+        };
+        const handleDeleteTransaction = async (txId) => {
+            if (!isAdmin || !confirm(`Are you sure you want to delete this transaction? This will PERMANENTLY affect the total stock count.`)) return;
+            
+            const txDocRef = doc(db, getCollectionPath('inventoryHistory'), txId);
+            try {
+                const txDoc = await getDoc(txDocRef);
+                if (!txDoc.exists()) {
+                    console.error("Transaction not found");
+                    return;
+                }
+                const txData = txDoc.data();
+                const amountToReverse = txData.type === 'purchase' ? -txData.amountKg : txData.amountKg;
+                const locationToUpdate = txData.location === 'office' ? 'officeStockKg' : 'warehouseStockKg';
+
+                const inventoryRef = doc(db, getCollectionPath('inventory'), 'main');
+
+                const batch = writeBatch(db);
+                batch.delete(txDocRef);
+                batch.update(inventoryRef, { [locationToUpdate]: increment(amountToReverse) });
+                await batch.commit();
+
+            } catch (error) {
+                console.error("Error deleting transaction:", error);
+                alert("Error deleting transaction. Check console for details.");
+            }
+        };
+        
+        const handleAddStock = async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const amountKg = parseFloat(form.elements.amount.value);
+            const location = form.elements.location.value;
+            if (!db || amountKg <= 0) return;
+            
+            const inventoryRef = doc(db, getCollectionPath('inventory'), 'main');
+            const historyRef = collection(db, getCollectionPath('inventoryHistory'));
+
+            try {
+                const batch = writeBatch(db);
+                const updateData = {};
+                if (location === 'office') {
+                    updateData.officeStockKg = increment(amountKg);
+                } else {
+                    updateData.warehouseStockKg = increment(amountKg);
+                }
+                batch.update(inventoryRef, updateData);
+                batch.set(doc(historyRef), {
+                    type: 'purchase',
+                    amountKg: amountKg,
+                    location: location,
+                    date: serverTimestamp()
+                });
+                await batch.commit();
+                form.reset();
+            } catch (error) {
+                console.error("Error adding stock:", error);
+            }
+        };
+        const handleLogConsumption = async (e) => {
+             e.preventDefault();
+            const form = e.target;
+            const amountKg = parseFloat(form.elements.consumption.value);
+            if (!db || amountKg <= 0) return;
+
+            if (amountKg > appState.inventory.officeStockKg) {
+                alert("Cannot consume more coffee than is available in the office!");
+                return;
+            }
+
+            const inventoryRef = doc(db, getCollectionPath('inventory'), 'main');
+            const historyRef = collection(db, getCollectionPath('inventoryHistory'));
+            
+            try {
+                const batch = writeBatch(db);
+                batch.update(inventoryRef, { officeStockKg: increment(-amountKg) });
+                batch.set(doc(historyRef), {
+                    type: 'consumption',
+                    amountKg: amountKg,
+                    location: 'office',
+                    date: serverTimestamp()
+                });
+                await batch.commit();
+                form.reset();
+            } catch (error) { console.error("Error logging consumption:", error); }
+        };
 
         // --- Initialization ---
         let listeners = [];
@@ -329,7 +486,6 @@
         const setupListeners = () => {
             detachListeners();
             
-            // Listeners needed by all logged-in users
             const membersQuery = query(collection(db, getCollectionPath('users')));
             listeners.push(onSnapshot(membersQuery, s => {
                 appState.members = s.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -346,13 +502,11 @@
             }));
 
             if (isAdmin) {
-                // Admin-only listeners
                 listeners.push(onSnapshot(query(collection(db, getCollectionPath('inventoryHistory'))), s => { 
                     appState.inventoryHistory = s.docs.map(d => ({ id: d.id, ...d.data() }));
                     appState.inventoryHistory.sort((a, b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0));
                     renderCurrentView(); 
                 }));
-                // ... other admin listeners for payments etc.
             }
         };
 
