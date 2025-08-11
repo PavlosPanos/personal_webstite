@@ -44,7 +44,7 @@
             <div class="flex justify-between items-center p-4 border-b">
                 <h3 id="modal-title" class="text-xl font-semibold"></h3>
                 <button id="modal-close-btn" class="text-gray-400 hover:text-gray-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
             </div>
             <div id="modal-content" class="p-6 prose"></div>
@@ -69,6 +69,7 @@
         // --- IMPORTANT: Configuration ---
         const ADMIN_EMAIL = "pavlospanos@hotmail.com"; // The Coffee Master's email
         const DEFAULT_PASSWORD = "ILoveCoffee"; // Default password for all regular users
+        const GRAMS_PER_CUP = 10; // Assumption for cost per cup calculation
 
         const firebaseConfig = {
           apiKey: "AIzaSyBqThTqWZxNg1nyXpDRNBSM-wPNpDEGodA",
@@ -86,7 +87,8 @@
         let isAdmin = false;
         let appState = {
             members: [],
-            inventory: { officeStockKg: 0, warehouseStockKg: 0 },
+            coffeeTypes: [],
+            financials: { totalCollected: 0, totalSpent: 0 },
             inventoryHistory: [],
             paymentRounds: [],
             activeRound: null,
@@ -120,44 +122,6 @@
             }
         };
 
-        // --- Gemini API Call Helper ---
-        const callGemini = async (prompt, buttonElement) => {
-            const originalButtonHTML = buttonElement.innerHTML;
-            buttonElement.disabled = true;
-            buttonElement.innerHTML = `<div class="spinner mx-auto"></div>`;
-
-            const apiKey = ""; // Provided by the environment
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-            const payload = { contents: [{ parts: [{ text: prompt }] }] };
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    throw new Error(`API request failed with status ${response.status}`);
-                }
-
-                const result = await response.json();
-                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content.parts.length > 0) {
-                    return result.candidates[0].content.parts[0].text;
-                } else {
-                    throw new Error("No content received from API.");
-                }
-            } catch (error) {
-                console.error("Gemini API call failed:", error);
-                alert(`Error calling AI: ${error.message}`);
-                return null;
-            } finally {
-                buttonElement.disabled = false;
-                buttonElement.innerHTML = originalButtonHTML;
-            }
-        };
-
-
         // --- Core Render Function ---
         const renderApp = () => {
             if (!currentUser) {
@@ -170,22 +134,21 @@
 
         // --- Login & Public View ---
         const renderLoginScreen = () => {
-            const docRef = doc(db, getCollectionPath('inventory'), 'main');
-            getDoc(docRef).then(docSnap => {
-                const publicInventory = docSnap.exists() ? docSnap.data() : { officeStockKg: 0, warehouseStockKg: 0 };
-                const totalStock = (publicInventory.officeStockKg || 0) + (publicInventory.warehouseStockKg || 0);
+            Promise.all([
+                getDocs(collection(db, getCollectionPath('coffeeTypes'))),
+                getDoc(doc(db, getCollectionPath('financials'), 'summary'))
+            ]).then(([coffeeSnapshot, financialSnapshot]) => {
+                const publicCoffeeTypes = coffeeSnapshot.docs.map(d => d.data()).filter(c => c.stockKg > 0);
+                const publicFinancials = financialSnapshot.exists() ? financialSnapshot.data() : { totalCollected: 0, totalSpent: 0 };
+                
                 appRoot.innerHTML = `
                     <div class="min-h-screen bg-gray-100 flex flex-col justify-center items-center p-4">
-                        <div class="w-full max-w-md">
+                        <div class="w-full max-w-4xl">
                             <div class="bg-white p-8 rounded-2xl shadow-lg text-center mb-8">
-                                <h2 class="text-2xl font-bold text-gray-800 mb-2">Public Dashboard</h2>
-                                <p class="text-gray-500 mb-4">Current Office Coffee Status</p>
-                                <div class="grid grid-cols-2 gap-4 text-left">
-                                    <div class="bg-amber-50 p-4 rounded-lg"><p class="text-sm text-amber-800">Office Stock</p><p class="text-xl font-bold text-amber-900">${publicInventory.officeStockKg.toFixed(2)} kg</p></div>
-                                    <div class="bg-blue-50 p-4 rounded-lg"><p class="text-sm text-blue-800">Total Stock</p><p class="text-xl font-bold text-blue-900">${totalStock.toFixed(2)} kg</p></div>
-                                </div>
+                                <h2 class="text-3xl font-bold text-gray-800 mb-4">Public Dashboard</h2>
+                                ${renderPublicDashboardContent(publicCoffeeTypes, publicFinancials)}
                             </div>
-                            <div class="bg-white p-8 rounded-2xl shadow-lg">
+                            <div class="bg-white p-8 rounded-2xl shadow-lg max-w-md mx-auto">
                                 <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Coffee Club Login</h2>
                                 <form id="login-form">
                                     <div class="mb-4"><label for="email" class="block text-sm font-medium text-gray-700">Email Address</label><input type="email" name="email" id="email" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500"></div>
@@ -199,7 +162,7 @@
                     </div>`;
                 document.getElementById('login-form').addEventListener('submit', handleLogin);
             }).catch(err => {
-                 appRoot.innerHTML = `<div class="text-center p-8 bg-red-100 border border-red-400 text-red-700 rounded-lg"><h2>Error</h2><p>Could not load public data. Check console for details.</p></div>`;
+                 appRoot.innerHTML = `<div class="text-center p-8 bg-red-100 border border-red-400 text-red-700 rounded-lg"><h2>Error</h2><p>Could not load public data. Please check your Firebase Security Rules.</p></div>`;
                  console.error("Error fetching public data:", err);
             });
         };
@@ -237,7 +200,7 @@
             appRoot.innerHTML = `
                 <div id="app-container" class="flex flex-col md:flex-row">
                     <aside class="bg-gray-800 text-white w-full md:w-64 p-4 md:min-h-screen flex flex-col">
-                        <div class="flex items-center mb-8"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 mr-3 text-amber-400"><path d="M17 8h1a4 4 0 1 1 0 8h-1"></path><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path><line x1="6" x2="6" y1="2" y2="4"></line><line x1="10" x2="10" y1="2" y2="4"></line><line x1="14" x2="14" y1="2" y2="4"></line></svg><h1 class="text-xl font-bold">Coffee Master</h1></div>
+                        <div class="flex items-center mb-8"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 mr-3 text-amber-400"><path d="M17 8h1a4 4 0 1 1 0 8h-1"></path><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path><line x1="6" x2="6" y1="2" y2="4"></line><line x1="10" x2="10" y1="2" y2="4"></line><line x1="14" x2="14" y1="2" y2="4"></line></svg><h1 class="text-xl font-bold">Coffee Master</h1></div>
                         <nav id="nav-menu" class="flex flex-row md:flex-col justify-around md:justify-start"></nav>
                         <div class="mt-auto">
                             <div id="app-info" class="pt-8 text-xs text-gray-400 hidden md:block"><p class="truncate">User: ${currentUser.email}</p>${isAdmin ? '<p class="text-amber-400 font-bold">Admin Access</p>' : ''}</div>
@@ -264,11 +227,11 @@
             if (!mainContent || !navMenu) return;
 
             const navIcons = {
-                dashboard: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
-                members: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
-                inventory: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>`,
-                payments: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><line x1="12" y1="2" x2="12" y2="22"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>`,
-                communications: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><path d="m22 2-7 20-4-9-9-4Z"/><path d="m22 2-11 11"/></svg>`
+                dashboard: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+                members: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+                inventory: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>`,
+                payments: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><line x1="12" y1="2" x2="12" y2="22"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>`,
+                communications: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><path d="m22 2-7 20-4-9-9-4Z"/><path d="m22 2-11 11"/></svg>`
             };
             const navItems = isAdmin 
                 ? ['dashboard', 'members', 'inventory', 'payments', 'communications']
@@ -288,25 +251,51 @@
         };
 
         // --- View-Specific Render Functions ---
-        const renderAdminDashboard = () => {
-            const totalStock = (appState.inventory.officeStockKg || 0) + (appState.inventory.warehouseStockKg || 0);
-            return `<h2 class="text-3xl font-bold mb-6">Admin Dashboard</h2><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"><div class="bg-white p-6 rounded-lg shadow-md">Total Members: <span class="font-bold text-2xl">${appState.members.length}</span></div><div class="bg-white p-6 rounded-lg shadow-md">Total Stock: <span class="font-bold text-2xl">${totalStock.toFixed(2)} kg</span></div><div class="bg-white p-6 rounded-lg shadow-md">Active Round: <span class="font-bold text-xl">${appState.activeRound ? appState.activeRound.name : 'None'}</span></div></div>`;
+        const renderPublicDashboardContent = (coffeeTypes, financials) => {
+            const remainingBalance = (financials.totalCollected || 0) - (financials.totalSpent || 0);
+            return `
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-3">Financial Overview</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
+                            <div class="bg-green-50 p-4 rounded-lg"><p class="text-sm text-green-800">Total Collected</p><p class="text-xl font-bold text-green-900">$${(financials.totalCollected || 0).toFixed(2)}</p></div>
+                            <div class="bg-red-50 p-4 rounded-lg"><p class="text-sm text-red-800">Total Spent</p><p class="text-xl font-bold text-red-900">$${(financials.totalSpent || 0).toFixed(2)}</p></div>
+                            <div class="bg-blue-50 p-4 rounded-lg"><p class="text-sm text-blue-800">Remaining Balance</p><p class="text-xl font-bold text-blue-900">$${remainingBalance.toFixed(2)}</p></div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-3">Current Coffee Stock</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            ${coffeeTypes.length > 0 ? coffeeTypes.map(coffee => `
+                                <div class="bg-gray-50 border rounded-lg p-4 text-left">
+                                    <h4 class="font-bold text-gray-800">${coffee.name}</h4>
+                                    <p class="text-sm text-gray-500">${coffee.brand}</p>
+                                    <p class="mt-2 font-semibold text-lg">${coffee.stockKg.toFixed(2)} kg <span class="text-sm font-normal text-gray-600">remaining</span></p>
+                                    <div class="text-xs mt-2 space-y-1">
+                                        <p><span class="font-semibold">Cost/kg:</span> $${(coffee.costPerKg || 0).toFixed(2)}</p>
+                                        <p><span class="font-semibold">Cost/cup:</span> $${((coffee.costPerKg || 0) / (1000 / GRAMS_PER_CUP)).toFixed(2)} <span class="text-gray-400">(~${GRAMS_PER_CUP}g)</span></p>
+                                    </div>
+                                </div>
+                            `).join('') : '<p class="text-gray-500 col-span-full">No coffee in stock.</p>'}
+                        </div>
+                    </div>
+                </div>
+            `;
         };
 
-        const renderUserDashboard = () => {
-            return `<h2 class="text-3xl font-bold mb-6">Welcome, ${appState.userProfile ? appState.userProfile.name : currentUser.email}!</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div class="bg-white p-6 rounded-lg shadow-md"><p class="text-sm text-gray-500">Your Total Contribution</p><p class="text-3xl font-bold text-green-600">$${(appState.userProfile?.totalContributed || 0).toFixed(2)}</p></div><div class="bg-white p-6 rounded-lg shadow-md"><p class="text-sm text-gray-500">Current Coffee Stock (Office)</p><p class="text-3xl font-bold text-amber-800">${(appState.inventory.officeStockKg || 0).toFixed(2)} kg</p></div></div>`;
-        };
+        const renderAdminDashboard = () => renderPublicDashboardContent(appState.coffeeTypes, appState.financials);
+        const renderUserDashboard = () => renderPublicDashboardContent(appState.coffeeTypes, appState.financials);
 
         const renderMembers = () => {
-            const memberListHTML = appState.members.map(member => {
-                const isSelf = member.email === currentUser.email;
+             const memberListHTML = appState.members.map(member => {
+                const isSelf = currentUser && member.email === currentUser.email;
                 return `
                     <tr class="border-b hover:bg-gray-50 ${isSelf ? 'bg-amber-50 font-bold' : ''}">
                         <td class="p-2">${member.name}</td>
                         <td class="p-2 text-gray-600">${isSelf || isAdmin ? member.email : '******'}</td>
                         <td class="p-2 text-gray-600 hidden md:table-cell">${isSelf || isAdmin ? member.phone : '******'}</td>
                         <td class="p-2 text-right">${isSelf || isAdmin ? '$' + (member.totalContributed || 0).toFixed(2) : '******'}</td>
-                        ${isAdmin ? `<td class="p-2 text-center"><button data-id="${member.id}" class="delete-member-btn text-red-500 hover:text-red-700 p-1"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button></td>` : ''}
+                        ${isAdmin ? `<td class="p-2 text-center"><button data-id="${member.id}" class="delete-member-btn text-red-500 hover:text-red-700 p-1"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button></td>` : ''}
                     </tr>`;
             }).join('');
 
@@ -335,49 +324,52 @@
                     ${addMemberFormHTML}
                 </div>`;
         };
-
         const renderInventory = () => {
             return `
                 <h2 class="text-3xl font-bold mb-6">Inventory Management</h2>
                  <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-center">
-                    <div class="bg-white p-4 rounded-lg shadow-md"><p class="text-sm text-gray-500">Office Stock</p><p class="text-2xl font-bold">${(appState.inventory.officeStockKg || 0).toFixed(2)} kg</p></div>
-                    <div class="bg-white p-4 rounded-lg shadow-md"><p class="text-sm text-gray-500">Warehouse Stock</p><p class="text-2xl font-bold">${(appState.inventory.warehouseStockKg || 0).toFixed(2)} kg</p></div>
+                    <div class="bg-white p-4 rounded-lg shadow-md"><p class="text-sm text-gray-500">Total Office Stock</p><p class="text-2xl font-bold">${(appState.coffeeTypes.reduce((sum, coffee) => sum + (coffee.stockKg || 0), 0)).toFixed(2)} kg</p></div>
+                    <div class="bg-white p-4 rounded-lg shadow-md"><p class="text-sm text-gray-500">Total Spent on Coffee</p><p class="text-2xl font-bold">$${(appState.financials.totalSpent || 0).toFixed(2)}</p></div>
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="lg:col-span-2 grid grid-cols-1">
                         <div class="bg-white p-6 rounded-lg shadow-md">
                             <h3 class="text-xl font-semibold mb-4 text-green-700">Add Purchased Coffee</h3>
                             <form id="add-stock-form" class="space-y-4">
-                                <div><label class="block text-sm font-medium text-gray-700">Coffee Name/Origin</label><input name="coffeeName" type="text" placeholder="e.g., Ethiopian Yirgacheffe" class="w-full p-2 border rounded-md mt-1" /></div>
-                                <div><label class="block text-sm font-medium text-gray-700">Amount Purchased (kg)</label><input name="amount" type="number" step="0.1" placeholder="e.g., 1.0" required class="w-full p-2 border rounded-md mt-1" /></div>
-                                <div><label class="block text-sm font-medium text-gray-700">Add to</label><select name="location" class="w-full p-2 border rounded-md mt-1"><option value="office">Office</option><option value="warehouse">Warehouse</option></select></div>
-                                <div><label class="block text-sm font-medium text-gray-700">Tasting Notes (Optional)</label><textarea name="notes" rows="3" class="w-full p-2 border rounded-md mt-1"></textarea></div>
-                                <button type="button" id="generate-notes-btn" class="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition-colors">✨ Generate Tasting Notes</button>
-                                <button type="submit" class="w-full bg-green-500 text-white font-bold py-2 px-4 rounded-md hover:bg-green-600 transition-colors mt-2">Add Stock</button>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div><label class="block text-sm font-medium text-gray-700">Coffee Name</label><input name="name" type="text" placeholder="e.g., Caffè Crema Vollmundig" required class="w-full p-2 border rounded-md mt-1" /></div>
+                                    <div><label class="block text-sm font-medium text-gray-700">Brand</label><input name="brand" type="text" placeholder="e.g., Tchibo" required class="w-full p-2 border rounded-md mt-1" /></div>
+                                    <div><label class="block text-sm font-medium text-gray-700">Bag Weight (kg)</label><input name="weightKg" type="number" step="0.1" placeholder="e.g., 1.0" required class="w-full p-2 border rounded-md mt-1" /></div>
+                                    <div><label class="block text-sm font-medium text-gray-700">Total Cost ($)</label><input name="totalCost" type="number" step="0.01" placeholder="e.g., 15.50" required class="w-full p-2 border rounded-md mt-1" /></div>
+                                </div>
+                                <button type="submit" class="w-full bg-green-500 text-white font-bold py-2 px-4 rounded-md hover:bg-green-600 transition-colors mt-2">Add Stock Purchase</button>
                             </form>
                         </div>
-                        <div class="bg-white p-6 rounded-lg shadow-md">
+                        <div class="bg-white p-6 rounded-lg shadow-md mt-8">
                             <h3 class="text-xl font-semibold mb-4 text-red-700">Log Consumed Coffee</h3>
                             <form id="log-consumption-form" class="space-y-4">
+                                <div><label class="block text-sm font-medium text-gray-700">Select Coffee</label>
+                                <select name="coffeeId" class="w-full p-2 border rounded-md mt-1">
+                                    ${appState.coffeeTypes.filter(c => c.stockKg > 0).map(c => `<option value="${c.id}">${c.name} (${c.stockKg.toFixed(2)} kg)</option>`).join('')}
+                                </select>
+                                </div>
                                 <div><label class="block text-sm font-medium text-gray-700">Amount Consumed (kg)</label><input name="consumption" type="number" step="0.1" placeholder="e.g., 0.5" required class="w-full p-2 border rounded-md mt-1" /></div>
-                                <p class="text-xs text-gray-500">This will be subtracted from the Office stock.</p>
                                 <button type="submit" class="w-full bg-red-500 text-white font-bold py-2 px-4 rounded-md hover:bg-red-600 transition-colors">Log Consumption</button>
                             </form>
                         </div>
                     </div>
                     <div class="bg-white p-6 rounded-lg shadow-md">
-                        <h3 class="text-xl font-semibold mb-4">History</h3>
+                        <h3 class="text-xl font-semibold mb-4">Purchase History</h3>
                         <ul class="space-y-3 max-h-96 overflow-y-auto pr-2">
-                            ${appState.inventoryHistory.map(log => `
+                            ${appState.inventoryHistory.filter(log => log.type === 'purchase').map(log => `
                                 <li class="flex justify-between items-center text-sm border-b pb-2">
                                     <div>
-                                        <span class="font-semibold ${log.type === 'purchase' ? 'text-green-600' : 'text-red-600'}">${log.name || log.type.charAt(0).toUpperCase() + log.type.slice(1)}</span>
+                                        <span class="font-semibold text-green-600">${log.name}</span>
                                         <span class="text-gray-500 text-xs block">${log.date ? new Date(log.date.toDate()).toLocaleString() : '...'}</span>
-                                        ${log.notes ? `<p class="text-xs text-gray-600 mt-1 italic">"${log.notes}"</p>` : ''}
                                     </div>
                                     <div class="text-right flex-shrink-0 ml-2">
-                                        <span class="font-semibold">${log.amountKg.toFixed(2)} kg ${log.location ? `(${log.location})` : ''}</span>
-                                        ${isAdmin ? `<button data-id="${log.id}" class="delete-tx-btn text-gray-400 hover:text-red-600 p-1 text-xs"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>` : ''}
+                                        <span class="font-semibold">$${(log.totalCost || 0).toFixed(2)}</span>
+                                        ${isAdmin ? `<button data-id="${log.id}" class="delete-tx-btn text-gray-400 hover:text-red-600 p-1 text-xs"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>` : ''}
                                     </div>
                                 </li>
                             `).join('')}
@@ -462,16 +454,17 @@
         const attachInventoryEventListeners = () => {
             document.getElementById('add-stock-form')?.addEventListener('submit', handleAddStock);
             document.getElementById('log-consumption-form')?.addEventListener('submit', handleLogConsumption);
-            document.getElementById('generate-notes-btn')?.addEventListener('click', handleGenerateNotes);
             document.querySelectorAll('.delete-tx-btn').forEach(btn => btn.addEventListener('click', (e) => handleDeleteTransaction(e.currentTarget.dataset.id)));
         };
         const attachPaymentsEventListeners = () => {
             document.getElementById('start-round-form')?.addEventListener('submit', handleStartNewRound);
             document.getElementById('suggest-name-btn')?.addEventListener('click', handleSuggestName);
-            document.querySelectorAll('.mark-paid-btn').forEach(btn => btn.addEventListener('click', (e) => {
-                const { id, name, total } = e.currentTarget.dataset;
-                handleMarkAsPaid(id, name, parseFloat(total));
-            }));
+            document.querySelectorAll('.mark-paid-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const { id, name, total } = e.currentTarget.dataset;
+                    handleMarkAsPaid(id, name, parseFloat(total));
+                });
+            });
         };
         const attachCommunicationsEventListeners = () => {
             document.getElementById('draft-newsletter-btn')?.addEventListener('click', handleDraftNewsletter);
@@ -512,12 +505,22 @@
                 const txDoc = await getDoc(txDocRef);
                 if (!txDoc.exists()) { console.error("Transaction not found"); return; }
                 const txData = txDoc.data();
-                const amountToReverse = txData.type === 'purchase' ? -txData.amountKg : txData.amountKg;
-                const locationToUpdate = txData.location === 'office' ? 'officeStockKg' : 'warehouseStockKg';
-                const inventoryRef = doc(db, getCollectionPath('inventory'), 'main');
+                
                 const batch = writeBatch(db);
                 batch.delete(txDocRef);
-                batch.update(inventoryRef, { [locationToUpdate]: increment(amountToReverse) });
+
+                if (txData.type === 'purchase') {
+                    const coffeeId = txData.name.toLowerCase().replace(/\s+/g, '-');
+                    const coffeeRef = doc(db, getCollectionPath('coffeeTypes'), coffeeId);
+                    batch.update(coffeeRef, { stockKg: increment(-txData.amountKg) });
+                    
+                    const financialsRef = doc(db, getCollectionPath('financials'), 'summary');
+                    batch.update(financialsRef, { totalSpent: increment(-txData.totalCost) });
+                } else if (txData.type === 'consumption') {
+                    const coffeeRef = doc(db, getCollectionPath('coffeeTypes'), txData.coffeeId);
+                    batch.update(coffeeRef, { stockKg: increment(txData.amountKg) });
+                }
+                
                 await batch.commit();
             } catch (error) { console.error("Error deleting transaction:", error); alert("Error deleting transaction."); }
         };
@@ -525,48 +528,45 @@
         const handleAddStock = async (e) => {
             e.preventDefault();
             const form = e.target;
-            const amountKg = parseFloat(form.elements.amount.value);
-            const location = form.elements.location.value;
-            const coffeeName = form.elements.coffeeName.value;
-            const notes = form.elements.notes.value;
-            if (!db || amountKg <= 0) return;
-            
-            const inventoryRef = doc(db, getCollectionPath('inventory'), 'main');
-            const historyRef = collection(db, getCollectionPath('inventoryHistory'));
+            const name = form.elements.name.value;
+            const brand = form.elements.brand.value;
+            const weightKg = parseFloat(form.elements.weightKg.value);
+            const totalCost = parseFloat(form.elements.totalCost.value);
+            if (!name || !brand || !weightKg || !totalCost) { alert("Please fill in all fields."); return; }
+
+            const coffeeId = name.toLowerCase().replace(/\s+/g, '-');
+            const costPerKg = totalCost / weightKg;
+
+            const coffeeRef = doc(db, getCollectionPath('coffeeTypes'), coffeeId);
+            const financialsRef = doc(db, getCollectionPath('financials'), 'summary');
+            const historyRef = doc(collection(db, getCollectionPath('inventoryHistory')));
 
             try {
                 const batch = writeBatch(db);
-                const updateData = {};
-                if (location === 'office') {
-                    updateData.officeStockKg = increment(amountKg);
-                } else {
-                    updateData.warehouseStockKg = increment(amountKg);
-                }
-                batch.update(inventoryRef, updateData);
-                batch.set(doc(historyRef), {
-                    type: 'purchase',
-                    name: coffeeName,
-                    amountKg: amountKg,
-                    location: location,
-                    notes: notes,
-                    date: serverTimestamp()
-                });
+                batch.set(coffeeRef, { name, brand, stockKg: increment(weightKg), costPerKg }, { merge: true });
+                batch.set(financialsRef, { totalSpent: increment(totalCost) }, { merge: true });
+                batch.set(historyRef, { type: 'purchase', name, amountKg: weightKg, totalCost, date: serverTimestamp() });
                 await batch.commit();
                 form.reset();
-            } catch (error) { console.error("Error adding stock:", error); }
+            } catch (error) { console.error("Error adding stock:", error); alert("Failed to add stock."); }
         };
         const handleLogConsumption = async (e) => {
-             e.preventDefault();
+            e.preventDefault();
             const form = e.target;
+            const coffeeId = form.elements.coffeeId.value;
             const amountKg = parseFloat(form.elements.consumption.value);
-            if (!db || amountKg <= 0) return;
-            if (amountKg > appState.inventory.officeStockKg) { alert("Cannot consume more coffee than is available in the office!"); return; }
-            const inventoryRef = doc(db, getCollectionPath('inventory'), 'main');
-            const historyRef = collection(db, getCollectionPath('inventoryHistory'));
+            if (!db || !coffeeId || amountKg <= 0) return;
+
+            const selectedCoffee = appState.coffeeTypes.find(c => c.id === coffeeId);
+            if (!selectedCoffee || amountKg > selectedCoffee.stockKg) { alert("Cannot consume more coffee than is available!"); return; }
+
+            const coffeeRef = doc(db, getCollectionPath('coffeeTypes'), coffeeId);
+            const historyRef = doc(collection(db, getCollectionPath('inventoryHistory')));
+            
             try {
                 const batch = writeBatch(db);
-                batch.update(inventoryRef, { officeStockKg: increment(-amountKg) });
-                batch.set(doc(historyRef), { type: 'consumption', amountKg: amountKg, location: 'office', date: serverTimestamp() });
+                batch.update(coffeeRef, { stockKg: increment(-amountKg) });
+                batch.set(historyRef, { type: 'consumption', coffeeId, name: selectedCoffee.name, amountKg, date: serverTimestamp() });
                 await batch.commit();
                 form.reset();
             } catch (error) { console.error("Error logging consumption:", error); }
@@ -593,27 +593,20 @@
         
         const handleMarkAsPaid = async (memberId, memberName, memberTotalContributed) => {
             if (!db || !appState.activeRound) return;
+            const amount = appState.activeRound.amountPerPerson;
             try {
                 const batch = writeBatch(db);
                 const paymentRef = doc(db, `${getCollectionPath('paymentRounds')}/${appState.activeRound.id}/payments`, memberId);
                 batch.set(paymentRef, { status: 'paid', paymentDate: Timestamp.now(), memberName });
+                
                 const memberRef = doc(db, getCollectionPath('users'), memberId);
-                const newTotal = (memberTotalContributed || 0) + appState.activeRound.amountPerPerson;
-                batch.update(memberRef, { totalContributed: newTotal });
+                batch.update(memberRef, { totalContributed: increment(amount) });
+
+                const financialsRef = doc(db, getCollectionPath('financials'), 'summary');
+                batch.set(financialsRef, { totalCollected: increment(amount) }, { merge: true });
+
                 await batch.commit();
             } catch (error) { console.error("Error marking as paid:", error); }
-        };
-
-        const handleGenerateNotes = async (e) => {
-            const btn = e.target;
-            const form = btn.closest('form');
-            const coffeeName = form.elements.coffeeName.value;
-            if (!coffeeName) { alert("Please enter a coffee name first."); return; }
-            const prompt = `Generate a short, appealing description and tasting notes for a coffee called "${coffeeName}". Make it sound delicious for an office coffee club. Format it as a single paragraph.`;
-            const notes = await callGemini(prompt, btn);
-            if (notes) {
-                form.elements.notes.value = notes;
-            }
         };
 
         const handleSuggestName = async (e) => {
@@ -636,8 +629,8 @@
         const handleDraftNewsletter = async (e) => {
             const btn = e.target;
             const prompt = `Draft a fun and friendly monthly newsletter for an office coffee club. Here's the data:
-            - Current office stock: ${appState.inventory.officeStockKg.toFixed(2)} kg
-            - Current warehouse stock: ${appState.inventory.warehouseStockKg.toFixed(2)} kg
+            - Remaining balance: $${(appState.financials.totalCollected - appState.financials.totalSpent).toFixed(2)}
+            - Coffee in stock: ${appState.coffeeTypes.filter(c => c.stockKg > 0).map(c => `${c.name} (${c.stockKg.toFixed(2)} kg)`).join(', ')}
             - Active payment round: ${appState.activeRound ? `"${appState.activeRound.name}" for $${appState.activeRound.amountPerPerson.toFixed(2)}` : "None"}
             Keep the tone light and humorous. Mention the stock levels and gently remind people about the payment round if it's active. Format as a simple HTML email body.`;
             const draft = await callGemini(prompt, btn);
@@ -657,7 +650,7 @@
                 showModal("AI-Drafted Reminder", draft);
             }
         };
-
+        
         // --- Initialization ---
         let listeners = [];
         const detachListeners = () => {
@@ -668,21 +661,28 @@
         const setupListeners = () => {
             detachListeners();
             
-            const membersQuery = query(collection(db, getCollectionPath('users')));
-            listeners.push(onSnapshot(membersQuery, s => {
-                appState.members = s.docs.map(d => ({ id: d.id, ...d.data() }));
-                if (!isAdmin) {
-                    const self = appState.members.find(m => m.email === currentUser.email);
-                    if (self) appState.userProfile = self;
-                }
-                if(document.getElementById('app-container')) renderCurrentView();
+            // Public listeners that run regardless of auth state
+            listeners.push(onSnapshot(query(collection(db, getCollectionPath('coffeeTypes'))), s => {
+                appState.coffeeTypes = s.docs.map(d => ({ id: d.id, ...d.data() }));
+                if (!currentUser) renderApp();
             }));
-            
-            listeners.push(onSnapshot(doc(db, getCollectionPath('inventory'), 'main'), s => {
-                appState.inventory = s.exists() ? s.data() : {};
-                if(document.getElementById('app-container')) renderCurrentView();
+            listeners.push(onSnapshot(doc(db, getCollectionPath('financials'), 'summary'), s => {
+                appState.financials = s.exists() ? s.data() : { totalCollected: 0, totalSpent: 0 };
+                if (!currentUser) renderApp();
             }));
 
+            // Authenticated listeners
+            if (currentUser) {
+                listeners.push(onSnapshot(query(collection(db, getCollectionPath('users'))), s => {
+                    appState.members = s.docs.map(d => ({ id: d.id, ...d.data() }));
+                    if (!isAdmin) {
+                        appState.userProfile = appState.members.find(m => m.email === currentUser.email);
+                    }
+                    if(document.getElementById('app-container')) renderCurrentView();
+                }));
+            }
+
+            // Admin-only listeners
             if (isAdmin) {
                 listeners.push(onSnapshot(query(collection(db, getCollectionPath('inventoryHistory'))), s => { 
                     appState.inventoryHistory = s.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -732,9 +732,7 @@
                 onAuthStateChanged(auth, user => {
                     detachListeners();
                     currentUser = user;
-                    if(user) {
-                        setupListeners();
-                    }
+                    setupListeners(); // This will now correctly handle both logged-out and logged-in states
                     renderApp();
                 });
 
