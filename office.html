@@ -160,7 +160,6 @@
             try {
                 await signInWithEmailAndPassword(auth, email.value, password.value);
             } catch (error) {
-                // FIX: Handle modern 'auth/invalid-credential' error code for new user creation.
                 if ((error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') && password.value === DEFAULT_PASSWORD) {
                     try {
                         const userQuery = query(collection(db, getCollectionPath('users')), where("email", "==", email.value.toLowerCase()));
@@ -187,7 +186,7 @@
         const renderMainLayout = () => {
             const navItems = isAdmin 
                 ? ['dashboard', 'members', 'inventory', 'payments', 'communications']
-                : ['dashboard', 'members']; // Users can now see the members tab
+                : ['dashboard', 'members'];
 
             appRoot.innerHTML = `
                 <div id="app-container" class="flex flex-col md:flex-row">
@@ -202,6 +201,23 @@
                     <main id="main-content" class="flex-1 p-4 sm:p-6 lg:p-8"></main>
                 </div>`;
             
+            document.getElementById('logout-btn').addEventListener('click', handleLogout);
+            document.getElementById('nav-menu').addEventListener('click', (e) => {
+                const button = e.target.closest('.nav-button');
+                if (button) {
+                    appState.activeTab = button.dataset.tab;
+                    renderCurrentView(); // FIX: Just re-render the content, not the whole layout
+                }
+            });
+            renderCurrentView(); // Initial render
+        };
+        
+        const renderCurrentView = () => {
+            const mainContent = document.getElementById('main-content');
+            const navMenu = document.getElementById('nav-menu');
+            if (!mainContent || !navMenu) return;
+
+            // FIX: Update nav button styles without re-rendering the whole sidebar
             const navIcons = {
                 dashboard: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
                 members: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
@@ -209,25 +225,13 @@
                 payments: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><line x1="12" y1="2" x2="12" y2="22"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>`,
                 communications: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><path d="m22 2-7 20-4-9-9-4Z"/><path d="m22 2-11 11"/></svg>`
             };
-
-            document.getElementById('nav-menu').innerHTML = navItems.map(tab => `
+            const navItems = isAdmin 
+                ? ['dashboard', 'members', 'inventory', 'payments', 'communications']
+                : ['dashboard', 'members'];
+            navMenu.innerHTML = navItems.map(tab => `
                 <button data-tab="${tab}" class="nav-button flex items-center w-full text-left p-3 my-1 rounded-lg transition-colors duration-200 ${appState.activeTab === tab ? 'bg-amber-500 text-gray-900' : 'hover:bg-gray-700'}">${navIcons[tab]}<span class="capitalize hidden md:inline">${tab}</span></button>
             `).join('');
-            
-            document.getElementById('logout-btn').addEventListener('click', handleLogout);
-            document.getElementById('nav-menu').addEventListener('click', (e) => {
-                const button = e.target.closest('.nav-button');
-                if (button) {
-                    appState.activeTab = button.dataset.tab;
-                    renderCurrentView();
-                }
-            });
-            renderCurrentView();
-        };
-        
-        const renderCurrentView = () => {
-            const mainContent = document.getElementById('main-content');
-            if (!mainContent) return;
+
             switch (appState.activeTab) {
                 case 'dashboard': mainContent.innerHTML = isAdmin ? renderAdminDashboard() : renderUserDashboard(); break;
                 case 'members': mainContent.innerHTML = renderMembers(); attachMemberEventListeners(); break;
@@ -392,14 +396,13 @@
         };
 
         const handleDeleteMember = async (memberId) => {
-            // FIX: Removed confirm() which can be blocked. Admin action is now immediate.
             if (!isAdmin) return;
             try {
                 await deleteDoc(doc(db, getCollectionPath('users'), memberId));
             } catch (error) { console.error("Error deleting member:", error); }
         };
         const handleDeleteTransaction = async (txId) => {
-            if (!isAdmin || !confirm(`Are you sure you want to delete this transaction? This will PERMANENTLY affect the total stock count.`)) return;
+            if (!isAdmin) return;
             
             const txDocRef = doc(db, getCollectionPath('inventoryHistory'), txId);
             try {
@@ -533,8 +536,9 @@
                     currentUser = user;
                     if(user) {
                         setupListeners();
+                    } else {
+                        renderApp();
                     }
-                    renderApp();
                 });
 
                 modalCloseBtn.addEventListener('click', closeModal);
