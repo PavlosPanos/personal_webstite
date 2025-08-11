@@ -15,6 +15,18 @@
         ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #555; }
         .prose { max-width: none; }
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -26,7 +38,7 @@
         </div>
     </div>
 
-    <!-- Modal (used for email previews) -->
+    <!-- Modal (used for email previews and suggestions) -->
     <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
         <div class="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-full overflow-y-auto">
             <div class="flex justify-between items-center p-4 border-b">
@@ -107,6 +119,44 @@
                 errorEl.classList.remove('hidden');
             }
         };
+
+        // --- Gemini API Call Helper ---
+        const callGemini = async (prompt, buttonElement) => {
+            const originalButtonText = buttonElement.innerHTML;
+            buttonElement.disabled = true;
+            buttonElement.innerHTML = `<div class="spinner mx-auto"></div>`;
+
+            const apiKey = ""; // Provided by the environment
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const payload = { contents: [{ parts: [{ text: prompt }] }] };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API request failed with status ${response.status}`);
+                }
+
+                const result = await response.json();
+                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content.parts.length > 0) {
+                    return result.candidates[0].content.parts[0].text;
+                } else {
+                    throw new Error("No content received from API.");
+                }
+            } catch (error) {
+                console.error("Gemini API call failed:", error);
+                alert(`Error calling AI: ${error.message}`);
+                return null;
+            } finally {
+                buttonElement.disabled = false;
+                buttonElement.innerHTML = originalButtonText;
+            }
+        };
+
 
         // --- Core Render Function ---
         const renderApp = () => {
@@ -206,10 +256,10 @@
                 const button = e.target.closest('.nav-button');
                 if (button) {
                     appState.activeTab = button.dataset.tab;
-                    renderCurrentView(); // FIX: Just re-render the content, not the whole layout
+                    renderCurrentView();
                 }
             });
-            renderCurrentView(); // Initial render
+            renderCurrentView();
         };
         
         const renderCurrentView = () => {
@@ -217,7 +267,6 @@
             const navMenu = document.getElementById('nav-menu');
             if (!mainContent || !navMenu) return;
 
-            // FIX: Update nav button styles without re-rendering the whole sidebar
             const navIcons = {
                 dashboard: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
                 members: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
@@ -295,41 +344,26 @@
             return `
                 <h2 class="text-3xl font-bold mb-6">Inventory Management</h2>
                  <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-center">
-                    <div class="bg-white p-4 rounded-lg shadow-md">
-                        <p class="text-sm text-gray-500">Office Stock</p>
-                        <p class="text-2xl font-bold">${(appState.inventory.officeStockKg || 0).toFixed(2)} kg</p>
-                    </div>
-                    <div class="bg-white p-4 rounded-lg shadow-md">
-                        <p class="text-sm text-gray-500">Warehouse Stock</p>
-                        <p class="text-2xl font-bold">${(appState.inventory.warehouseStockKg || 0).toFixed(2)} kg</p>
-                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-md"><p class="text-sm text-gray-500">Office Stock</p><p class="text-2xl font-bold">${(appState.inventory.officeStockKg || 0).toFixed(2)} kg</p></div>
+                    <div class="bg-white p-4 rounded-lg shadow-md"><p class="text-sm text-gray-500">Warehouse Stock</p><p class="text-2xl font-bold">${(appState.inventory.warehouseStockKg || 0).toFixed(2)} kg</p></div>
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div class="bg-white p-6 rounded-lg shadow-md">
                             <h3 class="text-xl font-semibold mb-4 text-green-700">Add Purchased Coffee</h3>
                             <form id="add-stock-form" class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Amount Purchased (kg)</label>
-                                    <input name="amount" type="number" step="0.1" placeholder="e.g., 1.0" required class="w-full p-2 border rounded-md mt-1" />
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Add to</label>
-                                    <select name="location" class="w-full p-2 border rounded-md mt-1">
-                                        <option value="office">Office</option>
-                                        <option value="warehouse">Warehouse</option>
-                                    </select>
-                                </div>
-                                <button type="submit" class="w-full bg-green-500 text-white font-bold py-2 px-4 rounded-md hover:bg-green-600 transition-colors">Add Stock</button>
+                                <div><label class="block text-sm font-medium text-gray-700">Coffee Name/Origin</label><input name="coffeeName" type="text" placeholder="e.g., Ethiopian Yirgacheffe" class="w-full p-2 border rounded-md mt-1" /></div>
+                                <div><label class="block text-sm font-medium text-gray-700">Amount Purchased (kg)</label><input name="amount" type="number" step="0.1" placeholder="e.g., 1.0" required class="w-full p-2 border rounded-md mt-1" /></div>
+                                <div><label class="block text-sm font-medium text-gray-700">Add to</label><select name="location" class="w-full p-2 border rounded-md mt-1"><option value="office">Office</option><option value="warehouse">Warehouse</option></select></div>
+                                <div><label class="block text-sm font-medium text-gray-700">Tasting Notes (Optional)</label><textarea name="notes" rows="3" class="w-full p-2 border rounded-md mt-1"></textarea></div>
+                                <button type="button" id="generate-notes-btn" class="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition-colors">✨ Generate Tasting Notes</button>
+                                <button type="submit" class="w-full bg-green-500 text-white font-bold py-2 px-4 rounded-md hover:bg-green-600 transition-colors mt-2">Add Stock</button>
                             </form>
                         </div>
                         <div class="bg-white p-6 rounded-lg shadow-md">
                             <h3 class="text-xl font-semibold mb-4 text-red-700">Log Consumed Coffee</h3>
                             <form id="log-consumption-form" class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Amount Consumed (kg)</label>
-                                    <input name="consumption" type="number" step="0.1" placeholder="e.g., 0.5" required class="w-full p-2 border rounded-md mt-1" />
-                                </div>
+                                <div><label class="block text-sm font-medium text-gray-700">Amount Consumed (kg)</label><input name="consumption" type="number" step="0.1" placeholder="e.g., 0.5" required class="w-full p-2 border rounded-md mt-1" /></div>
                                 <p class="text-xs text-gray-500">This will be subtracted from the Office stock.</p>
                                 <button type="submit" class="w-full bg-red-500 text-white font-bold py-2 px-4 rounded-md hover:bg-red-600 transition-colors">Log Consumption</button>
                             </form>
@@ -341,25 +375,88 @@
                             ${appState.inventoryHistory.map(log => `
                                 <li class="flex justify-between items-center text-sm border-b pb-2">
                                     <div>
-                                        <span class="font-semibold ${log.type === 'purchase' ? 'text-green-600' : 'text-red-600'}">${log.type.charAt(0).toUpperCase() + log.type.slice(1)}</span>
+                                        <span class="font-semibold ${log.type === 'purchase' ? 'text-green-600' : 'text-red-600'}">${log.name || log.type.charAt(0).toUpperCase() + log.type.slice(1)}</span>
                                         <span class="text-gray-500 text-xs block">${log.date ? new Date(log.date.toDate()).toLocaleString() : '...'}</span>
+                                        ${log.notes ? `<p class="text-xs text-gray-600 mt-1 italic">"${log.notes}"</p>` : ''}
                                     </div>
-                                    <div class="text-right">
+                                    <div class="text-right flex-shrink-0 ml-2">
                                         <span class="font-semibold">${log.amountKg.toFixed(2)} kg ${log.location ? `(${log.location})` : ''}</span>
-                                        ${isAdmin ? `<button data-id="${log.id}" class="delete-tx-btn text-gray-400 hover:text-red-600 ml-2 p-1 text-xs">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                        </button>` : ''}
+                                        ${isAdmin ? `<button data-id="${log.id}" class="delete-tx-btn text-gray-400 hover:text-red-600 p-1 text-xs"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>` : ''}
                                     </div>
                                 </li>
                             `).join('')}
                         </ul>
                     </div>
-                </div>
-            `;
+                </div>`;
         };
         
-        const renderPayments = () => { return `<!-- Payments View HTML -->`; };
-        const renderCommunications = () => { return `<!-- Communications View HTML -->`; };
+        const renderPayments = () => {
+             const paidMemberIds = new Set(appState.activeRoundPayments.filter(p => p.status === 'paid').map(p => p.userId));
+             const unpaidMembers = appState.members.filter(m => !paidMemberIds.has(m.id));
+             const paidMembers = appState.members.filter(m => paidMemberIds.has(m.id));
+
+            return `
+                <h2 class="text-3xl font-bold mb-6">Payment Rounds</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold mb-4">Active Round: ${appState.activeRound ? appState.activeRound.name : 'None'}</h3>
+                        ${appState.activeRound ? `
+                            <div>
+                                <p class="mb-4">Mark members as paid for <strong>$${appState.activeRound.amountPerPerson.toFixed(2)}</strong></p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <h4 class="font-bold mb-2">Unpaid (${unpaidMembers.length})</h4>
+                                        <ul class="space-y-2 max-h-80 overflow-y-auto pr-2">
+                                            ${unpaidMembers.map(member => `<li class="flex justify-between items-center bg-red-50 p-2 rounded-md"><span>${member.name}</span><button data-id="${member.id}" data-name="${member.name}" data-total="${member.totalContributed || 0}" class="mark-paid-btn bg-green-500 text-white text-xs font-bold py-1 px-2 rounded hover:bg-green-600">Mark Paid</button></li>`).join('')}
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold mb-2">Paid (${paidMembers.length})</h4>
+                                        <ul class="space-y-2 max-h-80 overflow-y-auto pr-2">
+                                            ${paidMembers.map(member => `<li class="flex justify-between items-center bg-green-50 p-2 rounded-md text-gray-500"><span>${member.name}</span><span>Paid</span></li>`).join('')}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        ` : `<p class="text-gray-500">Start a new round to begin collecting payments.</p>`}
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold mb-4">Manage Rounds</h3>
+                        <form id="start-round-form" class="space-y-4 mb-6">
+                            <h4 class="font-bold">Start a New Round</h4>
+                            <div class="flex items-center space-x-2">
+                                <input name="name" id="round-name-input" type="text" placeholder="Round Name (e.g., August 2025)" required class="flex-grow p-2 border rounded-md" />
+                                <button type="button" id="suggest-name-btn" class="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600" title="Suggest a name">✨</button>
+                            </div>
+                            <input name="amount" type="number" step="0.01" placeholder="Amount per person" required class="w-full p-2 border rounded-md" />
+                            <button type="submit" class="w-full bg-amber-500 text-white font-bold py-2 px-4 rounded-md hover:bg-amber-600 transition-colors">Start New Round</button>
+                        </form>
+                        <h4 class="font-bold mt-6 mb-2">Past Rounds</h4>
+                        <ul class="space-y-2 max-h-48 overflow-y-auto">
+                            ${appState.paymentRounds.filter(r => !r.isActive).map(round => `<li class="text-sm p-2 bg-gray-100 rounded-md">${round.name} - $${round.amountPerPerson.toFixed(2)}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>`;
+        };
+        const renderCommunications = () => {
+            return `
+                <h2 class="text-3xl font-bold mb-6">Communications</h2>
+                <p class="mb-8 text-gray-600">Use the buttons below to generate email drafts using AI. You can then copy the content and send it manually.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-md flex flex-col items-center text-center">
+                        <h3 class="text-xl font-semibold mb-2">Monthly Newsletter</h3>
+                        <p class="text-gray-500 mb-4 flex-grow">Send an update to all members about current stock levels and recent consumption.</p>
+                        <button id="draft-newsletter-btn" class="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition-colors">✨ Draft Newsletter with AI</button>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md flex flex-col items-center text-center">
+                        <h3 class="text-xl font-semibold mb-2">Payment Reminder</h3>
+                        <p class="text-gray-500 mb-4 flex-grow">Notify members that a new payment round has begun.</p>
+                        <button id="draft-reminder-btn" ${!appState.activeRound ? 'disabled' : ''} class="w-full bg-green-500 text-white font-bold py-2 px-4 rounded-md hover:bg-green-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed">
+                            ${appState.activeRound ? '✨ Draft Reminder with AI' : 'No Active Round'}
+                        </button>
+                    </div>
+                </div>`;
+        };
 
         // --- Event Listener Attachment ---
         const attachMemberEventListeners = () => {
@@ -369,12 +466,23 @@
         const attachInventoryEventListeners = () => {
             document.getElementById('add-stock-form')?.addEventListener('submit', handleAddStock);
             document.getElementById('log-consumption-form')?.addEventListener('submit', handleLogConsumption);
+            document.getElementById('generate-notes-btn')?.addEventListener('click', handleGenerateNotes);
             document.querySelectorAll('.delete-tx-btn').forEach(btn => btn.addEventListener('click', (e) => handleDeleteTransaction(e.currentTarget.dataset.id)));
         };
-        const attachPaymentsEventListeners = () => { /* ... */ };
-        const attachCommunicationsEventListeners = () => { /* ... */ };
+        const attachPaymentsEventListeners = () => {
+            document.getElementById('start-round-form')?.addEventListener('submit', handleStartNewRound);
+            document.getElementById('suggest-name-btn')?.addEventListener('click', handleSuggestName);
+            document.querySelectorAll('.mark-paid-btn').forEach(btn => btn.addEventListener('click', (e) => {
+                const { id, name, total } = e.currentTarget.dataset;
+                handleMarkAsPaid(id, name, parseFloat(total));
+            }));
+        };
+        const attachCommunicationsEventListeners = () => {
+            document.getElementById('draft-newsletter-btn')?.addEventListener('click', handleDraftNewsletter);
+            document.getElementById('draft-reminder-btn')?.addEventListener('click', handleDraftReminder);
+        };
 
-        // --- Data Handlers (CRUD) ---
+        // --- Data Handlers (CRUD & AI) ---
         const handleAddMember = async (e) => {
             e.preventDefault();
             const form = e.target;
@@ -403,29 +511,19 @@
         };
         const handleDeleteTransaction = async (txId) => {
             if (!isAdmin) return;
-            
             const txDocRef = doc(db, getCollectionPath('inventoryHistory'), txId);
             try {
                 const txDoc = await getDoc(txDocRef);
-                if (!txDoc.exists()) {
-                    console.error("Transaction not found");
-                    return;
-                }
+                if (!txDoc.exists()) { console.error("Transaction not found"); return; }
                 const txData = txDoc.data();
                 const amountToReverse = txData.type === 'purchase' ? -txData.amountKg : txData.amountKg;
                 const locationToUpdate = txData.location === 'office' ? 'officeStockKg' : 'warehouseStockKg';
-
                 const inventoryRef = doc(db, getCollectionPath('inventory'), 'main');
-
                 const batch = writeBatch(db);
                 batch.delete(txDocRef);
                 batch.update(inventoryRef, { [locationToUpdate]: increment(amountToReverse) });
                 await batch.commit();
-
-            } catch (error) {
-                console.error("Error deleting transaction:", error);
-                alert("Error deleting transaction. Check console for details.");
-            }
+            } catch (error) { console.error("Error deleting transaction:", error); alert("Error deleting transaction."); }
         };
         
         const handleAddStock = async (e) => {
@@ -433,6 +531,8 @@
             const form = e.target;
             const amountKg = parseFloat(form.elements.amount.value);
             const location = form.elements.location.value;
+            const coffeeName = form.elements.coffeeName.value;
+            const notes = form.elements.notes.value;
             if (!db || amountKg <= 0) return;
             
             const inventoryRef = doc(db, getCollectionPath('inventory'), 'main');
@@ -449,42 +549,117 @@
                 batch.update(inventoryRef, updateData);
                 batch.set(doc(historyRef), {
                     type: 'purchase',
+                    name: coffeeName,
                     amountKg: amountKg,
                     location: location,
+                    notes: notes,
                     date: serverTimestamp()
                 });
                 await batch.commit();
                 form.reset();
-            } catch (error) {
-                console.error("Error adding stock:", error);
-            }
+            } catch (error) { console.error("Error adding stock:", error); }
         };
         const handleLogConsumption = async (e) => {
              e.preventDefault();
             const form = e.target;
             const amountKg = parseFloat(form.elements.consumption.value);
             if (!db || amountKg <= 0) return;
-
-            if (amountKg > appState.inventory.officeStockKg) {
-                alert("Cannot consume more coffee than is available in the office!");
-                return;
-            }
-
+            if (amountKg > appState.inventory.officeStockKg) { alert("Cannot consume more coffee than is available in the office!"); return; }
             const inventoryRef = doc(db, getCollectionPath('inventory'), 'main');
             const historyRef = collection(db, getCollectionPath('inventoryHistory'));
-            
             try {
                 const batch = writeBatch(db);
                 batch.update(inventoryRef, { officeStockKg: increment(-amountKg) });
-                batch.set(doc(historyRef), {
-                    type: 'consumption',
-                    amountKg: amountKg,
-                    location: 'office',
-                    date: serverTimestamp()
-                });
+                batch.set(doc(historyRef), { type: 'consumption', amountKg: amountKg, location: 'office', date: serverTimestamp() });
                 await batch.commit();
                 form.reset();
             } catch (error) { console.error("Error logging consumption:", error); }
+        };
+
+        const handleStartNewRound = async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const { name, amount } = form.elements;
+            if (!name.value || !amount.value || !db) return;
+            try {
+                const batch = writeBatch(db);
+                appState.paymentRounds.filter(r => r.isActive).forEach(oldRound => {
+                    batch.update(doc(db, getCollectionPath('paymentRounds'), oldRound.id), { isActive: false });
+                });
+                batch.set(doc(collection(db, getCollectionPath('paymentRounds'))), {
+                    name: name.value, amountPerPerson: parseFloat(amount.value),
+                    startDate: Timestamp.now(), isActive: true
+                });
+                await batch.commit();
+                form.reset();
+            } catch (error) { console.error("Error starting new round:", error); }
+        };
+        
+        const handleMarkAsPaid = async (memberId, memberName, memberTotalContributed) => {
+            if (!db || !appState.activeRound) return;
+            try {
+                const batch = writeBatch(db);
+                const paymentRef = doc(db, `${getCollectionPath('paymentRounds')}/${appState.activeRound.id}/payments`, memberId);
+                batch.set(paymentRef, { status: 'paid', paymentDate: Timestamp.now(), memberName });
+                const memberRef = doc(db, getCollectionPath('users'), memberId);
+                const newTotal = (memberTotalContributed || 0) + appState.activeRound.amountPerPerson;
+                batch.update(memberRef, { totalContributed: newTotal });
+                await batch.commit();
+            } catch (error) { console.error("Error marking as paid:", error); }
+        };
+
+        const handleGenerateNotes = async (e) => {
+            const btn = e.target;
+            const form = btn.closest('form');
+            const coffeeName = form.elements.coffeeName.value;
+            if (!coffeeName) { alert("Please enter a coffee name first."); return; }
+            const prompt = `Generate a short, appealing description and tasting notes for a coffee called "${coffeeName}". Make it sound delicious for an office coffee club. Format it as a single paragraph.`;
+            const notes = await callGemini(prompt, btn);
+            if (notes) {
+                form.elements.notes.value = notes;
+            }
+        };
+
+        const handleSuggestName = async (e) => {
+            const btn = e.target;
+            const prompt = "Suggest exactly 5 fun, creative, and office-appropriate names for a monthly coffee club payment round. Examples: 'August Ant-Man Antics', 'September Supercharge', 'Octoberfest Obliteration'. Return them as a simple, comma-separated list and nothing else.";
+            const result = await callGemini(prompt, btn);
+            if (result) {
+                const names = result.split(',').map(name => name.trim());
+                const listHTML = names.map(name => `<li class="p-2 border-b hover:bg-gray-100 cursor-pointer suggestion-item">${name}</li>`).join('');
+                showModal("Suggested Round Names", `<ul class="list-none p-0">${listHTML}</ul>`);
+                document.querySelectorAll('.suggestion-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        document.getElementById('round-name-input').value = item.textContent;
+                        closeModal();
+                    });
+                });
+            }
+        };
+
+        const handleDraftNewsletter = async (e) => {
+            const btn = e.target;
+            const prompt = `Draft a fun and friendly monthly newsletter for an office coffee club. Here's the data:
+            - Current office stock: ${appState.inventory.officeStockKg.toFixed(2)} kg
+            - Current warehouse stock: ${appState.inventory.warehouseStockKg.toFixed(2)} kg
+            - Active payment round: ${appState.activeRound ? `"${appState.activeRound.name}" for $${appState.activeRound.amountPerPerson.toFixed(2)}` : "None"}
+            Keep the tone light and humorous. Mention the stock levels and gently remind people about the payment round if it's active. Format as a simple HTML email body.`;
+            const draft = await callGemini(prompt, btn);
+            if (draft) {
+                showModal("AI-Drafted Newsletter", draft);
+            }
+        };
+
+        const handleDraftReminder = async (e) => {
+            if (!appState.activeRound) return;
+            const btn = e.target;
+            const paidMemberIds = new Set(appState.activeRoundPayments.filter(p => p.status === 'paid').map(p => p.userId));
+            const unpaidMembers = appState.members.filter(m => !paidMemberIds.has(m.id)).map(m => m.name);
+            const prompt = `Draft a short, friendly, and slightly humorous reminder email for an office coffee club. The payment round is called "${appState.activeRound.name}" and the amount is $${appState.activeRound.amountPerPerson.toFixed(2)}. The following people still need to pay: ${unpaidMembers.join(', ')}. Gently nudge them to pay up so we can keep the coffee flowing. Format as a simple HTML email body.`;
+            const draft = await callGemini(prompt, btn);
+            if (draft) {
+                showModal("AI-Drafted Reminder", draft);
+            }
         };
 
         // --- Initialization ---
@@ -518,7 +693,34 @@
                     appState.inventoryHistory.sort((a, b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0));
                     renderCurrentView(); 
                 }));
+                listeners.push(onSnapshot(query(collection(db, getCollectionPath('paymentRounds'))), s => {
+                    appState.paymentRounds = s.docs.map(d => ({ id: d.id, ...d.data() }));
+                    appState.paymentRounds.sort((a, b) => (b.startDate?.toMillis() || 0) - (a.startDate?.toMillis() || 0));
+                    const newActiveRound = appState.paymentRounds.find(r => r.isActive) || null;
+                    if (newActiveRound?.id !== appState.activeRound?.id) {
+                        appState.activeRound = newActiveRound;
+                        setupActiveRoundListener();
+                    } else {
+                        appState.activeRound = newActiveRound;
+                    }
+                    renderCurrentView();
+                }));
             }
+        };
+
+        let activeRoundUnsubscribe;
+        const setupActiveRoundListener = () => {
+            if (activeRoundUnsubscribe) activeRoundUnsubscribe();
+            if (!appState.activeRound) {
+                appState.activeRoundPayments = [];
+                renderCurrentView();
+                return;
+            }
+            const paymentsPath = `${getCollectionPath('paymentRounds')}/${appState.activeRound.id}/payments`;
+            activeRoundUnsubscribe = onSnapshot(query(collection(db, paymentsPath)), s => {
+                appState.activeRoundPayments = s.docs.map(d => ({ userId: d.id, ...d.data() }));
+                renderCurrentView();
+            });
         };
 
         const init = () => {
