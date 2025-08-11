@@ -437,6 +437,9 @@
                                         </ul>
                                     </div>
                                 </div>
+                                <div class="mt-6">
+                                    <button id="end-round-btn" class="w-full bg-red-500 text-white font-bold py-2 px-4 rounded-md hover:bg-red-600">End Current Round</button>
+                                </div>
                             </div>
                         ` : `<p class="text-gray-500">Start a new round to begin collecting payments.</p>`}
                     </div>
@@ -527,6 +530,7 @@
         };
         const attachPaymentsEventListeners = () => {
             document.getElementById('start-round-form')?.addEventListener('submit', handleStartNewRound);
+            document.getElementById('end-round-btn')?.addEventListener('click', handleEndRound);
             document.querySelectorAll('.mark-paid-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const { id, name } = e.currentTarget.dataset;
@@ -743,6 +747,16 @@
 
                 await batch.commit();
             } catch (error) { console.error("Error marking as paid:", error); }
+        };
+
+        const handleEndRound = async () => {
+            if (!appState.activeRound || !confirm("Are you sure you want to end this payment round?")) return;
+            try {
+                const roundRef = doc(db, getCollectionPath('paymentRounds'), appState.activeRound.id);
+                await updateDoc(roundRef, { isActive: false });
+            } catch (error) {
+                console.error("Error ending round:", error);
+            }
         };
 
         const handleResetCoffeeData = async () => {
