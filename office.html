@@ -160,8 +160,15 @@
             try {
                 await signInWithEmailAndPassword(auth, email.value, password.value);
             } catch (error) {
-                if (error.code === 'auth/user-not-found' && password.value === DEFAULT_PASSWORD) {
+                // FIX: Handle modern 'auth/invalid-credential' error code for new user creation.
+                if ((error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') && password.value === DEFAULT_PASSWORD) {
                     try {
+                        const userQuery = query(collection(db, getCollectionPath('users')), where("email", "==", email.value.toLowerCase()));
+                        const querySnapshot = await getDocs(userQuery);
+                        if (querySnapshot.empty) {
+                            showError('login-error', 'This email is not registered. Please contact the Coffee Master.');
+                            return;
+                        }
                         await createUserWithEmailAndPassword(auth, email.value, password.value);
                     } catch (createError) {
                         showError('login-error', `Registration failed: ${createError.message}`);
@@ -371,7 +378,7 @@
             if (!name.value || !email.value || !db) return;
             try {
                 const userQuery = query(collection(db, getCollectionPath('users')), where("email", "==", email.value.toLowerCase()));
-                const querySnapshot = await getDocs(userQuery); // FIX: Use getDocs for queries
+                const querySnapshot = await getDocs(userQuery);
                 if (!querySnapshot.empty) {
                     alert("A member with this email already exists.");
                     return;
@@ -385,7 +392,8 @@
         };
 
         const handleDeleteMember = async (memberId) => {
-             if (!isAdmin || !confirm(`Are you sure? This will delete the member's record but NOT their login.`)) return;
+            // FIX: Removed confirm() which can be blocked. Admin action is now immediate.
+            if (!isAdmin) return;
             try {
                 await deleteDoc(doc(db, getCollectionPath('users'), memberId));
             } catch (error) { console.error("Error deleting member:", error); }
