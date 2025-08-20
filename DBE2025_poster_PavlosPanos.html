@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super-Resolution Image Enhancement for 3D Morphological Lung MRI | DBE 2025 Poster</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Custom styles to enhance the poster's look and feel */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* A light grey background */
+        }
+        h1, h2, h3 {
+            font-weight: 700;
+        }
+        .poster-section {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            margin-bottom: 2rem;
+        }
+        figcaption {
+            font-size: 0.875rem;
+            color: #4b5563; /* Gray-600 */
+            margin-top: 0.75rem;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+
+        <!-- Header Section -->
+        <header class="text-center mb-12">
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900">
+                Super-Resolution Image Enhancement for 3D Morphological Lung MRI with bSTAR at 0.55T
+            </h1>
+            <p class="mt-4 text-lg text-gray-600">
+                Panos P.<sup>1,2</sup>, Pradella M.<sup>1</sup>, Bieri O.<sup>1,2</sup>, Hostettler K.E.<sup>3</sup>, Bauman G.<sup>1,2</sup>
+            </p>
+            <div class="mt-4 text-sm text-gray-500 space-y-1">
+                <p><sup>1</sup>Division of Radiological Physics, Department of Radiology, University of Basel Hospital, Basel, Switzerland</p>
+                <p><sup>2</sup>Department of Biomedical Engineering, University of Basel, Basel, Switzerland</p>
+                <p><sup>3</sup>Clinics of Respiratory Medicine, University Hospital Basel, Basel, Switzerland</p>
+            </div>
+        </header>
+
+        <!-- Main Content Grid -->
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- Left Column: Intro, Purpose, Methods -->
+            <div class="lg:col-span-1 space-y-8">
+                <section class="poster-section">
+                    <h2 class="text-2xl font-bold text-sky-700 mb-4">Introduction</h2>
+                    <p class="text-base leading-relaxed">
+                        Despite the development of various dedicated techniques for morphological lung imaging, MRI offers limited spatial resolution compared to computed tomography (CT). With the rapid progress in AI-based image enhancement techniques, our study aims to improve lung MRI quality using a deep learning-based super-resolution model, thereby enabling better visualization of lung morphology. In this work, we applied a pre-trained 2D image enhancement model to 3D lung MRI datasets acquired at 0.55 T to enhance image quality.
+                    </p>
+                </section>
+
+                <section class="poster-section">
+                    <h2 class="text-2xl font-bold text-sky-700 mb-4">Purpose</h2>
+                    <p class="text-base leading-relaxed">
+                        Due to physical and physiological challenges, lung MRI is currently rarely used in clinical routine. Our study demonstrates that a deep learning-based super-resolution image enhancement results in improved visualization of MRI lung morphology without introducing new anatomical structures.
+                    </p>
+                </section>
+
+                <section class="poster-section">
+                    <h2 class="text-2xl font-bold text-sky-700 mb-4">Methods</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <h3 class="text-lg font-semibold">Data Acquisition</h3>
+                            <p class="mt-2">MRI data was acquired on a 0.55T MAGNETOM Free.Max scanner. We used two structural, free-breathing lung MRI sequences that both provided isotropic resolution:</p>
+                            <ul class="list-disc list-inside mt-2 space-y-1">
+                                <li><strong>3D half-radial bSTAR:</strong> 1.3 mm isotropic resolution.</li>
+                                <li><strong>3D stack-of-spirals UTE:</strong> 2.0 mm isotropic resolution.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold">Super-Resolution Model</h3>
+                            <p class="mt-2">We used a pre-trained 2D super-resolution model based on the Dense Residual Channel Attention (DRCT) architecture to perform a 4× upscale. Notably, the model was trained on large-scale natural image datasets (DF2K and OST300), not on prior medical images.</p>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold">3D Enhancement Workflow</h3>
+                            <p class="mt-2">Our memory-efficient workflow enhances the 3D volume by applying the 2D model across all three spatial dimensions. This approach ensures uniform sharpness and minimizes artifacts.</p>
+                             <figure class="mt-4">
+                                <img src="https://placehold.co/600x400/e0e0e0/333?text=Figure+1:+Workflow" alt="Diagram of the 3D MRI enhancement workflow" class="w-full h-auto rounded-lg object-cover">
+                                <figcaption><strong>Figure 1.</strong> Workflow for 3D MRI enhancement using a 2D super-resolution model.</figcaption>
+                            </figure>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Center Column: Results -->
+            <div class="lg:col-span-1">
+                <section class="poster-section">
+                    <h2 class="text-2xl font-bold text-sky-700 mb-4">Results</h2>
+                    <p class="mb-6">The results of the AI-based image enhancement for the two different volumetric MRI acquisitions are summarized in Figure 2, with a maximum intensity projection (MIP) in Figure 3.</p>
+                    
+                    <figure class="mb-8">
+                         <img src="https://placehold.co/800x400/e0e0e0/333?text=Figure+2:+Coronal+and+Axial+Slices" alt="Comparison of original and enhanced MRI slices" class="w-full h-auto rounded-lg object-cover">
+                        <figcaption><strong>Figure 2.</strong> Coronal (top) and axial (bottom) slices from a sarcoidosis patient using bSTAR (left) and UTE (right) sequences. Original images are compared with enhanced images. The super-resolution model improves sharpness, enhances vessel definition, and preserves anatomical integrity.</figcaption>
+                    </figure>
+
+                    <figure>
+                        <img src="https://placehold.co/800x600/e0e0e0/333?text=Figure+3:+Maximum+Intensity+Projection" alt="Maximum intensity projection images from bSTAR datasets" class="w-full h-auto rounded-lg object-cover">
+                        <figcaption><strong>Figure 3.</strong> Maximum intensity projection images from bSTAR datasets in two patients. Top Row: patient with suspected immunodeficiency (coronal and sagittal views). Bottom Row: sarcoidosis patient (coronal view).</figcaption>
+                    </figure>
+                </section>
+            </div>
+
+            <!-- Right Column: Discussion, Outlook, Author -->
+            <div class="lg:col-span-1 space-y-8">
+                <section class="poster-section">
+                    <h2 class="text-2xl font-bold text-sky-700 mb-4">Discussion and Conclusion</h2>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li>Achieves 4× resolution increase without heavy memory use.</li>
+                        <li>No artificial structures added — critical for clinical trust.</li>
+                        <li>Sequence-agnostic, not pathology-tuned → minimizes model bias.</li>
+                    </ul>
+                </section>
+
+                <section class="poster-section">
+                    <h2 class="text-2xl font-bold text-sky-700 mb-4">Outlook - Future Work</h2>
+                    <p>Medical-data training may boost detail, but risks overfitting.</p>
+                </section>
+
+                <section class="poster-section flex flex-col items-center text-center">
+                    <img src="https://placehold.co/150x150/e0e0e0/333?text=Author" alt="Photo of Pavlos Panos" class="w-36 h-36 rounded-full mb-4 object-cover">
+                    <h3 class="text-xl font-semibold">Pavlos Panos</h3>
+                    <p class="text-gray-600">Contact & Info</p>
+                    <img src="https://placehold.co/150x150/ffffff/333?text=QR+Code" alt="QR Code for more information" class="w-32 h-32 mt-4">
+                </section>
+            </div>
+
+        </main>
+        
+        <!-- Footer with Logos -->
+        <footer class="mt-12 border-t pt-8 flex justify-center items-center space-x-8">
+             <img src="https://placehold.co/200x60/e0e0e0/333?text=University+Hospital+Basel" alt="University Hospital Basel Logo" class="h-16">
+             <img src="https://placehold.co/200x60/e0e0e0/333?text=Swiss+National+Science+Foundation" alt="Swiss National Science Foundation Logo" class="h-16">
+        </footer>
+
+    </div>
+
+</body>
+</html>
