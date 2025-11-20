@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Future Food Nexus - Recipes for Tomorrow</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Dark background for futuristic feel */
+            background-color: #0d1117;
+            color: #e5e7eb;
+        }
+        .recipe-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        .recipe-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(100, 255, 218, 0.2), 0 4px 6px -2px rgba(100, 255, 218, 0.1);
+        }
+        .accent-color {
+            color: #64ffda; /* Neon Green/Cyan Accent */
+        }
+        .bg-accent {
+            background-color: #64ffda;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Header & Navigation -->
+    <header class="bg-gray-900 border-b border-gray-800 shadow-lg sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <div class="text-2xl font-extrabold tracking-widest accent-color">
+                NE<span class="text-gray-400">XUS</span>
+            </div>
+            <nav class="space-x-4">
+                <a href="#recipes" class="text-sm font-medium hover:text-white transition duration-300">Recipes</a>
+                <a href="#" class="text-sm font-medium hover:text-white transition duration-300">Technology</a>
+                <a href="#" class="text-sm font-medium hover:text-white transition duration-300">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        <!-- Recipe List View (Main Screen) -->
+        <section id="recipeList" class="block">
+            <!-- Hero Section -->
+            <div class="text-center mb-16 pt-10">
+                <h1 class="text-5xl sm:text-7xl font-bold mb-4 leading-tight">
+                    <span class="accent-color">Savor</span> the <span class="text-white">Future.</span>
+                </h1>
+                <p class="text-lg text-gray-400 max-w-3xl mx-auto">
+                    Explore a curated database of molecular gastronomy, precision fermentation, and sustainable protein recipes from the global culinary archives of 2077.
+                </p>
+            </div>
+
+            <!-- Search and Filter -->
+            <div class="mb-12">
+                <div class="max-w-xl mx-auto flex space-x-4">
+                    <div class="relative flex-grow">
+                        <input type="text" id="recipeSearch" oninput="filterRecipes()" placeholder="Search ingredients, tags, or methods..."
+                            class="w-full p-4 pl-12 bg-gray-800 border-2 border-gray-700 focus:border-accent rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-accent shadow-xl outline-none">
+                        <!-- Search Icon (using SVG for sleek look) -->
+                        <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipe Grid -->
+            <section id="recipes" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Recipe cards will be injected here by JavaScript -->
+            </section>
+        </section>
+
+        <!-- Recipe Detail View (Initially Hidden) -->
+        <section id="recipeDetail" class="hidden pt-10">
+            <button onclick="backToRecipes()" class="flex items-center text-gray-400 hover:text-accent transition duration-300 mb-8">
+                <!-- Back Arrow Icon -->
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Blueprints
+            </button>
+
+            <!-- Detail Content Injection Point -->
+            <div id="detailContent" class="bg-gray-800 rounded-3xl p-6 sm:p-10 shadow-3xl border border-gray-700">
+                <!-- Content will be injected here -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-800 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-gray-500 text-sm">
+            <p>&copy; 2077 Future Food Nexus. Simulated Data Environment. All Rights Reserved.</p>
+            <p class="mt-2">Powered by Molecular Cuisine and Zero-G Farming.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Mock data for the recipes, enhanced with ingredients and instructions
+        const recipeData = [
+            {
+                title: "Algae-Based Spirulina Noodles",
+                description: "A high-protein, zero-carbon alternative to traditional pasta. Tossed in a photonic garlic butter sauce.",
+                tags: ["sustainable", "vegan", "fast"],
+                prep: "10 min",
+                yield: "2 servings",
+                image: "https://placehold.co/800x400/38a169/ffffff?text=Algae+Noodles",
+                ingredients: ["200g Spirulina Noodles", "50g Photonic Garlic Butter (synthesized)", "10ml Activated Yeast Drizzle", "10g Cryo-Preserved Chives"],
+                instructions: [
+                    "Rehydrate Spirulina Noodles in warm nutrient solution for 5 minutes.",
+                    "In a sonic pan, melt the Photonic Garlic Butter.",
+                    "Toss the rehydrated noodles in the butter for 2 minutes, ensuring even photon absorption.",
+                    "Plate and garnish with Activated Yeast Drizzle and Cryo-Preserved Chives."
+                ],
+                nutrition: "450 Calories, 30g Protein, 40g Carbs, 20g Fat"
+            },
+            {
+                title: "Cultured Beef Synthesis Steak",
+                description: "The pinnacle of lab-grown meat technology, delivering authentic marbling and texture. Paired with a red wine reduction.",
+                tags: ["lab-grown", "carnivore", "advanced"],
+                prep: "45 min",
+                yield: "1 serving",
+                image: "https://placehold.co/800x400/e53e3e/ffffff?text=Cultured+Steak",
+                ingredients: ["1x Synthesis Grade-A Steak", "30ml Bio-Fermented Red Wine Reduction", "5g Mineral Salt Flakes", "Zero-G Truffle Oil"],
+                instructions: [
+                    "Thaw the Synthesis Steak for 1 hour at 25°C.",
+                    "Sear on an electromagnetic induction plate for 3 minutes per side for medium-rare.",
+                    "Rest the steak for 5 minutes under a warming UV lamp.",
+                    "Drizzle generously with Red Wine Reduction and Truffle Oil. Finish with Mineral Salt Flakes."
+                ],
+                nutrition: "650 Calories, 55g Protein, 5g Carbs, 45g Fat"
+            },
+            {
+                title: "Vertical Farm Microgreens Salad",
+                description: "A vibrant, hyper-local salad featuring 12 rare microgreen variants grown in controlled environments. Light citrus dressing.",
+                tags: ["sustainable", "vegan", "fresh"],
+                prep: "5 min",
+                yield: "4 servings",
+                image: "https://placehold.co/800x400/4299e1/ffffff?text=Microgreen+Salad",
+                ingredients: ["100g Mixed Microgreens (Basil, Arugula, Radish)", "50g Dehydrated Citrus Cubes", "30ml Light-Activated Vinaigrette"],
+                instructions: [
+                    "Gently combine the Mixed Microgreens and Dehydrated Citrus Cubes in a gravity bowl.",
+                    "Shake the Light-Activated Vinaigrette until it glows softly.",
+                    "Toss immediately before serving."
+                ],
+                nutrition: "120 Calories, 8g Protein, 15g Carbs, 5g Fat"
+            },
+            {
+                title: "Insect Protein Energy Bar (Cocoa)",
+                description: "Sustainable energy for the modern traveler. High in B12 and essential amino acids from bio-replicated cricket protein.",
+                tags: ["fast", "protein", "portable"],
+                prep: "0 min",
+                yield: "1 bar",
+                image: "https://placehold.co/800x400/dd6b20/ffffff?text=Energy+Bar",
+                ingredients: ["1x 75g Cocoa Cricket Bar", "None"],
+                instructions: [
+                    "Remove from vacuum-sealed packaging.",
+                    "Consume immediately for optimal bio-absorption."
+                ],
+                nutrition: "300 Calories, 25g Protein, 25g Carbs, 10g Fat"
+            },
+            {
+                title: "Hydroponic Tomato Soup (Concentrate)",
+                description: "Rich, creamy, and made from genetically optimized, high-brix tomatoes grown without soil or pesticides.",
+                tags: ["sustainable", "soup", "easy"],
+                prep: "20 min",
+                yield: "6 servings",
+                image: "https://placehold.co/800x400/9f7aea/ffffff?text=Tomato+Soup",
+                ingredients: ["1L Tomato Concentrate (Hydroponic Grade)", "500ml Nutrient Broth", "10g Basil Polymer"],
+                instructions: [
+                    "Pour Concentrate and Nutrient Broth into a thermal recombiner.",
+                    "Heat to 90°C and stir until uniformly creamy.",
+                    "Serve with a sprinkle of Basil Polymer for aroma."
+                ],
+                nutrition: "250 Calories, 10g Protein, 30g Carbs, 10g Fat"
+            },
+            {
+                title: "3D-Printed Artisan Pastry",
+                description: "A complex geometric pastry printed layer-by-layer using nutrient gels and flavor polymers. Edible art.",
+                tags: ["advanced", "dessert", "molecular"],
+                prep: "90 min",
+                yield: "1 pastry",
+                image: "https://placehold.co/800x400/f6ad55/ffffff?text=3D+Pastry",
+                ingredients: ["Flavor Polymer Cartridge (Vanilla-Lavender)", "Nutrient Gel Base (Maltitol)", "Edible Conductive Filament"],
+                instructions: [
+                    "Calibrate the 3D Food Fabricator with the desired design blueprint.",
+                    "Load cartridges and initiate the 90-minute printing cycle.",
+                    "Once printed, activate the Edible Conductive Filament for a momentary luminescence effect."
+                ],
+                nutrition: "580 Calories, 5g Protein, 80g Carbs, 25g Fat"
+            },
+        ];
+
+        /**
+         * Renders a single recipe card HTML string.
+         * @param {Object} recipe - The recipe data object.
+         * @param {number} index - The index of the recipe in the array.
+         * @returns {string} The HTML string for the card.
+         */
+        function renderRecipeCard(recipe, index) {
+            const tagHtml = recipe.tags.map(tag =>
+                `<span class="text-xs font-semibold px-2 py-1 rounded-full bg-gray-700 text-accent uppercase tracking-wider">${tag}</span>`
+            ).join('');
+
+            // Added onclick handler calling showRecipeDetail with the index
+            return `
+                <div class="recipe-card bg-gray-800 rounded-2xl overflow-hidden shadow-2xl border border-gray-700/50" onclick="showRecipeDetail(${index})">
+                    <img src="${recipe.image}" alt="${recipe.title}" onerror="this.onerror=null;this.src='https://placehold.co/400x300/1f2937/9ca3af?text=Image+Not+Found';" class="w-full h-48 object-cover object-center">
+                    <div class="p-6">
+                        <h2 class="text-2xl font-bold mb-2 text-white">${recipe.title}</h2>
+                        <div class="flex flex-wrap gap-2 mb-4">${tagHtml}</div>
+                        <p class="text-gray-400 mb-4">${recipe.description}</p>
+                        <div class="flex justify-between items-center text-sm text-gray-500 border-t border-gray-700 pt-4">
+                            <div><span class="accent-color mr-1">&#x231B;</span> Prep: ${recipe.prep}</div>
+                            <div><span class="accent-color mr-1">&#x273F;</span> Yield: ${recipe.yield}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * Filters the recipe data based on the search input and renders the cards.
+         */
+        function filterRecipes() {
+            const searchTerm = document.getElementById('recipeSearch').value.toLowerCase();
+            const gridContainer = document.getElementById('recipes');
+            
+            const filteredRecipes = recipeData.filter(recipe => {
+                const searchString = `${recipe.title} ${recipe.description} ${recipe.tags.join(' ')}`.toLowerCase();
+                return searchString.includes(searchTerm);
+            });
+
+            // Generate HTML for all filtered recipes, passing the original index
+            const cardsHtml = filteredRecipes.map((recipe, index) => {
+                // Find the original index in recipeData for the onclick handler
+                const originalIndex = recipeData.findIndex(r => r.title === recipe.title);
+                return renderRecipeCard(recipe, originalIndex);
+            }).join('');
+
+            // Update the DOM
+            gridContainer.innerHTML = cardsHtml;
+
+            // Optional: Show message if no results found
+            if (filteredRecipes.length === 0) {
+                gridContainer.innerHTML = `
+                    <div class="col-span-1 md:col-span-2 lg:col-span-3 text-center py-10">
+                        <p class="text-xl text-gray-500">No blueprints found for "${searchTerm}". Try a different molecular structure.</p>
+                    </div>
+                `;
+            }
+        }
+
+        /**
+         * Switches view to the recipe detail page and populates content.
+         * @param {number} index - The index of the recipe in the recipeData array.
+         */
+        function showRecipeDetail(index) {
+            const recipe = recipeData[index];
+            if (!recipe) return;
+
+            // 1. Hide the list view
+            document.getElementById('recipeList').classList.add('hidden');
+            // 2. Show the detail view
+            document.getElementById('recipeDetail').classList.remove('hidden');
+
+            // 3. Populate the detail content
+            const detailContainer = document.getElementById('detailContent');
+
+            const tagHtml = recipe.tags.map(tag =>
+                `<span class="text-sm font-semibold px-3 py-1 rounded-full bg-gray-700 text-accent uppercase tracking-wider">${tag}</span>`
+            ).join('');
+
+            const ingredientsList = recipe.ingredients.map(item => 
+                `<li class="mb-2 flex items-start"><span class="accent-color mr-2 text-xl">&rArr;</span>${item}</li>`
+            ).join('');
+
+            const instructionsList = recipe.instructions.map((item, i) => 
+                `<li class="mb-3 flex"><span class="flex-shrink-0 w-6 h-6 mr-3 text-center font-bold bg-accent text-gray-900 rounded-full">${i + 1}</span>${item}</li>`
+            ).join('');
+
+            detailContainer.innerHTML = `
+                <div class="lg:flex lg:space-x-10">
+                    <!-- Image and Tags (Left Column on Desktop) -->
+                    <div class="lg:w-1/3 mb-8 lg:mb-0 flex flex-col space-y-4">
+                        <img src="${recipe.image}" alt="${recipe.title}" onerror="this.onerror=null;this.src='https://placehold.co/800x400/1f2937/9ca3af?text=Image+Not+Found';" class="w-full h-auto object-cover object-center rounded-xl shadow-lg border border-gray-700">
+                        <div class="flex flex-wrap gap-3 mt-4">
+                            ${tagHtml}
+                        </div>
+                        <div class="bg-gray-700 p-4 rounded-xl mt-4">
+                            <h3 class="text-xl font-bold accent-color mb-2">Details</h3>
+                            <p class="text-sm text-gray-300">Prep Time: <span class="text-white font-medium">${recipe.prep}</span></p>
+                            <p class="text-sm text-gray-300">Yields: <span class="text-white font-medium">${recipe.yield}</span></p>
+                            <p class="text-sm text-gray-300">Nutrition: <span class="text-white font-medium">${recipe.nutrition}</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Description, Ingredients, Instructions (Right Column on Desktop) -->
+                    <div class="lg:w-2/3">
+                        <h1 class="text-4xl sm:text-5xl font-extrabold mb-4 text-white">${recipe.title}</h1>
+                        <p class="text-xl text-gray-400 mb-8 border-b border-gray-700 pb-4">${recipe.description}</p>
+                        
+                        <!-- Ingredients -->
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold accent-color mb-4">Reagents & Components</h2>
+                            <ul class="list-none space-y-2 text-gray-300">
+                                ${ingredientsList}
+                            </ul>
+                        </div>
+
+                        <!-- Instructions -->
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold accent-color mb-4">Fabrication Protocol</h2>
+                            <ol class="list-none space-y-4 text-gray-300">
+                                ${instructionsList}
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Scroll to the top of the detail view
+            window.scrollTo(0, 0);
+        }
+
+        /**
+         * Switches view back to the main recipe list.
+         */
+        function backToRecipes() {
+            // 1. Hide the detail view
+            document.getElementById('recipeDetail').classList.add('hidden');
+            // 2. Show the list view
+            document.getElementById('recipeList').classList.remove('hidden');
+
+            // Scroll to the top of the list
+            window.scrollTo(0, 0);
+        }
+
+        // Initial render on page load
+        window.onload = filterRecipes;
+
+    </script>
+</body>
+</html>
