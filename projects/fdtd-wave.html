@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FDTD Simulation & Topological Materials | Pavlos Panos</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { background: var(--bg-slate-950); padding: 40px 20px; }
+    .project-container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-glass);
+      backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--border-glass);
+      border-radius: 32px;
+      padding: 50px;
+      position: relative;
+    }
+    .back-btn {
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      color: var(--accent-cyan);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--ff-space);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 14px;
+    }
+    .hero-img {
+      width: 100%;
+      border-radius: 20px;
+      margin: 40px 0;
+      border: 1px solid var(--border-glass);
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 40px;
+      padding-bottom: 30px;
+      border-bottom: 1px solid var(--border-glass);
+    }
+    .meta-item h5 { color: var(--accent-indigo); font-size: 12px; text-transform: uppercase; margin-bottom: 5px; }
+    .meta-item p { font-weight: 600; color: var(--text-primary); }
+    h1 { font-family: var(--ff-space); font-size: 36px; margin-bottom: 10px; }
+    .subtitle { color: var(--accent-cyan); font-family: var(--ff-space); font-size: 18px; margin-bottom: 30px; }
+    h2 { font-family: var(--ff-space); color: var(--text-primary); margin-top: 40px; margin-bottom: 15px; border-left: 4px solid var(--accent-cyan); padding-left: 15px; }
+    p { color: var(--text-secondary); line-height: 1.8; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+
+  <div class="project-container">
+    <a href="../index.html" class="back-btn">
+      <ion-icon name="arrow-back-outline"></ion-icon>
+      Back to Portfolio
+    </a>
+
+    <header>
+      <h1>FDTD Simulation</h1>
+      <p class="subtitle">Pulse Transmission & Topological Material Studies</p>
+    </header>
+
+    <div class="meta-grid">
+      <div class="meta-item">
+        <h5>Electromagnetics</h5>
+        <p>Numerical Analysis</p>
+      </div>
+      <div class="meta-item">
+        <h5>Method</h5>
+        <p>FDTD (Yee Lattice)</p>
+      </div>
+      <div class="meta-item">
+        <h5>Key Insight</h5>
+        <p>Edge State Stability</p>
+      </div>
+    </div>
+
+    <img src="../assets/images/2D_PML_Material_epsilon=10_heatmap.gif" alt="FDTD Heatmap" class="hero-img">
+
+    <section>
+      <h2>Numerical Method</h2>
+      <p>
+        The Finite-Difference Time-Domain (FDTD) method is a grid-based differential solver for Maxwell's equations. By staggering electric and magnetic fields in space and time (the Yee Lattice), we can observe the literal propagation of light through complex media.
+      </p>
+
+      <h2>Topological Insulation</h2>
+      <p>
+        This research investigated the propagation of electromagnetic pulses through topological photonic insulators. We focused on the stability of <strong>edge states</strong>—waves that propagate only along the boundaries of a material despite bulk-layer disorders. Our simulations demonstrated how these states remain "topologically protected" even when facing significant spatial noise or material imperfections.
+      </p>
+
+      <h2>Practical Applications</h2>
+      <p>
+        The findings from these simulations contribute to the design of next-generation optical waveguides and non-reciprocal photonic devices. Understanding the resilience of topological modes is key to building more robust communications hardware that can survive degradation without signal loss.
+      </p>
+    </section>
+
+  </div>
+
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</body>
+</html>

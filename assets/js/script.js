@@ -1,159 +1,205 @@
 'use strict';
 
-
-
-// element toggle function
+// --- ELEMENT TOGGLE FUNCTION ---
 const elementToggleFunc = function (elem) { elem.classList.toggle("active"); }
 
-
-
-// sidebar variables
+// --- SIDEBAR TOGGLE (MOBILE) ---
 const sidebar = document.querySelector("[data-sidebar]");
 const sidebarBtn = document.querySelector("[data-sidebar-btn]");
-
-// sidebar toggle functionality for mobile
-sidebarBtn.addEventListener("click", function () { elementToggleFunc(sidebar); });
-
-
-
-// testimonials variables
-const testimonialsItem = document.querySelectorAll("[data-testimonials-item]");
-const modalContainer = document.querySelector("[data-modal-container]");
-const modalCloseBtn = document.querySelector("[data-modal-close-btn]");
-const overlay = document.querySelector("[data-overlay]");
-
-// modal variable
-const modalImg = document.querySelector("[data-modal-img]");
-const modalTitle = document.querySelector("[data-modal-title]");
-const modalText = document.querySelector("[data-modal-text]");
-
-// modal toggle function
-const testimonialsModalFunc = function () {
-  modalContainer.classList.toggle("active");
-  overlay.classList.toggle("active");
+if (sidebarBtn) {
+  sidebarBtn.addEventListener("click", function () { elementToggleFunc(sidebar); });
 }
 
-// add click event to all modal items
-for (let i = 0; i < testimonialsItem.length; i++) {
-
-  testimonialsItem[i].addEventListener("click", function () {
-
-    modalImg.src = this.querySelector("[data-testimonials-avatar]").src;
-    modalImg.alt = this.querySelector("[data-testimonials-avatar]").alt;
-    modalTitle.innerHTML = this.querySelector("[data-testimonials-title]").innerHTML;
-    modalText.innerHTML = this.querySelector("[data-testimonials-text]").innerHTML;
-
-    testimonialsModalFunc();
-
-  });
-
-}
-
-// add click event to modal close button
-modalCloseBtn.addEventListener("click", testimonialsModalFunc);
-overlay.addEventListener("click", testimonialsModalFunc);
-
-
-
-// custom select variables
-const select = document.querySelector("[data-select]");
-const selectItems = document.querySelectorAll("[data-select-item]");
-const selectValue = document.querySelector("[data-selecct-value]");
-const filterBtn = document.querySelectorAll("[data-filter-btn]");
-
-select.addEventListener("click", function () { elementToggleFunc(this); });
-
-// add event in all select items
-for (let i = 0; i < selectItems.length; i++) {
-  selectItems[i].addEventListener("click", function () {
-
-    let selectedValue = this.innerText.toLowerCase();
-    selectValue.innerText = this.innerText;
-    elementToggleFunc(select);
-    filterFunc(selectedValue);
-
+// --- NAVBAR TOGGLE (MOBILE) ---
+const navbar = document.querySelector("[data-navbar]");
+const navToggler = document.querySelector("[data-nav-toggler]");
+if (navToggler) {
+  navToggler.addEventListener("click", () => {
+    elementToggleFunc(navbar);
+    elementToggleFunc(navToggler);
   });
 }
 
-// filter variables
-const filterItems = document.querySelectorAll("[data-filter-item]");
+// --- PARTICLE ENGINE ---
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+const particleCount = 60;
+const mouse = { x: null, y: null, radius: 150 };
 
-const filterFunc = function (selectedValue) {
+window.addEventListener('mousemove', (event) => {
+  mouse.x = event.x;
+  mouse.y = event.y;
+});
 
-  for (let i = 0; i < filterItems.length; i++) {
-
-    if (selectedValue === "all") {
-      filterItems[i].classList.add("active");
-    } else if (selectedValue === filterItems[i].dataset.category) {
-      filterItems[i].classList.add("active");
-    } else {
-      filterItems[i].classList.remove("active");
-    }
-
+class Particle {
+  constructor() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.size = Math.random() * 2 + 1;
+    this.baseX = this.x;
+    this.baseY = this.y;
+    this.density = (Math.random() * 30) + 1;
+    this.color = 'rgba(34, 211, 238, 0.5)';
   }
-
-}
-
-// add event in all filter button items for large screen
-let lastClickedBtn = filterBtn[0];
-
-for (let i = 0; i < filterBtn.length; i++) {
-
-  filterBtn[i].addEventListener("click", function () {
-
-    let selectedValue = this.innerText.toLowerCase();
-    selectValue.innerText = this.innerText;
-    filterFunc(selectedValue);
-
-    lastClickedBtn.classList.remove("active");
-    this.classList.add("active");
-    lastClickedBtn = this;
-
-  });
-
-}
-
-
-
-// contact form variables
-const form = document.querySelector("[data-form]");
-const formInputs = document.querySelectorAll("[data-form-input]");
-const formBtn = document.querySelector("[data-form-btn]");
-
-// add event to all form input field
-for (let i = 0; i < formInputs.length; i++) {
-  formInputs[i].addEventListener("input", function () {
-
-    // check form validation
-    if (form.checkValidity()) {
-      formBtn.removeAttribute("disabled");
+  draw() {
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.fill();
+  }
+  update() {
+    let dx = mouse.x - this.x;
+    let dy = mouse.y - this.y;
+    let distance = Math.sqrt(dx * dx + dy * dy);
+    let forceDirectionX = dx / distance;
+    let forceDirectionY = dy / distance;
+    let force = (mouse.radius - distance) / mouse.radius;
+    if (distance < mouse.radius) {
+      this.x -= forceDirectionX * force * this.density;
+      this.y -= forceDirectionY * force * this.density;
     } else {
-      formBtn.setAttribute("disabled", "");
+      if (this.x !== this.baseX) this.x -= (this.x - this.baseX) / 10;
+      if (this.y !== this.baseY) this.y -= (this.y - this.baseY) / 10;
     }
-
-  });
+  }
 }
 
+function initParticles() {
+  if (!canvas) return;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  particles = [];
+  for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+}
 
+function animateParticles() {
+  if (!canvas) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let i = 0; i < particles.length; i++) {
+    particles[i].draw();
+    particles[i].update();
+  }
+  connectParticles();
+  requestAnimationFrame(animateParticles);
+}
 
-// page navigation variables
+function connectParticles() {
+  for (let a = 0; a < particles.length; a++) {
+    for (let b = a; b < particles.length; b++) {
+      let dx = particles[a].x - particles[b].x;
+      let dy = particles[a].y - particles[b].y;
+      let dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 100) {
+        ctx.strokeStyle = `rgba(34, 211, 238, ${1 - (dist / 100)})`;
+        ctx.lineWidth = 1; ctx.beginPath();
+        ctx.moveTo(particles[a].x, particles[a].y);
+        ctx.lineTo(particles[b].x, particles[b].y); ctx.stroke();
+      }
+    }
+  }
+}
+
+if (canvas) {
+  initParticles(); animateParticles();
+  window.addEventListener('resize', initParticles);
+}
+
+// --- MULTI-LANGUAGE LOGIC ---
+const langBtns = document.querySelectorAll("[data-lang-btn]");
+const translatableElements = document.querySelectorAll("[data-en]");
+
+const setLanguage = (lang) => {
+  translatableElements.forEach(el => {
+    const text = el.getAttribute(`data-${lang}`);
+    if (text) {
+        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+            el.placeholder = text;
+        } else {
+            el.innerText = text;
+        }
+    }
+  });
+  langBtns.forEach(btn => {
+    btn.classList.toggle("active", btn.getAttribute("data-lang-btn") === lang);
+  });
+  localStorage.setItem('pref-lang', lang);
+}
+
+langBtns.forEach(btn => {
+  btn.addEventListener("click", () => setLanguage(btn.getAttribute("data-lang-btn")));
+});
+
+// Load preferred language
+const savedLang = localStorage.getItem('pref-lang') || 'en';
+setLanguage(savedLang);
+
+// --- NAVIGATION ---
 const navigationLinks = document.querySelectorAll("[data-nav-link]");
 const pages = document.querySelectorAll("[data-page]");
 
-// add event to all nav link
 for (let i = 0; i < navigationLinks.length; i++) {
   navigationLinks[i].addEventListener("click", function () {
+    const dataEn = this.getAttribute('data-en');
+    if (!dataEn) return;
+    
+    const targetPage = dataEn.toLowerCase().trim();
+    
+    // Update links state
+    navigationLinks.forEach(link => link.classList.remove("active"));
+    this.classList.add("active");
 
-    for (let i = 0; i < pages.length; i++) {
-      if (this.innerHTML.toLowerCase() === pages[i].dataset.page) {
-        pages[i].classList.add("active");
-        navigationLinks[i].classList.add("active");
-        window.scrollTo(0, 0);
+    // Update pages visibility
+    let found = false;
+    pages.forEach(page => {
+      if (page.dataset.page === targetPage) {
+        page.classList.add("active");
+        found = true;
       } else {
-        pages[i].classList.remove("active");
-        navigationLinks[i].classList.remove("active");
+        page.classList.remove("active");
       }
-    }
+    });
 
+    if (navbar) navbar.classList.remove("active");
+    if (navToggler) navToggler.classList.remove("active");
+    
+    if (found) {
+      window.scrollTo(0, 0);
+    }
   });
 }
+
+// --- PORTFOLIO FILTER ---
+const select = document.querySelector("[data-select]");
+const selectItems = document.querySelectorAll("[data-select-item]");
+const filterBtn = document.querySelectorAll("[data-filter-btn]");
+const filterItems = document.querySelectorAll("[data-filter-item]");
+
+if (select) select.addEventListener("click", function () { elementToggleFunc(this); });
+
+for (let i = 0; i < selectItems.length; i++) {
+  selectItems[i].addEventListener("click", function () {
+    let val = this.innerText.toLowerCase();
+    elementToggleFunc(select);
+    filterFunc(val);
+  });
+}
+
+const filterFunc = (val) => {
+  filterItems.forEach(item => {
+    if (val === "all" || val === item.dataset.category) item.classList.add("active");
+    else item.classList.remove("active");
+  });
+}
+
+let lastBtn = filterBtn[0];
+filterBtn.forEach(btn => {
+  btn.addEventListener("click", function () {
+    let val = this.innerText.toLowerCase();
+    filterFunc(val);
+    if (lastBtn) lastBtn.classList.remove("active");
+    this.classList.add("active");
+    lastBtn = this;
+  });
+});

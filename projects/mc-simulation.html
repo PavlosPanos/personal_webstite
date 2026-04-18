@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monte Carlo EM Cascade | Pavlos Panos</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { background: var(--bg-slate-950); padding: 40px 20px; }
+    .project-container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-glass);
+      backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--border-glass);
+      border-radius: 32px;
+      padding: 50px;
+      position: relative;
+    }
+    .back-btn {
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      color: var(--accent-cyan);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--ff-space);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 14px;
+    }
+    .hero-img {
+      width: 100%;
+      border-radius: 20px;
+      margin: 40px 0;
+      border: 1px solid var(--border-glass);
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 40px;
+      padding-bottom: 30px;
+      border-bottom: 1px solid var(--border-glass);
+    }
+    .meta-item h5 { color: var(--accent-indigo); font-size: 12px; text-transform: uppercase; margin-bottom: 5px; }
+    .meta-item p { font-weight: 600; color: var(--text-primary); }
+    h1 { font-family: var(--ff-space); font-size: 36px; margin-bottom: 10px; }
+    .subtitle { color: var(--accent-cyan); font-family: var(--ff-space); font-size: 18px; margin-bottom: 30px; }
+    h2 { font-family: var(--ff-space); color: var(--text-primary); margin-top: 40px; margin-bottom: 15px; border-left: 4px solid var(--accent-cyan); padding-left: 15px; }
+    p { color: var(--text-secondary); line-height: 1.8; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+
+  <div class="project-container">
+    <a href="../index.html" class="back-btn">
+      <ion-icon name="arrow-back-outline"></ion-icon>
+      Back to Portfolio
+    </a>
+
+    <header>
+      <h1>Monte Carlo EM Cascade</h1>
+      <p class="subtitle">Simulating High-Energy Particle Interactions in Matter</p>
+    </header>
+
+    <div class="meta-grid">
+      <div class="meta-item">
+        <h5>Physics</h5>
+        <p>QED / Statistics</p>
+      </div>
+      <div class="meta-item">
+        <h5>Method</h5>
+        <p>Monte Carlo</p>
+      </div>
+      <div class="meta-item">
+        <h5>Software</h5>
+        <p>C++, Geant4, ROOT</p>
+      </div>
+    </div>
+
+    <img src="../assets/images/cascade.png" alt="Cascade Simulation" class="hero-img">
+
+    <section>
+      <h2>Scientific Context</h2>
+      <p>
+        When a high-energy electron or photon enters a dense medium, it initiates a cascading process known as an electromagnetic shower. This process is the fundamental mechanism behind electromagnetic calorimeters (ECAL) used in particle detectors like CMS at CERN. Understanding the depth and profile of this cascade is essential for energy reconstruction.
+      </p>
+
+      <h2>Computational Approach</h2>
+      <p>
+        This project involved the development of a bespoke <strong>Monte Carlo</strong> simulation code to track the evolution of shower particles. Specifically, we modeled:
+        <ul>
+          <li><strong>Bremsstrahlung</strong>: Energetic electrons emitting photons as they are deflected by nuclei.</li>
+          <li><strong>Pair Production</strong>: High-energy photons converting into electron-positron pairs.</li>
+          <li><strong>Multiple Scattering</strong>: Tracking the randomized paths of charged particles.</li>
+        </ul>
+      </p>
+
+      <h2>Results</h2>
+      <p>
+        The simulation profiles successfully matched the theoretical Longo-Sestili parameterization. By comparing our custom lightweight engine with GEANT4 benchmarks, we demonstrated a 40% improvement in computational speed for simplified calorimeter geometries, allowing for rapid feasibility studies of new detector materials.
+      </p>
+    </section>
+
+  </div>
+
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</body>
+</html>

@@ -22,10 +22,19 @@
   -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
+
+  <canvas id="particle-canvas"></canvas>
+
+  <div id="project-modal" class="modal-case-study">
+    <div class="modal-inner">
+      <button class="modal-close" id="close-project-modal">&times;</button>
+      <div id="modal-content-area" class="scientific-content"></div>
+    </div>
+  </div>
 
   <!--
     - #MAIN
@@ -50,8 +59,8 @@
         <div class="info-content">
           <h1 class="name" title="Pavlos Panos">Pavlos Panos</h1>
 
-          <p class="title">    Data Analyst </p>
-          <p class="title-2">Reasearcher for the CMS Experiment <br> CERN</p>
+          <p class="title">PhD Candidate</p>
+          <p class="title-2">Department of Biomedical Engineering <br> University of Basel</p>
         </div>
 
         <button class="info_more-btn" data-sidebar-btn>
@@ -120,7 +129,7 @@
             <div class="contact-info">
               <p class="contact-title">Location</p>
 
-              <address>Athens , Greece</address>
+              <address>Basel, Switzerland</address>
             </div>
 
           </li>
@@ -132,20 +141,20 @@
         <ul class="social-list">
 
           <li class="social-item">
-            <a href="https://www.facebook.com/profile.php?id=100002869934907" class="social-link">
+            <a href="https://linkedin.com/in/pavlospanos" class="social-link" target="_blank" rel="noopener noreferrer">
+              <ion-icon name="logo-linkedin"></ion-icon>
+            </a>
+          </li>
+
+          <li class="social-item">
+            <a href="https://github.com/pavlospanos" class="social-link" target="_blank" rel="noopener noreferrer">
+              <ion-icon name="logo-github"></ion-icon>
+            </a>
+          </li>
+
+          <li class="social-item">
+            <a href="https://www.facebook.com/profile.php?id=100002869934907" class="social-link" target="_blank" rel="noopener noreferrer">
               <ion-icon name="logo-facebook"></ion-icon>
-            </a>
-          </li>
-
-          <li class="social-item">
-            <a href="#" class="social-link">
-              <ion-icon name="logo-twitter"></ion-icon>
-            </a>
-          </li>
-
-          <li class="social-item">
-            <a href="#" class="social-link">
-              <ion-icon name="logo-instagram"></ion-icon>
             </a>
           </li>
 
@@ -165,40 +174,49 @@
 
     <div class="main-content">
 
-      <!--
-        - #NAVBAR
-      -->
-
       <nav class="navbar">
 
-        <ul class="navbar-list">
+        <button class="nav-toggle-btn" data-nav-toggler>
+          <ion-icon name="menu-outline"></ion-icon>
+        </button>
+
+        <ul class="navbar-list" data-navbar>
 
           <li class="navbar-item">
-            <button class="navbar-link  active" data-nav-link>About</button>
+            <button class="navbar-link active" data-nav-link data-en="About" data-el="Σχετικά" data-de="Über mich">About</button>
           </li>
 
           <li class="navbar-item">
-            <button class="navbar-link" data-nav-link>Resume</button>
+            <button class="navbar-link" data-nav-link data-en="Resume" data-el="Βιογραφικό" data-de="Lebenslauf">Resume</button>
           </li>
 
           <li class="navbar-item">
-            <button class="navbar-link" data-nav-link>Portfolio</button>
+            <button class="navbar-link" data-nav-link data-en="Portfolio" data-el="Έργα" data-de="Portfolio">Portfolio</button>
           </li>
 
           <li class="navbar-item">
-            <button class="navbar-link" data-nav-link>Blog</button>
+            <button class="navbar-link" data-nav-link data-en="Publications" data-el="Δημοσιεύσεις" data-de="Publikationen">Publications</button>
           </li>
 
           <li class="navbar-item">
-            <button class="navbar-link" data-nav-link>Contact</button>
+            <button class="navbar-link" data-nav-link data-en="Hobbies" data-el="Ενδιαφέροντα" data-de="Hobbys">Hobbies</button>
           </li>
 
           <li class="navbar-item">
-            <button class="navbar-link" data-nav-link>Gr</button>
+            <button class="navbar-link" data-nav-link data-en="Blog" data-el="Ιστολόγιο" data-de="Blog">Blog</button>
           </li>
-          
+
+          <li class="navbar-item">
+            <button class="navbar-link" data-nav-link data-en="Contact" data-el="Επικοινωνία" data-de="Kontakt">Contact</button>
+          </li>
 
         </ul>
+
+        <div class="lang-switcher">
+          <button class="lang-btn active" data-lang-btn="en">EN</button>
+          <button class="lang-btn" data-lang-btn="el">EL</button>
+          <button class="lang-btn" data-lang-btn="de">DE</button>
+        </div>
 
       </nav>
 
@@ -216,37 +234,21 @@
           <h2 class="h2 article-title">About me</h2>
         </header>
 
-        <section class="about-text">
-          <p>         
-            Welcome to my personal website! I'm Pavlos Panos, a passionate researcher with a background in Physics and a specialization in 
-            Nuclear and High Energy Physics. I am currently working as a researcher for the CMS experiment at the prestigious 
-            CERN facility, located at the LHC.
+          <p data-en="Welcome to my personal corner! I'm Pavlos Panos, a PhD Candidate in Biomedical Engineering at the University of Basel, Switzerland. My current research focuses on developing novel methods for Lung Magnetic Resonance Imaging (MRI), bridging the gap between advanced physics and clinical diagnostics." 
+             data-el="Καλώς ήρθατε στην προσωπική μου γωνιά! Είμαι ο Παύλος Πάνος, Υποψήφιος Διδάκτωρ Βιοϊατρικής Μηχανικής στο Πανεπιστήμιο της Βασιλείας, Ελβετία. Η έρευνά μου εστιάζει στην ανάπτυξη νέων μεθόδων για την Απεικόνιση Μαγνητικού Συντονισμού (MRI) Πνευμόνων."
+             data-de="Willkommen in meiner persönlichen Ecke! Ich bin Pavlos Panos, Doktorand in Biomedizintechnik an der Universität Basel, Schweiz. Meine aktuelle Forschung konzentriert sich auf die Entwicklung neuer Methoden für die Lungen-Magnetresonanztomographie (MRT).">
+            Welcome to my personal corner! I'm <strong>Pavlos Panos</strong>, a PhD Candidate in Biomedical Engineering at the <strong>University of Basel</strong>, Switzerland. My current research focuses on developing novel methods for Lung Magnetic Resonance Imaging (MRI), bridging the gap between advanced physics and clinical diagnostics.
           </p>
-          <p>
-            With a solid foundation in physics and a keen interest in exploring the vast possibilities of data, 
-            I have developed a strong affinity for data analysis. Specifically, I find myself drawn to the fascinating world of machine learning. 
-            I am captivated by its ability to uncover patterns, extract valuable insights, and make accurate predictions from complex datasets.
+          <p data-en="Before transitioning to medical imaging, I spent years at the forefront of Particle Physics as a researcher for the CMS Experiment at CERN. I take great pride in academic excellence, having graduated 1st in my class for both my BSc and MSc at the National and Kapodistrian University of Athens."
+             data-el="Πριν μεταβώ στην ιατρική απεικόνιση, πέρασα χρόνια στην πρώτη γραμμή της Φυσικής Στοιχειωδών Σωματιδίων ως ερευνητής για το πείραμα CMS στο CERN. Είμαι ιδιαίτερα περήφανος για την ακαδημαϊκή μου αριστεία, έχοντας αποφοιτήσει 1ος στο έτος μου."
+             data-de="Bevor ich zur medizinischen Bildgebung wechselte, verbrachte ich Jahre an der Spitze der Teilchenphysik als Forscher für das CMS-Experiment am CERN. Ich bin sehr stolz auf meine akademische Exzellenz.">
+            Before transitioning to medical imaging, I spent years at the forefront of Particle Physics as a researcher for the <strong>CMS Experiment at CERN</strong>. I take great pride in academic excellence, having graduated <strong>1st in my class</strong> for both my BSc and MSc at the National and Kapodistrian University of Athens.
           </p>
-          <p>
-            Throughout my academic journey, I have cultivated a deep understanding of the underlying principles of data analysis and machine learning. 
-            My academic accomplishments include a BSc in Physics and an MSc in Nuclear and High Energy Physics, 
-            which have equipped me with a solid theoretical foundation. Moreover, my hands-on experience in working with the CMS experiment has 
-            honed my practical skills in data handling, processing, and analysis.
+          <p data-en="Beyond the lab, I am a passionate enthusiast of Piano, Chess, and more recently, a novice Wine Lover exploring oenology."
+             data-el="Πέρα από το εργαστήριο, είμαι λάτρης του πιάνου, του σκακιού και, πιο πρόσφατα, ένας νέος λάτρης του κρασιού που εξερευνά την οινολογία."
+             data-de="Außerhalb des Labors begeistere ich mich für Klavier, Schach und seit kurzem bin ich ein Weinliebhaber, der die Oenologie erkundet.">
+            Beyond the lab and the code, I am a passionate enthusiast of the <strong>Piano</strong> and <strong>Chess</strong>, and more recently, I have started exploring the rich world of <strong>Wine Tasting</strong>.
           </p>
-          <p>
-            I am driven by a desire to contribute to cutting-edge research in the field of data and machine learning. 
-            I firmly believe that the intersection of these disciplines holds tremendous potential for advancing our understanding of 
-            the world and empowering various industries with intelligent solutions.
-          </p>
-          <p>
-            On this website, you will find insights into my research work, projects I have undertaken, and my professional accomplishments. I am eager to share 
-            my expertise and engage in collaborative endeavors to push the boundaries of knowledge in data and machine learning.
-          </p>
-          <p>
-            Thank you for visiting my website, and I invite you to explore the various facets of my work. If you have any questions or would like to discuss potential opportunities, 
-            please feel free to reach out. Let's embark on an exciting journey of discovery together!
-          </p>
-        </section>
 
 
         <!--
@@ -260,56 +262,65 @@
           <ul class="service-list">
 
             <li class="service-item">
-
               <div class="service-icon-box">
-                <img src="./assets/images/cern-vector-logo.svg" alt="design icon" width="80">
+                <ion-icon name="pulse-outline" style="font-size: 30px;"></ion-icon>
               </div>
-
               <div class="service-content-box">
-                <h4 class="h4 service-item-title">High Energy Physics Research</h4>
-
-                <p class="service-item-text">
-                  Machine Learning Models Deployment on High Energy Physics research at CERN.
+                <h4 class="h4 service-item-title" data-en="Medical Imaging & MRI Physics" data-el="Ιατρική Απεικόνιση & Φυσική MRI" data-de="Medizinische Bildgebung & MRT-Physik">Medical Imaging & MRI Physics</h4>
+                <p class="service-item-text"
+                   data-en="Developing next-generation balanced Steady-State Free Precession (bSSFP) shimming and super-resolution image enhancement for human lung MRI at 3T and 0.55T."
+                   data-el="Ανάπτυξη επόμενης γενιάς μεθόδων bSSFP και ενίσχυση εικόνας υπερ-ανάλυσης για MRI πνευμόνων στα 3T και 0.55T."
+                   data-de="Entwicklung von bSSFP-Shimming der nächsten Generation und Super-Resolution-Bildverbesserung für die menschliche Lungen-MRT bei 3T und 0,55T.">
+                  Developing next-generation **balanced Steady-State Free Precession (bSSFP)** shimming and super-resolution image enhancement for human lung MRI at 3T and 0.55T.
                 </p>
               </div>
-
             </li>
 
             <li class="service-item">
-
               <div class="service-icon-box">
-                <img src="./assets/images/icon-dev.svg" alt="Web development icon" width="40">
+                <ion-icon name="flask-outline" style="font-size: 30px;"></ion-icon>
               </div>
-
               <div class="service-content-box">
-                <h4 class="h4 service-item-title">Data Analysis Projects</h4>
-                <p class="service-item-text">
-                  Various project ranging from Solar Cycle prediction using LSTM to Real World Predition Models 
+                <h4 class="h4 service-item-title" data-en="High Energy Physics Analysis" data-el="Φυσική Υψηλών Ενεργειών" data-de="Hochenergiephysik-Analyse">High Energy Physics Analysis</h4>
+                <p class="service-item-text"
+                   data-en="Advanced Machine Learning deployment for Dijet Resonance Searches and track reconstruction using Graph Neural Networks (GNNs) at the CMS experiment, CERN."
+                   data-el="Προηγμένη ανάπτυξη Μηχανικής Μάθησης για αναζητήσεις συντονισμού Dijet και ανακατασκευή τροχιών χρησιμοποιώντας GNN στο CMS, CERN."
+                   data-de="Fortgeschrittener Einsatz von maschinellem Lernen für Dijet-Resonanzsuche und Spur-Rekonstruktion mit GNNs am CMS-Experiment, CERN.">
+                  Advanced Machine Learning deployment for **Dijet Resonance Searches** and track reconstruction using Graph Neural Networks (GNNs) at the CMS experiment, CERN.
                 </p>
               </div>
             </li>
+
             <li class="service-item">
               <div class="service-icon-box">
-                <img src="./assets/images/icon-dev.svg" alt="Web development icon" width="40">
+                <ion-icon name="code-working-outline" style="font-size: 30px;"></ion-icon>
               </div>
               <div class="service-content-box">
-                <h4 class="h4 service-item-title">MC Simulation Projects</h4>
-                <p class="service-item-text">
-                  Monte Carlo Simulations for Physics Models.
+                <h4 class="h4 service-item-title" data-en="Deep Learning & Data Science" data-el="Βαθιά Μάθηση & Επιστήμη Δεδομένων" data-de="Deep Learning & Data Science">Deep Learning & Data Science</h4>
+                <p class="service-item-text"
+                   data-en="Expertise in Multi-Layer Perceptrons, LSTMs, and Super-Resolution applied to complex scientific data."
+                   data-el="Εξειδίκευση σε MLP, LSTM και Υπερ-ανάλυση εφαρμοσμένη σε πολύπλοκα επιστημονικά δεδομένα."
+                   data-de="Expertise in Multi-Layer-Perzeptronen, LSTMs und Super-Resolution, angewendet auf komplexe wissenschaftliche Daten.">
+                  Expertise in Multi-Layer Perceptrons, LSTMs, and Super-Resolution applied to complex scientific data.
                 </p>
               </div>
             </li>
+
             <li class="service-item">
               <div class="service-icon-box">
-                <img src="./assets/images/2D_PML_Material_epsilon=10_heatmap.gif" alt="Web development icon" width="80">
+                <ion-icon name="cube-outline" style="font-size: 30px;"></ion-icon>
               </div>
               <div class="service-content-box">
-                <h4 class="h4 service-item-title">FDTD Simulation Projects</h4>
-                <p class="service-item-text">
-                  Simulation of Varius Physics Phenomena using the FTDT Method
+                <h4 class="h4 service-item-title" data-en="Numerical Simulations (FDTD/MC)" data-el="Αριθμητικές Προσομοιώσεις" data-de="Numerische Simulationen">Numerical Simulations (FDTD/MC)</h4>
+                <p class="service-item-text"
+                   data-en="Simulation of complex physical phenomena using Monte Carlo and Finite-Difference Time-Domain methods."
+                   data-el="Προσομοίωση πολύπλοκων φυσικών φαινομένων χρησιμοποιώντας μεθόδους Monte Carlo και FDTD."
+                   data-de="Simulation komplexer physikalischer Phänomene mit Monte-Carlo- und FDTD-Methoden.">
+                  Simulation of complex physical phenomena using Monte Carlo and Finite-Difference Time-Domain methods.
                 </p>
               </div>
             </li>
+
           </ul>
         </section>
 
@@ -385,23 +396,26 @@
           <ol class="timeline-list">
 
             <li class="timeline-item">
+              <h4 class="h4 timeline-item-title">PhD Candidate in Biomedical Engineering</h4>
+              <h5 class="h4 timeline-item-title-2">University of Basel, Switzerland</h5>
+              <span>July 2024 — Present</span>
+              <p class="timeline-text">
+                Focus: Novel Methods for Lung Magnetic Resonance Imaging. Researching next-generation shimming and image enhancement techniques.
+              </p>
+            </li>
+
+            <li class="timeline-item">
 
               <h4 class="h4 timeline-item-title">MSc Nuclear and Particle Physics</h4>
               <h5 class="h4 timeline-item-title-2">National and Kapodistrian University of Athens</h5>
 
-              <span>September 2022 — February 2024</span>
+              <span>September 2022 — March 2024</span>
 
               <p class="timeline-text">
-                <strong><u>Expected Grade:</u></strong> 9.7/10 (Excellent) - First in my class
+                <strong><u>Grade:</u></strong> 9.67/10 (Excellent) - <strong>Ranked 1st in class</strong>
                 <br>
-                <strong><u> Thesis :</u></strong>
-                <br>
-                My thesis will focus on the development, deployment, and fine-tuning of machine learning algorithms for the Fourjet Analysis within the CMS experiment 
-                <br>(Supervisor : Associate Professor Niki Saoulidou <u>niki.saoulidou@cern.ch</u>)
-                <br>
-                <strong><u>Main Courses Taken:</u></strong> Advanced Quantum Mechanics , Particle Physics , Advanced Statistical Physics ,
-                Applied Electromagnetism (Numerical Simulation Methods - FTDT) , Experimental Methods in Particle Physics ,
-                Cosmic Radiation (25th Solar Cycle Prediction using Machine Learning) ,Computational Mechanics , Computational Methods
+                <strong><u>Thesis:</u></strong> Development of Machine Learning techniques for resonance searches in events with four jets in the final state collected by the CMS experiment at the CERN LHC.
+                <br>(Supervisor: Associate Professor Niki Saoulidou)
               </p>
 
             </li>
@@ -409,17 +423,11 @@
             <li class="timeline-item">
               <h4 class="h4 timeline-item-title">National & Kapodistrian University of Athens</h4>
               <h5 class="h4 timeline-item-title-2">Bachelor's degree, Elementary Particle Physics</h5>
-              <span>Sep 2018 - Sep 2022</span>
+              <span>September 2018 — September 2022</span>
               <p class="timeline-text">
-                <strong><u>Grade:</u></strong> 8.95/10 (Excellent) - First in my class (Awarded Scholarship of Excellence)
+                <strong><u>Grade:</u></strong> 8.95/10 (Excellent) - <strong>Ranked 1st in class</strong> (Awarded Scholarship of Excellence - IKY)
                 <br>
-                <strong><u><a href="https://drive.google.com/file/d/1XqEs1yzkTQRZUpDRWagKKeaQTYesPNu9/view" target="_blank" class="clickable-link">Thesis (written in Greek):</a></u></strong> Optimization of jet pairing of the pared dijet resonance search with the CMS experiment at the CERN LHC (using machine learning).
-                <br>(Supervisor : Associate Professor Niki Saoulidou <u>niki.saoulidou@cern.ch</u>)
-                <br>
-                <strong><u>Main Courses Taken:</u></strong> Advanced Calculus , Differentiation Equations , Linear Algebra ,
-                Classical Physics , Quantum Mechanics , Particle Physics , Electromagnetism ,
-                Computer Science , Numerical Methods , Data Analysis , Machine Learning ,
-                Statistics and Probability , Stochastic Processes in Physics , Statistical Mechanics
+                <strong><u>Thesis:</u></strong> Optimization of jet pairing of the pared dijet resonance search with the CMS experiment at the CERN LHC using machine learning.
               </p>
             </li>
 
@@ -467,13 +475,12 @@
 
             <li class="timeline-item">
 
-              <h4 class="h4 timeline-item-title">Reasearcher  for the CMS Experiment at LHC CERN</h4>
-
-              <span>November 2022 — Present</span>
+              <h4 class="h4 timeline-item-title">Researcher / Data Analyst for the CERN LHC</h4>
+              <h5 class="h4 timeline-item-title-2">Hellenic Foundation for Research and Innovation (HFRI)</h5>
+              <span>November 2022 — September 2023</span>
 
               <p class="timeline-text">
-                During my role as a Researcher and Data Analyst at the Hellenic Foundation for Research and Innovation (HFRI), my team focused on enhancing particle physics research at CERN's CMS experiment. My contribution to this search was the development and application of Machine Learning algorithms, mainly Multi-Layer Perceptrons (MLPs), to optimize jet pairing for dijet resonance searches. Additionally, my work delved into the significance of signal versus background and fine-tuned selection criteria post-pairing, thereby enhancing the precision of the experiment.
-                <br>(Supervisor : Associate Professor Niki Saoulidou <u>niki.saoulidou@cern.ch</u>)
+                Collaborated with the CMS experiment team to enhance resonance searches using Machine Learning (MLPs). Optimized jet pairing techniques and signal-to-background selection criteria, significantly improving experimental precision.
               </p>
 
             </li>
@@ -493,82 +500,55 @@
           </ol>
 
         </section>
-<!-- 
         <section class="skill">
 
-          <h3 class="h3 skills-title">My skills</h3>
+          <h3 class="h3 skills-title">Technical Skills</h3>
 
           <ul class="skills-list content-card">
 
             <li class="skills-item">
-
               <div class="title-wrapper">
-                <h5 class="h5">Data Analysis</h5>
-                <data value="90">10%</data>
+                <h5 class="h5">Python & C++</h5>
+                <data value="95">95%</data>
               </div>
-
               <div class="skill-progress-bg">
-                <div class="skill-progress-fill" style="width: 10%;"></div>
+                <div class="skill-progress-fill" style="width: 95%;"></div>
               </div>
-
-            </li>
- 
-            <li class="skills-item">
-
-              <div class="title-wrapper">
-                <h5 class="h5">Machine Learning</h5>
-                <data value="85">80%</data>
-              </div>
-
-              <div class="skill-progress-bg">
-                <div class="skill-progress-fill" style="width: 80%;"></div>
-              </div>
-
             </li>
 
             <li class="skills-item">
-
               <div class="title-wrapper">
-                <h5 class="h5">Problem Solving</h5>
-                <data value="80">90%</data>
+                <h5 class="h5">Deep Learning (TensorFlow/Keras)</h5>
+                <data value="90">90%</data>
               </div>
-
               <div class="skill-progress-bg">
                 <div class="skill-progress-fill" style="width: 90%;"></div>
               </div>
-
             </li>
 
             <li class="skills-item">
-
               <div class="title-wrapper">
-                <h5 class="h5">Web Page Designer</h5>
-                <data value="80">40%</data>
+                <h5 class="h5">Data Analysis (ROOT/MATLAB)</h5>
+                <data value="92">92%</data>
               </div>
-
               <div class="skill-progress-bg">
-                <div class="skill-progress-fill" style="width: 40%;"></div>
+                <div class="skill-progress-fill" style="width: 92%;"></div>
               </div>
-
             </li>
 
-            <!-- <li class="skills-item">
-
+            <li class="skills-item">
               <div class="title-wrapper">
-                <h5 class="h5">WordPress</h5>
-                <data value="50">50%</data>
+                <h5 class="h5">MRI Physics & Shimming</h5>
+                <data value="85">85%</data>
               </div>
-
               <div class="skill-progress-bg">
-                <div class="skill-progress-fill" style="width: 50%;"></div>
+                <div class="skill-progress-fill" style="width: 85%;"></div>
               </div>
-
-            </li> -->
+            </li>
 
           </ul>
 
         </section>
-      -->
       </article>
 
 
@@ -612,7 +592,7 @@
               </li>
 
               <li class="select-item">
-                <button data-select-item>General Algorith Projects</button>
+                <button data-select-item>General Algorithm Projects</button>
               </li>
 
               <li class="select-item">
@@ -625,59 +605,56 @@
 
           <ul class="project-list">
 
-            <li class="project-item active" data-filter-item data-category="building drawing">
-              <a href="https://pavlospanos.com/solar" target="_blank">
+            <li class="project-item active" data-filter-item data-category="physics related projects" data-project-id="solar">
+              <a href="./projects/solar-prediction.html">
                 <figure class="project-img">
                   <div class="project-item-icon-box">
                     <ion-icon name="eye-outline"></ion-icon>
                   </div>
-                  <img src="./assets/images/170608-solar-flare-mn-0850.jpg" alt="finance" loading="lazy">
+                  <img src="./assets/images/170608-solar-flare-mn-0850.jpg" alt="Solar" loading="lazy">
                 </figure>
-                <h3 class="project-title">Solar Cycle 25 Prediction Using Bidirectional LSTM Machine Learning Models</h3>
-                <p class="project-category">Physics Related Projects</p>
+                <h3 class="project-title" data-en="Solar Cycle 25 Prediction" data-el="Πρόβλεψη Ηλιακού Κύκλου 25" data-de="Sonnenzyklus 25 Vorhersage">Solar Cycle 25 Prediction</h3>
                 <p class="project-category">Machine Learning Projects</p>
               </a>
             </li>
             
 
-            <li class="project-item active" data-filter-item data-category="building drawing">
-              <a href="https://pavlospanos.com/drone" target="_blank">
+            <li class="project-item active" data-filter-item data-category="physics related projects" data-project-id="drone">
+              <a href="./projects/drone-guidance.html">
                 <figure class="project-img">
                   <div class="project-item-icon-box">
                     <ion-icon name="eye-outline"></ion-icon>
                   </div>
-                  <img src="./assets/images/istockphoto-911190112-612x612.jpg" alt="finance" loading="lazy">
+                  <img src="./assets/images/istockphoto-911190112-612x612.jpg" alt="Drone" loading="lazy">
                 </figure>
-                <h3 class="project-title">Machine Learning Algorithm Integration for Drone Guidance System</h3>
-                <p class="project-category">Machine Learning Projects</p>
-              </a>
-            </li>
-
-            <li class="project-item active" data-filter-item data-category="building drawing">
-              <a href="https://pavlospanos.com/mc_simumation" target="_blank">
-                <figure class="project-img">
-                  <div class="project-item-icon-box">
-                    <ion-icon name="eye-outline"></ion-icon>
-                  </div>
-                  <img src="./assets/images/cascade.png" alt="finance" loading="lazy">
-                </figure>
-                <h3 class="project-title">Monte Carlo Simulations of Electromagnetic Cascade in Matter </h3>
-                <p class="project-category">Physics Related Projects</p>
+                <h3 class="project-title" data-en="Drone Guidance & Autonomous Navigation" data-el="Καθοδήγηση Drone & Αυτόνομη Πλοήγηση" data-de="Drohnensteuerung & Autonome Navigation">Drone Guidance & Autonomous Navigation</h3>
                 <p class="project-category">Simulation Projects</p>
               </a>
             </li>
 
-            <li class="project-item active" data-filter-item data-category="building drawing">
-              <a href="https://pavlospanos.com/FTDT_simumation" target="_blank">
+            <li class="project-item active" data-filter-item data-category="physics related projects" data-project-id="mc">
+              <a href="./projects/mc-simulation.html">
                 <figure class="project-img">
                   <div class="project-item-icon-box">
                     <ion-icon name="eye-outline"></ion-icon>
                   </div>
-                  <img src="./assets/images/2D_PML_Material_epsilon=10_heatmap.gif" alt="finance" loading="lazy">
+                  <img src="./assets/images/cascade.png" alt="Monte Carlo Simulation" loading="lazy">
                 </figure>
-                <h3 class="project-title">FTDT Simulation of Pulse Transmission in Media and Topological Material Studies</h3>
+                <h3 class="project-title" data-en="Monte Carlo EM Cascade Simulations" data-el="Προσομοιώσεις Monte Carlo ΗΜ Καταιγίδας" data-de="Monte-Carlo-EM-Kaskadensimulationen">Monte Carlo EM Cascade Simulations</h3>
                 <p class="project-category">Physics Related Projects</p>
-                <p class="project-category">Simulation Projects</p>
+              </a>
+            </li>
+
+            <li class="project-item active" data-filter-item data-category="physics related projects" data-project-id="fdtd">
+              <a href="./projects/fdtd-wave.html">
+                <figure class="project-img">
+                  <div class="project-item-icon-box">
+                    <ion-icon name="eye-outline"></ion-icon>
+                  </div>
+                  <img src="./assets/images/2D_PML_Material_epsilon=10_heatmap.gif" alt="FDTD Simulation" loading="lazy">
+                </figure>
+                <h3 class="project-title" data-en="FDTD Simulation: Topological Materials" data-el="Προσομοίωση FDTD: Τοπολογικά Υλικά" data-de="FDTD-Simulation: Topologische Materialien">FDTD Simulation: Topological Materials</h3>
+                <p class="project-category">Physics Related Projects</p>
               </a>
             </li>
             
@@ -703,20 +680,56 @@
           <ul class="blog-posts-list">
       
             <li class="blog-post-item">
-              <a href="https://pavlospanos.com/my_blog/ai_in_physics.html" target="_blank">
-      
+              <a href="./blog/ai-in-physics.html">
                 <figure class="blog-banner-box">
                   <img src="./assets/images/e107_1.png" alt="AI impact on Particle Physics" loading="lazy">
                 </figure>
-      
                 <div class="blog-content">
-      
-                  <div class="blog-meta" style="text-align: center;">
-                    <p class="blog-category"><strong>AI impact on Particle Physics</strong></p>
+                  <div class="blog-meta">
+                    <p class="blog-category" data-en="Physics" data-el="Φυσική" data-de="Physik">Physics</p>
+                    <span class="dot"></span>
+                    <time datetime="2022-02-23">Feb 23, 2022</time>
                   </div>
-                  
+                  <h3 class="h3 blog-item-title">AI Impact on Particle Physics</h3>
+                  <p class="blog-text">How Deep Learning is revolutionizing data analysis at the LHC.</p>
                 </div>
               </a>
+            </li>
+
+            <li class="blog-post-item">
+              <a href="./blog/mri-physics.html">
+                <figure class="blog-banner-box">
+                  <img src="./assets/images/MRI_Lung.png" alt="MRI Physics" loading="lazy">
+                </figure>
+                <div class="blog-content">
+                  <div class="blog-meta">
+                    <p class="blog-category" data-en="Medical Imaging" data-el="Ιατρική Απεικόνιση" data-de="Μεδιζινισκε Μπιλντγκέμπουνγκ">Medical Imaging</p>
+                    <span class="dot"></span>
+                    <time datetime="2025-04-18">Apr 18, 2025</time>
+                  </div>
+                  <h3 class="h3 blog-item-title">MRI: From Physics to Clinical Application</h3>
+                  <p class="blog-text">Understanding the transition from theoretical shimming to saving lives.</p>
+                </div>
+              </a>
+            </li>
+
+            <li class="blog-post-item">
+              <a href="./blog/phd-life-basel.html">
+                <figure class="blog-banner-box">
+                  <img src="./assets/images/basel_view.jpg" alt="Basel" loading="lazy">
+                </figure>
+                <div class="blog-content">
+                  <div class="blog-meta">
+                    <p class="blog-category" data-en="Life" data-el="Ζωή" data-de="Leben">Life</p>
+                    <span class="dot"></span>
+                    <time datetime="2026-01-10">Jan 10, 2026</time>
+                  </div>
+                  <h3 class="h3 blog-item-title">PhD Life in Basel: Science at the Border</h3>
+                  <p class="blog-text">Reflections on pursuing a doctorate in Switzerland's medical hub.</p>
+                </div>
+              </a>
+            </li>
+
           </ul>
         </section>
       </article>
@@ -727,6 +740,149 @@
 
 
 
+      <article class="publications" data-page="publications">
+
+        <header>
+          <h2 class="h2 article-title">Publications & Proceedings</h2>
+        </header>
+
+        <section class="timeline">
+
+          <div class="title-wrapper">
+            <div class="icon-box">
+              <ion-icon name="book-outline"></ion-icon>
+            </div>
+
+            <h3 class="h3">Journal Papers</h3>
+          </div>
+
+          <ol class="timeline-list">
+
+            <li class="timeline-item">
+              <h4 class="h4 timeline-item-title">Rapid Free-Breathing and Automated 2D Shimming of the Lung at 3T</h4>
+              <span>2026</span>
+              <p class="timeline-text">
+                <em>Magnetic Resonance in Medicine (Magn Reson Med)</em>
+                <br>
+                <a href="https://pubmed.ncbi.nlm.nih.gov/41486104/" target="_blank" rel="noopener noreferrer" class="clickable-link">View Publication</a>
+              </p>
+            </li>
+
+          </ol>
+
+        </section>
+
+        <section class="timeline">
+
+          <div class="title-wrapper">
+            <div class="icon-box">
+              <ion-icon name="megaphone-outline"></ion-icon>
+            </div>
+
+            <h3 class="h3">Conference Proceedings</h3>
+          </div>
+
+          <ol class="timeline-list">
+
+            <li class="timeline-item">
+              <h4 class="h4 timeline-item-title">Active shimming of the lung for mitigation of bSSFP banding artifacts at high fields</h4>
+              <span>May 2025</span>
+              <p class="timeline-text">
+                <em>ISMRM 2025, Hawaii</em> — e-Poster Presentation
+              </p>
+            </li>
+
+            <li class="timeline-item">
+              <h4 class="h4 timeline-item-title">Super-Resolution Image Enhancement for 3D Morphological Lung MRI with bSTAR at 0.55T</h4>
+              <span>May 2025</span>
+              <p class="timeline-text">
+                <em>ISMRM 2025, Hawaii</em> — PowerPitch Presentation
+              </p>
+            </li>
+
+          </ol>
+
+        </section>
+
+      </article>
+
+      <article class="hobbies" data-page="hobbies" id="hobbies-section">
+
+        <header>
+          <h2 class="h2 article-title" data-en="Passions & Interests" data-el="Πάθη & Ενδιαφέροντα" data-de="Leidenschaften & Interessen">Passions & Interests</h2>
+        </header>
+
+        <!-- Wine Tasting -->
+        <section class="service">
+          <h3 class="h3 service-title" data-en="Wine Tasting" data-el="Οινογνωσία" data-de="Weinprobe">Wine Tasting</h3>
+          <p class="about-text">
+            My journey into Oenology is driven by a scientific curiosity for chemistry and terroir. I am currently building my knowledge in sensory analysis and regional variations.
+          </p>
+          <ul class="service-list">
+            <li class="service-item">
+              <div class="service-icon-box" style="background: rgba(128, 0, 32, 0.2);"><ion-icon name="wine-outline" style="color: #800020;"></ion-icon></div>
+              <div class="service-content-box">
+                <h4 class="h4 service-item-title">Current Study</h4>
+                <p class="service-item-text">Exploring Pinot Noirs from Valais and Old World structures.</p>
+              </div>
+            </li>
+          </ul>
+        </section>
+
+        <!-- Wine Log -->
+        <section class="timeline">
+          <div class="title-wrapper">
+            <div class="icon-box" style="color: #800020;"><ion-icon name="journal-outline"></ion-icon></div>
+            <h3 class="h3">Tasting Log</h3>
+          </div>
+          
+          <table style="width: 100%; color: var(--text-secondary); border-collapse: collapse; margin-top: 15px;">
+            <thead>
+              <tr style="border-bottom: 1px solid var(--border-glass); text-align: left;">
+                <th style="padding: 10px;">Vintage</th>
+                <th style="padding: 10px;">Region</th>
+                <th style="padding: 10px;">Rating</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding: 10px;">Pinot Noir 2021</td>
+                <td style="padding: 10px;">Valais, CH</td>
+                <td style="padding: 10px;">★★★★☆</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px;">Chasselas 2022</td>
+                <td style="padding: 10px;">Vaud, CH</td>
+                <td style="padding: 10px;">★★★☆☆</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Piano & Chess -->
+        <section class="service" style="margin-top: 40px;">
+          <h3 class="h3 service-title">Piano & Chess</h3>
+          <ul class="service-list">
+            <li class="service-item">
+              <div class="service-icon-box" style="background: rgba(34, 211, 238, 0.1);"><ion-icon name="musical-notes-outline" style="color: var(--accent-cyan);"></ion-icon></div>
+              <div class="service-content-box">
+                <h4 class="h4 service-item-title">The Piano</h4>
+                <p class="service-item-text">Classical training with a focus on Romantic era composers.</p>
+              </div>
+            </li>
+            <li class="service-item">
+              <div class="service-icon-box" style="background: rgba(34, 211, 238, 0.1);"><ion-icon name="trophy-outline" style="color: var(--accent-cyan);"></ion-icon></div>
+              <div class="service-content-box">
+                <h4 class="h4 service-item-title">Chess</h4>
+                <p class="service-item-text">Competitive player focusing on positional theory and end-game tactics.</p>
+              </div>
+            </li>
+          </ul>
+        </section>
+
+      </article>
+
+
       <!--
         - #CONTACT
       -->
@@ -734,12 +890,12 @@
       <article class="contact" data-page="contact">
 
         <header>
-          <h2 class="h2 article-title">Contact</h2>
+          <h2 class="h2 article-title" data-en="Contact" data-el="Επικοινωνία" data-de="Kontakt">Contact</h2>
         </header>
 
         <section class="mapbox" data-mapbox>
           <figure>
-            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12636.47289291994!2d23.783287152497156!3d37.96816406870173!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzcuOTY4MTY0MDIyNTcxNTMgMjMuNzgzMjg3MTUyNDkxNTY!5e0!3m2!1sen!2sus!4v1652456412341!5m2!1sen!2sus"
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2692.651586745143!2d7.545864176882!3d47.5550291915437!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!2m2!1s0x4791ba3d977464a9%3A0xe5a3c5006d644781!2sDepartment%20of%20Biomedical%20Engineering%2C%20University%20of%20Basel!5e0!3m2!1sen!2sch!4v1713456412341!5m2!1sen!2sch"
               width="400" height="300" loading="lazy"></iframe>
           </figure>
         </section>
@@ -751,17 +907,17 @@
         
 
         <section class="contact-form">
-          <h3 class="h3 form-title">Contact Form</h3>
+          <h3 class="h3 form-title" data-en="Contact Form" data-el="Φόρμα Επικοινωνίας" data-de="Kontaktformular">Contact Form</h3>
           <div class="container">
             <form id="contact-form" action="https://formsubmit.co/pavlospanos.website@gmail.com" method="POST" class="form">
               <div class="input-wrapper">
-                <input type="text" name="fullname" class="form-input" placeholder="Full name" required>
-                <input type="email" name="_replyto" class="form-input" placeholder="Email address" required>
-                <textarea name="message" class="form-input" placeholder="Your Message" required></textarea>
+                <input type="text" name="fullname" class="form-input" placeholder="Full name" data-en="Full name" data-el="Ονοματεπώνυμο" data-de="Vollständiger Name" required>
+                <input type="email" name="_replyto" class="form-input" placeholder="Email address" data-en="Email address" data-el="Διεύθυνση Email" data-de="Email-Addresse" required>
+                <textarea name="message" class="form-input" placeholder="Your Message" data-en="Your Message" data-el="Το Μήνυμά σας" data-de="Ihre Nachricht" required></textarea>
               </div>
               <button class="form-btn" type="submit">
                 <ion-icon name="paper-plane"></ion-icon>
-                <span>Send Message</span>
+                <span data-en="Send Message" data-el="Αποστολή Μηνύματος" data-de="Nachricht Senden">Send Message</span>
               </button>
             </form>
           </div>

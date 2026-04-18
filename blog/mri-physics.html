@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MRI: From Physics to Clinical Application | Pavlos Panos</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { background: var(--bg-slate-950); padding: 40px 20px; }
+    .post-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: var(--bg-glass);
+      backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--border-glass);
+      border-radius: 32px;
+      padding: 60px;
+      position: relative;
+    }
+    .back-btn {
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      color: var(--accent-cyan);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--ff-space);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 14px;
+    }
+    .blog-banner {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      border-radius: 20px;
+      margin: 40px 0;
+      border: 1px solid var(--border-glass);
+    }
+    .date { color: var(--accent-cyan); font-family: var(--ff-space); font-weight: 600; margin-bottom: 5px; }
+    h1 { font-family: var(--ff-space); font-size: 42px; margin-bottom: 20px; color: var(--text-primary); }
+    h2 { font-family: var(--ff-space); color: var(--text-primary); margin-top: 40px; margin-bottom: 15px; }
+    p { color: var(--text-secondary); line-height: 1.8; margin-bottom: 25px; font-size: 18px; }
+    .highlight { background: rgba(34, 211, 238, 0.1); padding: 2px 6px; border-radius: 4px; color: var(--accent-cyan); }
+  </style>
+</head>
+<body>
+
+  <article class="post-container">
+    <a href="../index.html" class="back-btn">
+      <ion-icon name="arrow-back-outline"></ion-icon>
+      Back
+    </a>
+
+    <header>
+      <p class="date">April 18, 2025</p>
+      <h1>MRI: From Physics to Clinical Application</h1>
+    </header>
+
+    <img src="../assets/images/MRI_Lung.png" alt="Lung MRI" class="blog-banner">
+
+    <section>
+      <p>
+        The transition from High Energy Physics to Biomedical Engineering may seem like a leap, but at the heart of both fields lies the same fundamental truth: <span class="highlight">Electromagnetism</span>. In my current PhD research at the University of Basel, I apply the rigors of physics to solve one of the most challenging problems in medical imaging—shimming the human lung.
+      </p>
+
+      <h2>The Challenge of the Lung</h2>
+      <p>
+        The lung is a nightmare for MRI. The vast number of air-tissue interfaces causes massive susceptibility artifacts and field inhomogeneities. Standard MRI sequences often fail here, producing "signal voids" where we should see clinical detail.
+      </p>
+
+      <h2>bSSFP & Shimming</h2>
+      <p>
+        We utilize <strong>balanced Steady-State Free Precession (bSSFP)</strong> sequences, which are notoriously sensitive to off-resonance effects. My work involves developing automated shimming techniques that "iron out" these field distortions in real-time. By combining 2D shimming with super-resolution algorithms, we can finally begin to see the fine architecture of the lung without the need for radiation-intensive CT scans.
+      </p>
+
+      <p>
+        Ultimately, this isn't just about clearer pictures. It's about providing a faster, safer, and more precise diagnostic tool for pulmonary diseases, proving that the bridge between theoretical physics and life-saving technology is shorter than we think.
+      </p>
+    </section>
+
+  </article>
+
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</body>
+</html>
