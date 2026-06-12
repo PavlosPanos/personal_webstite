@@ -223,14 +223,8 @@
         const modalContent = document.getElementById('modal-content');
         const modalCloseBtn = document.getElementById('modal-close-btn');
 
-        // --- Mock Data Seeds (real Basel club data, seeded Aug 2025) ---
-        // _v2: bumped so browsers with the old demo DB pick up the real data
-        const MOCK_STORAGE_KEY = `espresso_club_mock_db_${appId}_v2`;
-        const loadMockDB = () => {
-            const data = localStorage.getItem(MOCK_STORAGE_KEY);
-            if (data) return JSON.parse(data);
-
-            const initialSeeds = {
+        // --- Real Basel club data (used to seed demo mode AND importable into Firebase) ---
+        const CLUB_SEED = {
                 members: [
                     { id: 'm1', name: 'Pavlos Panos', email: 'pavlospanos@hotmail.com', phone: '', totalContributed: 0.0, joinedDate: '2025-07-01T09:00:00.000Z', preference: { favoriteCoffee: 'tchibo-crema', roastLevel: 'medium', favoriteDrink: 'Double Espresso', dailyGoal: 3 } },
                     { id: 'm2', name: 'Oliver Bieri', email: 'oliver.bieri@unibas.ch', phone: '', totalContributed: 20.0, joinedDate: '2025-07-01T09:00:00.000Z', preference: { favoriteCoffee: 'tchibo-crema', roastLevel: 'medium', favoriteDrink: 'Single Espresso', dailyGoal: 2 } },
@@ -261,9 +255,45 @@
                 broadcast: { message: '', active: false },
                 machineStats: { cupsSinceClean: 0, lastCleanedBy: 'Pavlos Panos' },
                 collectionPlan: { amountPerMember: 20, dueDate: '', note: '' }
-            };
+        };
+
+        // _v2: bumped so browsers with the old demo DB pick up the real data
+        const MOCK_STORAGE_KEY = `espresso_club_mock_db_${appId}_v2`;
+        const loadMockDB = () => {
+            const data = localStorage.getItem(MOCK_STORAGE_KEY);
+            if (data) return JSON.parse(data);
+            const initialSeeds = JSON.parse(JSON.stringify(CLUB_SEED));
             localStorage.setItem(MOCK_STORAGE_KEY, JSON.stringify(initialSeeds));
             return initialSeeds;
+        };
+
+        // --- One-click import of the club data into Firebase (admin only) ---
+        const importSeedToFirebase = async () => {
+            if (isMockMode || !db) { alert('Already running on the local demo database — data is there.'); return; }
+            if (!confirm('Write the club data (8 members, 7 payments totalling CHF 160, Coop order CHF 183.90) into your Firebase database?\n\nExisting entries with the same IDs will be overwritten; everything else is kept.')) return;
+            try {
+                const batch = writeBatch(db);
+                CLUB_SEED.members.forEach(m => {
+                    batch.set(doc(db, getCollectionPath('users'), m.id), m);
+                });
+                CLUB_SEED.coffeeTypes.forEach(c => {
+                    batch.set(doc(db, getCollectionPath('coffeeTypes'), c.id), c);
+                });
+                CLUB_SEED.payments.forEach(p => {
+                    batch.set(doc(db, getCollectionPath('payments'), p.id), { ...p, date: Timestamp.fromDate(new Date(p.date)) });
+                });
+                CLUB_SEED.inventoryHistory.forEach(h => {
+                    batch.set(doc(db, getCollectionPath('inventoryHistory'), h.id), { ...h, date: Timestamp.fromDate(new Date(h.date)) });
+                });
+                batch.set(doc(db, getCollectionPath('financials'), 'summary'), CLUB_SEED.financials);
+                batch.set(doc(db, getCollectionPath('machine'), 'status'), CLUB_SEED.machineStats);
+                batch.set(doc(db, getCollectionPath('reminders'), 'plan'), CLUB_SEED.collectionPlan);
+                await batch.commit();
+                alert('Club data imported successfully! The dashboard will refresh automatically.');
+            } catch (err) {
+                console.error(err);
+                alert('Import failed: ' + (err.message || err) + '\n\nCheck your Firestore security rules allow writes for your admin account.');
+            }
         };
 
         const saveMockDB = (data) => {
@@ -371,6 +401,23 @@
                 renderApp();
             } catch (err) {
                 console.error(err);
+                // First login for a known club member: create their account automatically.
+                const isKnownMember = CLUB_SEED.members.some(m => m.email && m.email.toLowerCase() === email.toLowerCase());
+                const noAccountYet = ['auth/user-not-found', 'auth/invalid-credential', 'auth/invalid-login-credentials'].includes(err.code);
+                if (isKnownMember && noAccountYet) {
+                    try {
+                        const cred = await createUserWithEmailAndPassword(auth, email, password);
+                        currentUser = cred.user;
+                        renderApp();
+                        return;
+                    } catch (err2) {
+                        errorEl.textContent = err2.code === 'auth/email-already-in-use'
+                            ? 'Wrong password for this account.'
+                            : (err2.code === 'auth/weak-password' ? 'Choose a password with at least 6 characters — it becomes your account password.' : (err2.message || 'Could not create account.'));
+                        errorEl.classList.remove('hidden');
+                        return;
+                    }
+                }
                 errorEl.textContent = err.message || "Invalid Credentials.";
                 errorEl.classList.remove('hidden');
             }
@@ -526,6 +573,15 @@
 
             container.innerHTML = `
                 <div class="space-y-8">
+                    ${isAdmin && !isMockMode && appState.members.length < CLUB_SEED.members.length ? `
+                        <div class="bg-emerald-900/30 border border-emerald-500/30 text-emerald-100 p-5 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-lg">
+                            <div>
+                                <p class="text-xs uppercase tracking-widest text-emerald-400 font-bold">Setup</p>
+                                <p class="text-sm mt-1">Your online database doesn't have the club data yet — import the 8 members, all CHF 160 of contributions, and the Coop order (CHF 183.90)?</p>
+                            </div>
+                            <button id="import-seed-btn" class="bg-emerald-500 hover:bg-emerald-400 text-espresso-950 font-bold text-sm py-2.5 px-5 rounded-xl transition-all whitespace-nowrap">Import Club Data</button>
+                        </div>
+                    ` : ''}
                     <!-- Host Broadcast Banner -->
                     ${appState.broadcast?.active ? `
                         <div class="bg-indigo-900/40 border border-indigo-500/30 text-indigo-100 p-5 rounded-2xl flex justify-between items-center shadow-lg relative overflow-hidden">
@@ -743,6 +799,7 @@
                     handleCustomBrew(id, type, weight);
                 });
             });
+            document.getElementById('import-seed-btn')?.addEventListener('click', importSeedToFirebase);
             document.getElementById('descale-btn')?.addEventListener('click', handleDescaleMachine);
             document.getElementById('broadcast-btn')?.addEventListener('click', handleBroadcastRequest);
             document.getElementById('admin-disable-broadcast')?.addEventListener('click', handleDisableBroadcast);
@@ -2098,7 +2155,7 @@ Pavlos`;
         };
 
         const renderMyPaymentsView = (container) => {
-            const profile = appState.members.find(m => m.email === currentUser.email) || { id: 'mock-id' };
+            const profile = appState.members.find(m => m.email && m.email.toLowerCase() === currentUser.email.toLowerCase()) || { id: 'mock-id' };
             const myPaymentsList = appState.payments.filter(p => p.memberId === profile.id);
             const myConsumptions = appState.inventoryHistory.filter(h => h.type === 'consumption' && h.memberId === profile.id);
 
@@ -2352,10 +2409,10 @@ Pavlos`;
                     if(document.getElementById('main-content')) renderCurrentView();
                 }));
 
-                const pQuery = isAdmin 
-                    ? query(collection(db, getCollectionPath('payments')))
-                    : query(collection(db, getCollectionPath('payments')), where("memberId", "==", currentUser.uid));
-                
+                // Everyone reads the full payments list; the "My Payments" view filters by
+                // the member profile (matched by email), since member IDs (m1..m8) differ from auth UIDs.
+                const pQuery = query(collection(db, getCollectionPath('payments')));
+
                 dbListeners.push(onSnapshot(pQuery, snap => {
                     appState.payments = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                     appState.payments.sort((a,b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0));
