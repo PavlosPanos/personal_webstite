@@ -471,19 +471,85 @@ const initChess = () => {
   drawBoard();
 };
 
-// --- SENSORY WINE LOG FILTERS ---
+// --- SENSORY WINE LOG (interactive registry, persisted locally) ---
+const DEFAULT_WINES = [
+  { name: 'Assyrtiko 2020', region: 'Santorini, Greece', stars: 5 },
+  { name: 'Pinot Noir 2021', region: 'Valais, Switzerland', stars: 4 },
+  { name: 'Petite Arvine 2022', region: 'Valais, Switzerland', stars: 4 },
+  { name: 'Chasselas 2022', region: 'Vaud, Switzerland', stars: 3 },
+  { name: 'Xinomavro 2018', region: 'Naoussa, Greece', stars: 5 },
+  { name: 'Agiorgitiko 2021', region: 'Nemea, Greece', stars: 4 },
+  { name: 'Riesling-Silvaner 2023', region: 'Basel-Landschaft, Switzerland', stars: 3 },
+  { name: 'Malagousia 2022', region: 'Macedonia, Greece', stars: 4 }
+];
+
 const initWineLog = () => {
+  const tbody = document.getElementById('wine-tbody');
   const searchInput = document.getElementById('wine-search');
-  const tableRows = document.querySelectorAll('.wine-table tbody tr');
-  if (!searchInput) return;
-  
-  searchInput.addEventListener('input', () => {
-    const query = searchInput.value.toLowerCase().trim();
-    tableRows.forEach(row => {
-      const text = row.innerText.toLowerCase();
-      row.style.display = text.includes(query) ? '' : 'none';
+  const statsEl = document.getElementById('wine-stats');
+  const form = document.getElementById('wine-add-form');
+  if (!tbody) return;
+
+  let customWines = [];
+  try { customWines = JSON.parse(localStorage.getItem('wine-log') || '[]'); } catch (e) { customWines = []; }
+
+  const allWines = () => [...DEFAULT_WINES, ...customWines];
+  const starStr = (n) => '★'.repeat(n) + '☆'.repeat(5 - n);
+
+  const renderStats = () => {
+    if (!statsEl) return;
+    const wines = allWines();
+    const avg = wines.reduce((s, w) => s + w.stars, 0) / wines.length;
+    const regions = wines.reduce((acc, w) => {
+      const r = w.region.split(',')[0].trim();
+      acc[r] = (acc[r] || 0) + 1;
+      return acc;
+    }, {});
+    const topRegion = Object.entries(regions).sort((a, b) => b[1] - a[1])[0][0];
+    statsEl.innerHTML = `${wines.length} tastings logged · avg <span class="wine-rating">${avg.toFixed(1)}★</span> · most explored: <strong>${topRegion}</strong>`;
+  };
+
+  const renderRows = () => {
+    const query = (searchInput?.value || '').toLowerCase().trim();
+    tbody.innerHTML = allWines()
+      .filter(w => !query || `${w.name} ${w.region}`.toLowerCase().includes(query))
+      .map((w, i) => {
+        const customIdx = i - DEFAULT_WINES.length; // >= 0 only for custom entries
+        return `<tr>
+          <td>${w.name}</td>
+          <td>${w.region}</td>
+          <td class="wine-rating">${starStr(w.stars)}</td>
+          <td>${customIdx >= 0 && !query ? `<button type="button" class="wine-del-btn" data-idx="${customIdx}" title="Remove entry">&times;</button>` : ''}</td>
+        </tr>`;
+      }).join('');
+
+    tbody.querySelectorAll('.wine-del-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        customWines.splice(parseInt(btn.dataset.idx, 10), 1);
+        localStorage.setItem('wine-log', JSON.stringify(customWines));
+        renderRows();
+        renderStats();
+      });
     });
+  };
+
+  searchInput?.addEventListener('input', renderRows);
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('wine-name').value.trim();
+    const region = document.getElementById('wine-region').value.trim();
+    const stars = parseInt(document.getElementById('wine-stars').value, 10);
+    if (!name || !region) return;
+    customWines.push({ name, region, stars });
+    localStorage.setItem('wine-log', JSON.stringify(customWines));
+    form.reset();
+    renderRows();
+    renderStats();
   });
+
+  renderRows();
+  renderStats();
 };
 
 // --- CONTACT FORM FEEDBACK ---

@@ -1,5 +1,15 @@
+// Local artwork used while a photo loads or whenever a remote photo is unavailable
+const CAT_FALLBACK = {
+  bras: 'magazi_images/bra.svg',
+  slips: 'magazi_images/slip.svg',
+  nightwear: 'magazi_images/nightwear.svg',
+  sets: 'magazi_images/set.svg',
+  homewear: 'magazi_images/homewear.svg'
+};
+
 // Bilingual Product Data Catalog
 const products = [
+  // --- Bras ---
   {
     id: 'bra-lace',
     name: 'Lace Delicate Bra',
@@ -7,7 +17,7 @@ const products = [
     category: 'bras',
     brand: 'La Perla',
     price: 38.00,
-    imageUrl: 'https://images.unsplash.com/photo-1610444583731-97217983ffef?auto=compress&cs=tinysrgb&w=600',
+    imageUrl: 'https://images.unsplash.com/photo-1610444583731-97217983ffef?auto=format&fit=crop&w=600&q=70',
     sizes: ['75B', '80B', '85B', '90B', '75C', '80C', '85C']
   },
   {
@@ -17,9 +27,40 @@ const products = [
     category: 'bras',
     brand: 'Intimissimi',
     price: 42.00,
-    imageUrl: 'https://images.unsplash.com/photo-1569591159212-b02ea8a9f239?auto=compress&cs=tinysrgb&w=600',
+    imageUrl: 'https://images.unsplash.com/photo-1569591159212-b02ea8a9f239?auto=format&fit=crop&w=600&q=70',
     sizes: ['75B', '80B', '85B', '80C', '85C']
   },
+  {
+    id: 'bra-tshirt',
+    name: 'Smooth T-Shirt Push-Up Bra',
+    greekName: 'Σουτιέν T-shirt Push-Up',
+    category: 'bras',
+    brand: 'Triumph',
+    price: 36.00,
+    imageUrl: 'magazi_images/bra.svg',
+    sizes: ['70B', '75B', '80B', '85B', '75C', '80C']
+  },
+  {
+    id: 'bra-bralette',
+    name: 'Cotton Comfort Bralette',
+    greekName: 'Βαμβακερό Μπραλέτ Comfort',
+    category: 'bras',
+    brand: 'Calvin Klein',
+    price: 29.00,
+    imageUrl: 'magazi_images/bra.svg',
+    sizes: ['S', 'M', 'L', 'XL']
+  },
+  {
+    id: 'bra-strapless',
+    name: 'Invisible Strapless Bra',
+    greekName: 'Σουτιέν Στράπλες Invisible',
+    category: 'bras',
+    brand: 'Triumph',
+    price: 44.00,
+    imageUrl: 'magazi_images/bra.svg',
+    sizes: ['75B', '80B', '85B', '75C', '80C', '85C']
+  },
+  // --- Slips / Briefs ---
   {
     id: 'slip-lace',
     name: 'French Lace Slip',
@@ -27,7 +68,7 @@ const products = [
     category: 'slips',
     brand: 'Victoria\'s Secret',
     price: 15.00,
-    imageUrl: 'https://images.unsplash.com/photo-1616878438186-06103328e83b?auto=compress&cs=tinysrgb&w=600',
+    imageUrl: 'https://images.unsplash.com/photo-1616878438186-06103328e83b?auto=format&fit=crop&w=600&q=70',
     sizes: ['S', 'M', 'L', 'XL']
   },
   {
@@ -37,9 +78,30 @@ const products = [
     category: 'slips',
     brand: 'Calvin Klein',
     price: 18.00,
-    imageUrl: 'https://images.unsplash.com/photo-1608755673427-4a008c4e09f7?auto=compress&cs=tinysrgb&w=600',
+    imageUrl: 'https://images.unsplash.com/photo-1608755673427-4a008c4e09f7?auto=format&fit=crop&w=600&q=70',
     sizes: ['S', 'M', 'L']
   },
+  {
+    id: 'slip-cotton-3pack',
+    name: 'Cotton Briefs (3-Pack)',
+    greekName: 'Βαμβακερά Σλιπ (Σετ 3 τεμ.)',
+    category: 'slips',
+    brand: 'Sloggi',
+    price: 25.00,
+    imageUrl: 'magazi_images/slip.svg',
+    sizes: ['S', 'M', 'L', 'XL', 'XXL']
+  },
+  {
+    id: 'slip-highwaist',
+    name: 'High-Waist Shaping Brief',
+    greekName: 'Ψηλόμεσο Σλιπ Σύσφιξης',
+    category: 'slips',
+    brand: 'Triumph',
+    price: 22.00,
+    imageUrl: 'magazi_images/slip.svg',
+    sizes: ['M', 'L', 'XL', 'XXL']
+  },
+  // --- Nightwear ---
   {
     id: 'night-robe',
     name: 'Luxury Silk Kimono Robe',
@@ -47,7 +109,7 @@ const products = [
     category: 'nightwear',
     brand: 'La Perla',
     price: 85.00,
-    imageUrl: 'https://images.unsplash.com/photo-1549045337-9670077d206a?auto=compress&cs=tinysrgb&w=600',
+    imageUrl: 'https://images.unsplash.com/photo-1549045337-9670077d206a?auto=format&fit=crop&w=600&q=70',
     sizes: ['S', 'M', 'L', 'XL']
   },
   {
@@ -57,9 +119,30 @@ const products = [
     category: 'nightwear',
     brand: 'Hunkemöller',
     price: 49.00,
-    imageUrl: 'https://images.unsplash.com/photo-1608248597279-f99d160bfcbc?auto=compress&cs=tinysrgb&w=600',
+    imageUrl: 'https://images.unsplash.com/photo-1608248597279-f99d160bfcbc?auto=format&fit=crop&w=600&q=70',
     sizes: ['S', 'M', 'L']
   },
+  {
+    id: 'night-pyjama',
+    name: 'Cotton Pyjama Set',
+    greekName: 'Βαμβακερή Πιτζάμα Σετ',
+    category: 'nightwear',
+    brand: 'Oysho',
+    price: 55.00,
+    imageUrl: 'magazi_images/nightwear.svg',
+    sizes: ['S', 'M', 'L', 'XL']
+  },
+  {
+    id: 'night-winter',
+    name: 'Warm Fleece Nightgown',
+    greekName: 'Ζεστό Χειμωνιάτικο Νυχτικό',
+    category: 'nightwear',
+    brand: 'Triumph',
+    price: 39.00,
+    imageUrl: 'magazi_images/nightwear.svg',
+    sizes: ['M', 'L', 'XL', 'XXL']
+  },
+  // --- Sets ---
   {
     id: 'set-lace-gold',
     name: 'Boutique Lace Matching Set',
@@ -67,7 +150,7 @@ const products = [
     category: 'sets',
     brand: 'Agent Provocateur',
     price: 95.00,
-    imageUrl: 'https://images.unsplash.com/photo-1608748010899-18f300247112?auto=compress&cs=tinysrgb&w=600',
+    imageUrl: 'https://images.unsplash.com/photo-1608748010899-18f300247112?auto=format&fit=crop&w=600&q=70',
     sizes: ['S', 'M', 'L']
   },
   {
@@ -77,13 +160,68 @@ const products = [
     category: 'sets',
     brand: 'Oysho',
     price: 65.00,
-    imageUrl: 'https://images.unsplash.com/photo-1621184455862-c163dfb30e0f?auto=compress&cs=tinysrgb&w=600',
+    imageUrl: 'https://images.unsplash.com/photo-1621184455862-c163dfb30e0f?auto=format&fit=crop&w=600&q=70',
+    sizes: ['S', 'M', 'L', 'XL']
+  },
+  {
+    id: 'set-bridal',
+    name: 'Bridal White Lace Set',
+    greekName: 'Νυφικό Σετ Λευκή Δαντέλα',
+    category: 'sets',
+    brand: 'Intimissimi',
+    price: 75.00,
+    imageUrl: 'magazi_images/set.svg',
+    sizes: ['S', 'M', 'L']
+  },
+  // --- Homewear ---
+  {
+    id: 'home-robe',
+    name: 'Soft Cotton Bathrobe',
+    greekName: 'Απαλό Βαμβακερό Μπουρνούζι',
+    category: 'homewear',
+    brand: 'Oysho',
+    price: 65.00,
+    imageUrl: 'magazi_images/homewear.svg',
+    sizes: ['S/M', 'L/XL']
+  },
+  {
+    id: 'home-velour',
+    name: 'Velour Homewear Set',
+    greekName: 'Βελουτέ Σετ Homewear',
+    category: 'homewear',
+    brand: 'Triumph',
+    price: 59.00,
+    imageUrl: 'magazi_images/homewear.svg',
     sizes: ['S', 'M', 'L', 'XL']
   }
 ];
 
+// Generic bilingual descriptions per category (used when a product has no bespoke text)
+const defaultDescriptions = {
+  bras: {
+    el: 'Σουτιέν εξαιρετικής ποιότητας με προσεγμένες ραφές και άνετη εφαρμογή για όλη την ημέρα. Διαθέσιμο σε διάφορα μεγέθη — ρωτήστε μας για δοκιμή στο κατάστημα.',
+    en: 'High-quality bra with careful seams and all-day comfortable fit. Available in multiple sizes — visit us for a personal fitting.'
+  },
+  slips: {
+    el: 'Άνετο σλιπ από απαλά υλικά που δεν διαγράφονται κάτω από τα ρούχα. Ιδανικό για καθημερινή χρήση.',
+    en: 'Comfortable briefs in soft fabrics that stay invisible under clothing. Perfect for everyday wear.'
+  },
+  nightwear: {
+    el: 'Νυχτικό από ποιοτικά υφάσματα για όμορφο και ξεκούραστο ύπνο, με κομψές λεπτομέρειες.',
+    en: 'Sleepwear in quality fabrics for a beautiful, restful night, finished with elegant details.'
+  },
+  sets: {
+    el: 'Ασορτί σετ εσωρούχων με κομψό σχεδιασμό — μια ολοκληρωμένη επιλογή για εσάς ή για δώρο.',
+    en: 'Matching lingerie set with elegant design — a complete choice for yourself or as a gift.'
+  },
+  homewear: {
+    el: 'Άνετο homewear για χαλαρές στιγμές στο σπίτι, από μαλακά υλικά που αγαπούν το δέρμα.',
+    en: 'Cozy homewear for relaxed moments at home, in soft skin-loving fabrics.'
+  }
+};
+
 // Active wishlist state (persisted in localStorage)
-const IMG_FALLBACK = 'https://placehold.co/600x700/fdf0ed/b76e79?text=Chrysanthi';
+const IMG_FALLBACK = 'magazi_images/hero.svg';
 
 function loadState(key, fallback) {
   try {
@@ -292,7 +430,7 @@ window.filterAndSortCatalog = () => {
     
     card.innerHTML = `
       <div class="product-img-box" onclick="openProductDetails('${p.id}')" style="cursor: pointer;">
-        <img src="${p.imageUrl}" alt="${p.name}" loading="lazy" onerror="this.onerror=null;this.src='${IMG_FALLBACK}';">
+        <img src="${p.imageUrl}" alt="${p.name}" loading="lazy" onerror="this.onerror=null;this.src='${CAT_FALLBACK[p.category] || IMG_FALLBACK}';">
       </div>
       <div class="product-info">
         <span class="product-brand">${p.brand}</span>
@@ -368,13 +506,15 @@ window.openProductDetails = (productId) => {
     }
   };
   
-  const desc = descriptions[p.id] ? descriptions[p.id][activeLang] : '';
+  const desc = descriptions[p.id]
+    ? descriptions[p.id][activeLang]
+    : (defaultDescriptions[p.category] ? defaultDescriptions[p.category][activeLang] : '');
   const priceFormatted = convertPrice(p.price);
   
   contentEl.innerHTML = `
     <div class="details-grid">
       <div class="details-img-box">
-        <img src="${p.imageUrl}" alt="${p.name}" onerror="this.onerror=null;this.src='${IMG_FALLBACK}';">
+        <img src="${p.imageUrl}" alt="${p.name}" onerror="this.onerror=null;this.src='${CAT_FALLBACK[p.category] || IMG_FALLBACK}';">
       </div>
       <div class="details-info-box">
         <span class="product-brand" style="font-size:0.7rem;">${p.brand}</span>
@@ -494,7 +634,7 @@ function updateWishlistUI() {
     const cartItemEl = document.createElement('div');
     cartItemEl.className = 'cart-item';
     cartItemEl.innerHTML = `
-      <img src="${item.imageUrl}" alt="${item.name}" class="cart-item-img" onerror="this.onerror=null;this.src='${IMG_FALLBACK}';">
+      <img src="${item.imageUrl}" alt="${item.name}" class="cart-item-img" onerror="this.onerror=null;this.src='${CAT_FALLBACK[products.find(p => p.id === item.id)?.category] || IMG_FALLBACK}';">
       <div class="cart-item-info">
         <h4 class="cart-item-title">${displayTitle}</h4>
         <p class="cart-item-meta">${metaText}</p>
@@ -668,6 +808,7 @@ function showLightbox() {
   const img = document.getElementById("lightboxImage");
   if (!lightbox || !img) return;
   
+  img.onerror = () => { img.onerror = null; img.src = IMG_FALLBACK; };
   img.src = currentImgSet[currentImgIndex];
   lightbox.style.display = "block";
 }

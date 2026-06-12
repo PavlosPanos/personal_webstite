@@ -55,6 +55,43 @@ body {
   min-height: 100vh;
 }
 
+/* Soft "aurora" colour washes behind the glass cards */
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  width: 55vw;
+  height: 55vw;
+  max-width: 700px;
+  max-height: 700px;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.16;
+  z-index: -1;
+  pointer-events: none;
+}
+
+body::before {
+  top: -18vw;
+  right: -12vw;
+  background: radial-gradient(circle, var(--accent-cyan), transparent 65%);
+}
+
+body::after {
+  bottom: -20vw;
+  left: -14vw;
+  background: radial-gradient(circle, var(--accent-indigo), var(--accent-magenta) 50%, transparent 70%);
+}
+
+/* Custom scrollbar to match the theme */
+::-webkit-scrollbar { width: 9px; }
+::-webkit-scrollbar-track { background: var(--bg-dark); }
+::-webkit-scrollbar-thumb {
+  background: rgba(34, 211, 238, 0.25);
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(34, 211, 238, 0.45); }
+
 #particle-canvas {
   position: fixed;
   top: 0;
@@ -138,6 +175,12 @@ main {
   overflow: hidden;
   border: 2px solid var(--accent-cyan);
   box-shadow: var(--glow-shadow);
+  animation: avatar-glow 4s ease-in-out infinite;
+}
+
+@keyframes avatar-glow {
+  0%, 100% { box-shadow: 0 0 18px rgba(34, 211, 238, 0.2); }
+  50% { box-shadow: 0 0 30px rgba(99, 102, 241, 0.4); }
 }
 
 .avatar-box img {
@@ -346,6 +389,10 @@ article.active {
   margin-bottom: 25px;
   position: relative;
   display: inline-block;
+  background: linear-gradient(120deg, var(--text-primary) 55%, var(--accent-cyan));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .article-title::after {
@@ -1061,6 +1108,16 @@ strong {
   box-shadow: var(--glow-shadow);
 }
 
+select.form-input {
+  background-color: #0d1626;
+  cursor: pointer;
+}
+
+select.form-input option {
+  background: #0d1626;
+  color: var(--text-primary);
+}
+
 textarea.form-input {
   grid-column: span 2;
   min-height: 120px;
@@ -1119,6 +1176,84 @@ textarea.form-input {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+/* Focus area chips (About) */
+.focus-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 5px 0 10px;
+}
+
+.focus-chips li {
+  font-family: var(--ff-space);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-cyan);
+  background: rgba(34, 211, 238, 0.06);
+  border: 1px solid var(--border-glow);
+  border-radius: 999px;
+  padding: 6px 14px;
+  transition: var(--transition-smooth);
+}
+
+.focus-chips li:hover {
+  background: rgba(34, 211, 238, 0.14);
+  transform: translateY(-2px);
+  box-shadow: var(--glow-shadow);
+}
+
+/* Wine registry extras */
+.wine-stats {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.wine-add-form {
+  display: grid;
+  grid-template-columns: 2fr 2fr 1fr auto;
+  gap: 12px;
+  margin-top: 20px;
+  align-items: stretch;
+}
+
+.wine-add-form .form-input {
+  padding: 10px 14px;
+  font-size: 13px;
+}
+
+.wine-add-btn {
+  margin-top: 0;
+  padding: 10px 20px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.wine-del-btn {
+  color: var(--text-muted);
+  font-size: 18px;
+  line-height: 1;
+  padding: 2px 8px;
+  border-radius: 6px;
+  transition: var(--transition-smooth);
+}
+
+.wine-del-btn:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+@media (max-width: 768px) {
+  .wine-add-form {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .wine-add-form .wine-add-btn {
+    grid-column: span 2;
+    justify-content: center;
+  }
 }
 
 /* Responsiveness */

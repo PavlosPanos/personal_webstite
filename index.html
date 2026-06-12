@@ -151,6 +151,14 @@
              data-de="Vor meinem Wechsel zur medizinischen Bildgebung verbrachte ich Jahre an der Spitze der Teilchenphysik als Forscher für das <strong>CMS-Experiment am CERN</strong>. Ich bin stolz auf meine akademische Exzellenz: Meinen Bachelor und Master an der Nationalen und Kapodistrianischen Universität Athen habe ich jeweils als <strong>Klassenbester</strong> abgeschlossen.">
             Before transitioning to medical imaging, I spent years at the forefront of Particle Physics as a researcher for the <strong>CMS Experiment at CERN</strong>. I take great pride in academic excellence, having graduated <strong>1st in my class</strong> for both my BSc and MSc at the National and Kapodistrian University of Athens.
           </p>
+          <ul class="focus-chips" aria-label="Focus areas">
+            <li>Lung MRI</li>
+            <li>bSSFP / bSTAR</li>
+            <li>Deep Learning</li>
+            <li>CERN · CMS Alumni</li>
+            <li>0.55T Low-Field</li>
+            <li>Wine & Chess</li>
+          </ul>
         </div>
 
         <section class="service scroll-reveal">
@@ -359,6 +367,57 @@
             </li>
 
             <li class="blog-post-item">
+              <a href="./blog/super-resolution.html">
+                <figure class="blog-banner-box">
+                  <img src="./assets/images/MRI_Lung.png" alt="Super-resolution lung MRI" loading="lazy">
+                </figure>
+                <div class="blog-content">
+                  <div class="blog-meta">
+                    <p class="blog-category">Low-Field MRI</p>
+                    <span class="dot"></span>
+                    <time datetime="2025-05-14">May 14, 2025</time>
+                  </div>
+                  <h3 class="blog-item-title">Seeing More with Less: Super-Resolution at 0.55T</h3>
+                  <p class="blog-text">How deep learning recovers fine lung detail from free-breathing bSTAR scans on low-field hardware.</p>
+                </div>
+              </a>
+            </li>
+
+            <li class="blog-post-item">
+              <a href="./blog/physics-debugging.html">
+                <figure class="blog-banner-box">
+                  <img src="./assets/images/e107_1.png" alt="CMS event display" loading="lazy">
+                </figure>
+                <div class="blog-content">
+                  <div class="blog-meta">
+                    <p class="blog-category">Research Culture</p>
+                    <span class="dot"></span>
+                    <time datetime="2025-11-08">Nov 8, 2025</time>
+                  </div>
+                  <h3 class="blog-item-title">What Hunting Particles Taught Me About Debugging MRI</h3>
+                  <p class="blog-text">Distrust beautiful results, simulate first, blind yourself — CERN habits that survive the move to medical imaging.</p>
+                </div>
+              </a>
+            </li>
+
+            <li class="blog-post-item">
+              <a href="./blog/wine-journal.html">
+                <figure class="blog-banner-box">
+                  <img src="./assets/images/wine.svg" alt="Wine tasting journal" loading="lazy">
+                </figure>
+                <div class="blog-content">
+                  <div class="blog-meta">
+                    <p class="blog-category">Wine & Life</p>
+                    <span class="dot"></span>
+                    <time datetime="2026-03-02">Mar 2, 2026</time>
+                  </div>
+                  <h3 class="blog-item-title">From Assyrtiko to Pinot Noir: A Physicist's Tasting Journal</h3>
+                  <p class="blog-text">Greek volcanic whites, secretive Swiss reds, and why blind tasting is just hypothesis testing.</p>
+                </div>
+              </a>
+            </li>
+
+            <li class="blog-post-item">
               <a href="./blog/phd-life-basel.html">
                 <figure class="blog-banner-box">
                   <img src="./assets/images/basel_view.jpg" alt="Rhine river Basel" loading="lazy">
@@ -423,6 +482,7 @@
         <!-- Wine tasting register -->
         <section class="service scroll-reveal" style="margin-top: 30px;">
           <h3 class="service-title" data-en="Oenological Tasting Registry" data-el="Ημερολόγιο Οινογνωσίας" data-de="Weinverkostungsregister">Oenological Tasting Registry</h3>
+          <p id="wine-stats" class="wine-stats"></p>
           <input type="text" id="wine-search" class="wine-search-bar" placeholder="Filter by region or grape..." data-en="Filter by region or grape..." data-el="Φίλτρο κατά περιοχή ή ποικιλία..." data-de="Nach Region oder Traube filtern...">
           <div class="table-scroll">
           <table class="wine-table">
@@ -431,27 +491,26 @@
                 <th data-en="Vintage / Grape" data-el="Όνομα / Ποικιλία" data-de="Jahrgang / Traube">Vintage / Grape</th>
                 <th data-en="Region" data-el="Περιοχή" data-de="Region">Region</th>
                 <th data-en="Sensory Rating" data-el="Βαθμολογία" data-de="Bewertung">Sensory Rating</th>
+                <th></th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td>Pinot Noir 2021</td>
-                <td>Valais, Switzerland</td>
-                <td class="wine-rating">★★★★☆</td>
-              </tr>
-              <tr>
-                <td>Chasselas 2022</td>
-                <td>Vaud, Switzerland</td>
-                <td class="wine-rating">★★★☆☆</td>
-              </tr>
-              <tr>
-                <td>Assyrtiko 2020</td>
-                <td>Santorini, Greece</td>
-                <td class="wine-rating">★★★★★</td>
-              </tr>
-            </tbody>
+            <tbody id="wine-tbody"></tbody>
           </table>
           </div>
+          <form id="wine-add-form" class="wine-add-form">
+            <input type="text" id="wine-name" class="form-input" placeholder="Wine / grape (e.g. Xinomavro 2019)" data-en="Wine / grape (e.g. Xinomavro 2019)" data-el="Κρασί / ποικιλία" data-de="Wein / Traube" required>
+            <input type="text" id="wine-region" class="form-input" placeholder="Region" data-en="Region" data-el="Περιοχή" data-de="Region" required>
+            <select id="wine-stars" class="form-input">
+              <option value="5">★★★★★</option>
+              <option value="4" selected>★★★★☆</option>
+              <option value="3">★★★☆☆</option>
+              <option value="2">★★☆☆☆</option>
+              <option value="1">★☆☆☆☆</option>
+            </select>
+            <button type="submit" class="form-btn wine-add-btn">
+              <span data-en="Log Tasting" data-el="Καταχώρηση" data-de="Eintragen">Log Tasting</span>
+            </button>
+          </form>
         </section>
       </article>
 

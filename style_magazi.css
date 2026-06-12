@@ -326,6 +326,22 @@ main {
   opacity: 1;
 }
 
+/* Real shop photos in the story section */
+.store-photos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.store-photos img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
 /* Hero Section */
 .hero-wrapper {
   display: grid;

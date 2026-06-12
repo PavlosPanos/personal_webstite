@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>What CERN Taught Me About Debugging MRI | Pavlos Panos</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+  <article class="post-container">
+    <a href="../index.html" class="back-btn">Back</a>
+    <header>
+      <p class="date">Nov 08, 2025</p>
+      <h1>What Hunting Particles Taught Me About Debugging MRI Sequences</h1>
+    </header>
+
+    <img src="../assets/images/e107_1.png" alt="CMS detector event display" class="blog-banner">
+
+    <section>
+      <p>
+        At CMS, the enemy was background: billions of proton collisions per second, almost all of them boring, hiding the handful of events you actually care about. In lung MRI, the enemy is artifact: banding, motion, off-resonance — noise wearing the costume of signal. The surprising thing is how transferable the debugging mindset is.
+      </p>
+      <h2>Rule 1: Distrust Beautiful Results</h2>
+      <p>
+        In particle physics, a too-clean peak usually means a bug in your selection, not a discovery. The same instinct applies when a reconstruction network produces a suspiciously crisp lung image. The first question is never "how good is this?" but <strong>"what would have to be wrong for this to look this good?"</strong>
+      </p>
+      <h2>Rule 2: Simulate Before You Measure</h2>
+      <p>
+        CMS analyses live and die by Monte Carlo simulation. I carry that habit into MRI: before trusting a shimming algorithm on a volunteer, I run it on synthetic field maps where the ground truth is known. If it fails where I can check, it will certainly fail where I can't.
+      </p>
+      <h2>Rule 3: Blind Yourself</h2>
+      <p>
+        Physicists deliberately hide the signal region until the analysis is frozen, to avoid fooling themselves. The clinical analogue: fix your evaluation metrics and test cases <em>before</em> looking at the outputs. Confirmation bias does not care whether the data came from a 27-km collider or a 0.55T magnet.
+      </p>
+      <p>
+        Different machines, same epistemology: assume you are wrong, design experiments that can prove it, and only then start believing your plots.
+      </p>
+    </section>
+  </article>
+</body>
+</html>

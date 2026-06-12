@@ -85,8 +85,8 @@
           <button class="cta-btn" onclick="showSection('catalog')" data-el="Δειτε τον Καταλογο" data-en="View Catalog">Δειτε τον Καταλογο</button>
         </div>
         <div class="hero-gallery">
-          <img src="https://images.unsplash.com/photo-1610444583731-97217983ffef?auto=compress&cs=tinysrgb&w=600" alt="Boutique Lingerie">
-          <img src="https://images.unsplash.com/photo-1549045337-9670077d206a?auto=compress&cs=tinysrgb&w=600" alt="Silk Sleepwear">
+          <img src="./website_images/exterior1.jpg" alt="Κατάστημα Χρυσάνθη - εξωτερικό" onerror="this.onerror=null;this.src='magazi_images/hero.svg';">
+          <img src="https://images.unsplash.com/photo-1549045337-9670077d206a?auto=format&fit=crop&w=600&q=70" alt="Silk Sleepwear" onerror="this.onerror=null;this.src='magazi_images/nightwear.svg';">
         </div>
       </div>
     </section>
@@ -101,6 +101,10 @@
           <p data-el="&lt;strong&gt;Διεύθυνση:&lt;/strong&gt; Οδός Κεδρινού 66, Αμπελόκηποι, Αθήνα (κοντά στο μετρό Πανόρμου)." data-en="&lt;strong&gt;Address:&lt;/strong&gt; 66 Kedrinou Street, Ampelokipoi, Athens (near Panormou Metro station)."><strong>Διεύθυνση:</strong> Οδός Κεδρινού 66, Αμπελόκηποι, Αθήνα (κοντά στο μετρό Πανόρμου).</p>
         </div>
         <div class="map-container">
+          <div class="store-photos">
+            <img src="./website_images/exterior1.jpg" alt="Η βιτρίνα του καταστήματος Χρυσάνθη" loading="lazy" onerror="this.style.display='none';">
+            <img src="./website_images/exterior2.jpg" alt="Το κατάστημα Χρυσάνθη στην οδό Κεδρινού" loading="lazy" onerror="this.style.display='none';">
+          </div>
           <iframe
             src="https://www.google.com/maps?q=Οδός+Κεδρινού+66,+Αμπελόκηποι,+Αθήνα&output=embed"
             allowfullscreen=""
@@ -121,6 +125,7 @@
         <button class="catalog-btn" onclick="renderCatalog('slips')" data-el="Σλιπ" data-en="Slips">Σλιπ</button>
         <button class="catalog-btn" onclick="renderCatalog('nightwear')" data-el="Νυχτικα" data-en="Nightwear">Νυχτικα</button>
         <button class="catalog-btn" onclick="renderCatalog('sets')" data-el="Σετ" data-en="Sets">Σετ</button>
+        <button class="catalog-btn" onclick="renderCatalog('homewear')" data-el="Homewear" data-en="Homewear">Homewear</button>
         <button class="catalog-btn size-guide-trigger" onclick="toggleSizeGuide()" data-el="Οδηγός Μεγεθών" data-en="Size Guide" style="background-color: var(--color-rose-light); border-color: var(--color-rose); color: var(--color-rose);">Οδηγός Μεγεθών</button>
       </div>
 

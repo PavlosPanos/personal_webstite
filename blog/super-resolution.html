@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Super-Resolution Lung MRI at 0.55T | Pavlos Panos</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+  <article class="post-container">
+    <a href="../index.html" class="back-btn">Back</a>
+    <header>
+      <p class="date">May 14, 2025</p>
+      <h1>Seeing More with Less: Super-Resolution Lung MRI at 0.55T</h1>
+    </header>
+
+    <img src="../assets/images/MRI_Lung.png" alt="3D morphological lung MRI" class="blog-banner">
+
+    <section>
+      <p>
+        Low-field MRI is having a renaissance. Scanners operating at 0.55T are cheaper to build, cheaper to run, and — counterintuitively — often <strong>better for lung imaging</strong>: susceptibility gradients at air-tissue interfaces scale with field strength, so at low field the lung parenchyma stays visible for longer. The catch? Lower field means lower signal, which traditionally means lower resolution.
+      </p>
+      <h2>bSTAR: Free-Breathing 3D Acquisition</h2>
+      <p>
+        Our group images the lung with <strong>bSTAR</strong> (balanced steady-state free precession with stack-of-stars sampling), a sequence that lets patients breathe freely during the scan. The acquired 3D morphological images are robust, but their native resolution leaves fine structures — small airways, vessels, early fibrotic change — at the edge of visibility.
+      </p>
+      <h2>Learning to Sharpen Physics</h2>
+      <p>
+        This is where <strong>super-resolution deep learning</strong> comes in. Instead of asking the scanner for more signal, we train a network to recover high-frequency detail from the low-resolution acquisition, using paired data and physics-consistent degradation models. The key is honesty: the network must enhance what is truly there, not hallucinate plausible-looking anatomy. We constrain training with realistic point-spread functions and validate against higher-resolution references.
+      </p>
+      <p>
+        I presented this work as a PowerPitch at <strong>ISMRM 2025 in Hawaii</strong>. The combination of low-field hardware and learned reconstruction points to a future where high-quality lung MRI is accessible far beyond major research hospitals.
+      </p>
+    </section>
+  </article>
+</body>
+</html>

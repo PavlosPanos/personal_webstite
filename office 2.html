@@ -211,7 +211,6 @@
             activeTab: 'dashboard',
             userProfile: null,
             machineStats: { cupsSinceClean: 48, lastCleanedBy: 'Sarah Connor' },
-            collectionPlan: { amountPerMember: 20, dueDate: '', note: '' },
             waterIntake: {} // Local storage for daily hydration tracker
         };
 
@@ -438,8 +437,8 @@
             const mobileBottomNav = document.getElementById('mobile-bottom-nav');
             if (!mainContent || !navMenu) return;
 
-            const tabs = isAdmin
-                ? ['dashboard', 'members', 'requests', 'stats', 'inventory', 'payments_log', 'reminders']
+            const tabs = isAdmin 
+                ? ['dashboard', 'members', 'requests', 'stats', 'inventory', 'payments_log']
                 : ['dashboard', 'members', 'requests', 'stats', 'preferences', 'my_payments'];
 
             const tabIcons = {
@@ -450,8 +449,7 @@
                 inventory: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>',
                 preferences: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>',
                 payments_log: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="12" y1="4" x2="12" y2="20"></line></svg>',
-                my_payments: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="12" y1="4" x2="12" y2="20"></line></svg>',
-                reminders: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>'
+                my_payments: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="12" y1="4" x2="12" y2="20"></line></svg>'
             };
 
             // Render desktop side menu
@@ -480,7 +478,6 @@
                 case 'preferences': renderPreferencesView(mainContent); break;
                 case 'payments_log': renderPaymentsLogView(mainContent); break;
                 case 'my_payments': renderMyPaymentsView(mainContent); break;
-                case 'reminders': renderRemindersView(mainContent); break;
             }
         };
 
@@ -1411,7 +1408,7 @@
                                             <input name="weightKg" type="number" step="0.1" required class="w-full bg-espresso-950 border border-espresso-800 focus:border-goldAccent-500 rounded-xl px-4 py-2 text-espresso-100 outline-none text-sm transition-colors">
                                         </div>
                                         <div>
-                                            <label class="block text-xs uppercase tracking-wider text-espresso-300 mb-1">Cost (CHF)</label>
+                                            <label class="block text-xs uppercase tracking-wider text-espresso-300 mb-1">Cost ($)</label>
                                             <input name="totalCost" type="number" step="0.01" required class="w-full bg-espresso-950 border border-espresso-800 focus:border-goldAccent-500 rounded-xl px-4 py-2 text-espresso-100 outline-none text-sm transition-colors">
                                         </div>
                                     </div>
@@ -1681,17 +1678,7 @@
                             <h3 class="text-xl font-serif text-goldAccent-500 mb-4">Monthly Spending</h3>
                             <canvas id="monthly-expenses-chart"></canvas>
                         </div>
-
-                        <div class="coffee-glass p-6 rounded-2xl shadow-xl">
-                            <h3 class="text-xl font-serif text-goldAccent-500 mb-4">Contributions by Member</h3>
-                            <canvas id="contributions-chart"></canvas>
-                        </div>
-
-                        <div class="coffee-glass p-6 rounded-2xl shadow-xl lg:col-span-2">
-                            <h3 class="text-xl font-serif text-goldAccent-500 mb-4">Club Balance Over Time</h3>
-                            <canvas id="balance-chart" height="90"></canvas>
-                        </div>
-
+                        
                         <div class="coffee-glass p-6 rounded-2xl shadow-xl flex flex-col justify-between lg:col-span-2">
                             <div>
                                 <h3 class="text-xl font-serif text-goldAccent-500 mb-4">Weekly Consumption Speed</h3>
@@ -1722,7 +1709,7 @@
                 data: {
                     labels: Object.keys(monthlyExpenses),
                     datasets: [{
-                        label: 'Spending (CHF)',
+                        label: 'Spending ($)',
                         data: Object.values(monthlyExpenses),
                         backgroundColor: 'rgba(197, 168, 128, 0.6)',
                         borderColor: '#c5a880',
@@ -1767,235 +1754,6 @@
                     </div>
                 `).join('') || '<p class="text-espresso-400">No consumption metrics.</p>';
             }
-
-            // --- Contributions by member (bar) ---
-            const contribCanvas = document.getElementById('contributions-chart');
-            if (contribCanvas) {
-                const sorted = [...appState.members].sort((a, b) => (b.totalContributed || 0) - (a.totalContributed || 0));
-                new Chart(contribCanvas, {
-                    type: 'bar',
-                    data: {
-                        labels: sorted.map(m => m.name.split(' ')[0]),
-                        datasets: [{
-                            label: 'Contributed (CHF)',
-                            data: sorted.map(m => m.totalContributed || 0),
-                            backgroundColor: 'rgba(52, 211, 153, 0.5)',
-                            borderColor: '#34d399',
-                            borderWidth: 1.5,
-                            borderRadius: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#bd8f7b' } },
-                            x: { grid: { display: false }, ticks: { color: '#bd8f7b' } }
-                        },
-                        plugins: { legend: { display: false } }
-                    }
-                });
-            }
-
-            // --- Cumulative club balance over time (line) ---
-            const balanceCanvas = document.getElementById('balance-chart');
-            if (balanceCanvas) {
-                const events = [];
-                appState.payments.forEach(p => {
-                    if (p.status === 'approved' || !p.status) {
-                        events.push({ date: new Date(isMockMode ? p.date : p.date.toDate()), delta: p.amount || 0 });
-                    }
-                });
-                appState.inventoryHistory.forEach(h => {
-                    if (h.type === 'purchase' && h.date) {
-                        events.push({ date: new Date(isMockMode ? h.date : h.date.toDate()), delta: -(h.totalCost || 0) });
-                    }
-                });
-                events.sort((a, b) => a.date - b.date);
-                let running = 0;
-                const labels = [], values = [];
-                events.forEach(ev => {
-                    running += ev.delta;
-                    labels.push(ev.date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }));
-                    values.push(running.toFixed(2));
-                });
-                new Chart(balanceCanvas, {
-                    type: 'line',
-                    data: {
-                        labels,
-                        datasets: [{
-                            label: 'Balance (CHF)',
-                            data: values,
-                            borderColor: '#c5a880',
-                            backgroundColor: 'rgba(197, 168, 128, 0.12)',
-                            fill: true,
-                            tension: 0.3,
-                            pointBackgroundColor: values.map(v => v >= 0 ? '#34d399' : '#fb7185'),
-                            pointRadius: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#bd8f7b' } },
-                            x: { grid: { display: false }, ticks: { color: '#bd8f7b' } }
-                        },
-                        plugins: { legend: { display: false } }
-                    }
-                });
-            }
-        };
-
-        // --- REMINDERS / EMAIL LIST (admin) — prepares emails, never sends anything automatically ---
-        const renderRemindersView = (container) => {
-            const plan = appState.collectionPlan || { amountPerMember: 20, dueDate: '', note: '' };
-            const balance = (appState.financials.totalCollected || 0) - (appState.financials.totalSpent || 0);
-            const withEmail = appState.members.filter(m => m.email && m.email !== ADMIN_EMAIL);
-            const noEmail = appState.members.filter(m => !m.email);
-
-            const memberRows = withEmail.map(m => {
-                const lastPayment = appState.payments
-                    .filter(p => p.memberId === m.id)
-                    .sort((a, b) => new Date(isMockMode ? b.date : b.date.toDate()) - new Date(isMockMode ? a.date : a.date.toDate()))[0];
-                const lastStr = lastPayment ? new Date(isMockMode ? lastPayment.date : lastPayment.date.toDate()).toLocaleDateString() : '—';
-                return `
-                    <label class="flex items-center gap-3 py-2.5 px-3 rounded-xl hover:bg-espresso-900/40 cursor-pointer border-b border-espresso-800/50">
-                        <input type="checkbox" class="reminder-recipient accent-goldAccent-500" value="${m.email}" data-name="${m.name}" checked>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-semibold text-espresso-100">${m.name}</p>
-                            <p class="text-xs text-espresso-400 truncate">${m.email}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-xs text-espresso-400">last paid</p>
-                            <p class="text-xs font-mono text-goldAccent-500">${lastStr}</p>
-                        </div>
-                    </label>`;
-            }).join('');
-
-            container.innerHTML = `
-                <div class="space-y-8">
-                    <div>
-                        <h2 class="text-3xl font-serif font-bold text-goldAccent-500">Collection Reminders</h2>
-                        <p class="text-espresso-400 text-sm mt-1">Prepare reminder emails for the next money collection. <strong class="text-amber-300">Nothing is sent automatically</strong> — emails open in your own mail app.</p>
-                    </div>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <!-- Plan -->
-                        <div class="coffee-glass p-6 rounded-2xl shadow-xl">
-                            <h3 class="text-xl font-serif text-goldAccent-500 mb-4">Next Collection Plan</h3>
-                            <form id="collection-plan-form" class="space-y-4">
-                                <div>
-                                    <label class="block text-xs uppercase tracking-wider text-espresso-300 mb-1">Amount per member (CHF)</label>
-                                    <input name="amount" type="number" step="0.5" min="0" value="${plan.amountPerMember || 20}" class="w-full bg-espresso-950 border border-espresso-800 focus:border-goldAccent-500 rounded-xl px-4 py-2.5 text-espresso-100 outline-none text-sm">
-                                </div>
-                                <div>
-                                    <label class="block text-xs uppercase tracking-wider text-espresso-300 mb-1">Due date</label>
-                                    <input name="due" type="date" value="${plan.dueDate || ''}" class="w-full bg-espresso-950 border border-espresso-800 focus:border-goldAccent-500 rounded-xl px-4 py-2.5 text-espresso-100 outline-none text-sm">
-                                </div>
-                                <div>
-                                    <label class="block text-xs uppercase tracking-wider text-espresso-300 mb-1">Note (optional, e.g. payment method)</label>
-                                    <input name="note" type="text" value="${plan.note || ''}" placeholder="e.g. Cash to Pavlos or Twint" class="w-full bg-espresso-950 border border-espresso-800 focus:border-goldAccent-500 rounded-xl px-4 py-2.5 text-espresso-100 outline-none text-sm">
-                                </div>
-                                <button type="submit" class="w-full bg-goldAccent-500 hover:bg-goldAccent-600 text-espresso-950 font-bold py-2.5 rounded-xl transition-colors">Save Plan & Update Template</button>
-                            </form>
-                            <div class="mt-4 text-xs text-espresso-400 bg-espresso-950/60 rounded-xl p-3">
-                                Current club balance: <span class="font-mono font-bold ${balance >= 0 ? 'text-emerald-400' : 'text-rose-400'}">CHF ${balance.toFixed(2)}</span>
-                                ${balance < 0 ? '<span class="text-rose-300"> — a new collection is overdue!</span>' : ''}
-                            </div>
-                        </div>
-
-                        <!-- Recipients -->
-                        <div class="coffee-glass p-6 rounded-2xl shadow-xl">
-                            <h3 class="text-xl font-serif text-goldAccent-500 mb-4">Recipients (${withEmail.length})</h3>
-                            <div class="max-h-72 overflow-y-auto">${memberRows || '<p class="text-espresso-400 text-sm">No members with email.</p>'}</div>
-                            ${noEmail.length ? `<p class="text-xs text-amber-300 mt-3">⚠ No email on file: ${noEmail.map(m => m.name).join(', ')} — remind in person.</p>` : ''}
-                            <button id="copy-emails-btn" class="mt-4 w-full bg-espresso-800 hover:bg-goldAccent-500 hover:text-espresso-950 border border-goldAccent-500/20 text-espresso-200 text-sm font-semibold py-2.5 rounded-xl transition-all">Copy selected email addresses</button>
-                        </div>
-
-                        <!-- Composer -->
-                        <div class="coffee-glass p-6 rounded-2xl shadow-xl lg:col-span-2">
-                            <h3 class="text-xl font-serif text-goldAccent-500 mb-4">Email Preview</h3>
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-xs uppercase tracking-wider text-espresso-300 mb-1">Subject</label>
-                                    <input id="reminder-subject" type="text" class="w-full bg-espresso-950 border border-espresso-800 focus:border-goldAccent-500 rounded-xl px-4 py-2.5 text-espresso-100 outline-none text-sm">
-                                </div>
-                                <div>
-                                    <label class="block text-xs uppercase tracking-wider text-espresso-300 mb-1">Message</label>
-                                    <textarea id="reminder-body" rows="9" class="w-full bg-espresso-950 border border-espresso-800 focus:border-goldAccent-500 rounded-xl px-4 py-3 text-espresso-100 outline-none text-sm font-mono"></textarea>
-                                </div>
-                                <div class="flex flex-col sm:flex-row gap-3">
-                                    <button id="open-mail-btn" class="flex-1 bg-goldAccent-500 hover:bg-goldAccent-600 text-espresso-950 font-bold py-3 rounded-xl transition-colors">Open in my email app (BCC all selected)</button>
-                                    <button id="copy-message-btn" class="flex-1 bg-espresso-800 hover:bg-goldAccent-500 hover:text-espresso-950 border border-goldAccent-500/20 text-espresso-200 font-semibold py-3 rounded-xl transition-all">Copy message text</button>
-                                </div>
-                                <p class="text-xs text-espresso-400">Tip: the draft opens in your mail client — review it there and press send yourself.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-
-            const fillTemplate = () => {
-                const p = appState.collectionPlan || {};
-                const amount = p.amountPerMember || 20;
-                const due = p.dueDate ? new Date(p.dueDate + 'T00:00:00').toLocaleDateString('en-GB') : '';
-                const note = p.note || '';
-                document.getElementById('reminder-subject').value =
-                    `Espresso Club — next coffee collection: CHF ${amount}${due ? ` by ${due}` : ''}`;
-                document.getElementById('reminder-body').value =
-`Hi everyone,
-
-Friendly reminder from the Espresso Club: the next collection is CHF ${amount} per person${due ? `, due by ${due}` : ''}.
-${note ? note + '\n' : ''}
-Current club balance: CHF ${balance.toFixed(2)}${balance < 0 ? ' (we are in the red, so your contribution keeps the espresso flowing!)' : ''}.
-
-Thanks a lot!
-Pavlos`;
-            };
-            fillTemplate();
-
-            document.getElementById('collection-plan-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const f = e.target;
-                const newPlan = {
-                    amountPerMember: parseFloat(f.amount.value) || 20,
-                    dueDate: f.due.value || '',
-                    note: f.note.value.trim()
-                };
-                appState.collectionPlan = newPlan;
-                if (isMockMode) {
-                    const dbState = loadMockDB();
-                    dbState.collectionPlan = newPlan;
-                    saveMockDB(dbState);
-                } else {
-                    try { await setDoc(doc(db, getCollectionPath('reminders'), 'plan'), newPlan); } catch (err) { console.error(err); }
-                }
-                fillTemplate();
-            });
-
-            const selectedEmails = () =>
-                [...container.querySelectorAll('.reminder-recipient:checked')].map(cb => cb.value);
-
-            document.getElementById('copy-emails-btn').addEventListener('click', (e) => {
-                const list = selectedEmails().join(', ');
-                navigator.clipboard?.writeText(list).then(() => {
-                    e.target.textContent = `Copied ${selectedEmails().length} addresses ✓`;
-                    setTimeout(() => { e.target.textContent = 'Copy selected email addresses'; }, 2000);
-                });
-            });
-
-            document.getElementById('copy-message-btn').addEventListener('click', (e) => {
-                navigator.clipboard?.writeText(document.getElementById('reminder-body').value).then(() => {
-                    e.target.textContent = 'Copied ✓';
-                    setTimeout(() => { e.target.textContent = 'Copy message text'; }, 2000);
-                });
-            });
-
-            document.getElementById('open-mail-btn').addEventListener('click', () => {
-                const emails = selectedEmails();
-                if (!emails.length) { alert('Select at least one recipient.'); return; }
-                const subject = encodeURIComponent(document.getElementById('reminder-subject').value);
-                const body = encodeURIComponent(document.getElementById('reminder-body').value);
-                window.location.href = `mailto:?bcc=${encodeURIComponent(emails.join(','))}&subject=${subject}&body=${body}`;
-            });
         };
 
         const renderPaymentsLogView = (container) => {
@@ -2039,7 +1797,7 @@ Pavlos`;
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-xs uppercase tracking-wider text-espresso-300 mb-1">Amount Paid (CHF)</label>
+                                    <label class="block text-xs uppercase tracking-wider text-espresso-300 mb-1">Amount Paid ($)</label>
                                     <input name="amount" type="number" step="0.01" required placeholder="e.g. 20.00" class="w-full bg-espresso-950 border border-espresso-800 focus:border-goldAccent-500 rounded-xl px-4 py-2 text-espresso-100 outline-none text-sm transition-colors">
                                 </div>
                                 <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-espresso-950 font-bold py-2.5 px-4 rounded-xl transition-colors text-sm shadow-md mt-2">Log Contribution</button>
@@ -2150,7 +1908,7 @@ Pavlos`;
                                 <form id="settle-balance-form" class="space-y-4">
                                     <div class="grid grid-cols-2 gap-4">
                                         <div>
-                                            <label class="block text-xs uppercase tracking-wider text-espresso-300 mb-1">Amount (CHF)</label>
+                                            <label class="block text-xs uppercase tracking-wider text-espresso-300 mb-1">Amount ($)</label>
                                             <input name="amount" type="number" step="0.01" required placeholder="e.g. 20.00" class="w-full bg-espresso-950 border border-espresso-800 focus:border-goldAccent-500 rounded-xl px-4 py-2 text-espresso-100 outline-none text-sm transition-colors">
                                         </div>
                                         <div>
@@ -2285,8 +2043,7 @@ Pavlos`;
             appState.requests = dbState.requests || [];
             appState.broadcast = dbState.broadcast || { message: '', active: false };
             appState.machineStats = dbState.machineStats || { cupsSinceClean: 0, lastCleanedBy: 'None' };
-            appState.collectionPlan = dbState.collectionPlan || { amountPerMember: 20, dueDate: '', note: '' };
-
+            
             if (currentUser) {
                 appState.userProfile = appState.members.find(m => m.email.toLowerCase() === currentUser.email.toLowerCase());
             }
@@ -2344,11 +2101,6 @@ Pavlos`;
 
                 dbListeners.push(onSnapshot(doc(db, getCollectionPath('broadcast'), 'active'), doc => {
                     appState.broadcast = doc.exists() ? doc.data() : { message: '', active: false };
-                    if(document.getElementById('main-content')) renderCurrentView();
-                }));
-
-                dbListeners.push(onSnapshot(doc(db, getCollectionPath('reminders'), 'plan'), doc => {
-                    appState.collectionPlan = doc.exists() ? doc.data() : { amountPerMember: 20, dueDate: '', note: '' };
                     if(document.getElementById('main-content')) renderCurrentView();
                 }));
 

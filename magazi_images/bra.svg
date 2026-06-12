@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 700">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fdf4f1"/><stop offset="1" stop-color="#f7e6df"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="700" fill="url(#bg)"/>
+  <rect x="24" y="24" width="552" height="652" fill="none" stroke="#d9b8a5" stroke-width="1.5"/>
+  <!-- hanger -->
+  <g stroke="#a98467" stroke-width="4" fill="none" stroke-linecap="round">
+    <path d="M300 130 v-22 a14 14 0 1 1 14 -14"/>
+    <path d="M300 130 L160 200 H440 Z"/>
+  </g>
+  <!-- bra silhouette -->
+  <g stroke="#b76e79" stroke-width="5" fill="rgba(183,110,121,0.08)" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M185 205 C175 300 195 360 300 375 C405 360 425 300 415 205"/>
+    <path d="M185 205 C220 330 290 345 300 375"/>
+    <path d="M415 205 C380 330 310 345 300 375"/>
+    <path d="M186 250 C150 280 140 330 150 365"/>
+    <path d="M414 250 C450 280 460 330 450 365"/>
+  </g>
+  <circle cx="300" cy="372" r="7" fill="#c9a24b"/>
+  <text x="300" y="560" text-anchor="middle" font-family="Georgia, serif" font-size="44" fill="#b76e79" letter-spacing="10">ΧΡΥΣΑΝΘΗ</text>
+  <text x="300" y="605" text-anchor="middle" font-family="Georgia, serif" font-style="italic" font-size="22" fill="#a98467" letter-spacing="4">Σουτιέν · Bras</text>
+</svg>
