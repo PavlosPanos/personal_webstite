@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Introducing VQ-Wave | Pavlos Panos</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+  <article class="post-container">
+    <a href="../index.html" class="back-btn">Back</a>
+    <header>
+      <p class="date">October 12, 2025</p>
+      <h1>VQ-Wave: Physics-Driven Deep Learning for Contrast-Free Functional Lung Imaging</h1>
+    </header>
+
+    <img src="../assets/images/cascade.png" alt="VQ-Wave Deep Learning Architecture" class="blog-banner">
+
+    <section>
+      <p>
+        Traditional methods for measuring ventilation (airflow) and perfusion (blood flow) in the lungs rely on radioactive contrast agents or long breath-holds. In contrast-free MRI, we can extract these signals from the tiny fluctuations caused by breathing and heartbeat cycles. However, filtering this signal is highly challenging.
+      </p>
+      <h2>The Problem with Matrix Pencil Decomposition</h2>
+      <p>
+        Matrix Pencil (MP) decomposition is the current standard for separating breathing and cardiac frequencies. But MP is highly sensitive to noise, irregular breathing patterns, and scanner drift. If a patient coughs or inhales irregularly, the mathematical fit breaks down.
+      </p>
+      <h2>Enter VQ-Wave</h2>
+      <p>
+        To solve this, we developed <strong>VQ-Wave</strong>: a spatiotemporal deep learning framework. VQ-Wave uses inception-style networks trained on synthetic physical models of lung motion and flow dynamics. Because it learns both spatial correlations (how neighboring pixels move) and temporal profiles, it separates flow components with high fidelity.
+      </p>
+      <p>
+        Crucially, VQ-Wave is robust enough to reduce standard acquisition scan times from 45 seconds to just 15 seconds. This makes contrast-free functional lung MRI feasible for pediatric and elderly patients who cannot perform long, stable breath-holds.
+      </p>
+    </section>
+  </article>
+</body>
+</html>

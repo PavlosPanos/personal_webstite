@@ -5,30 +5,26 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pavlos Panos</title>
+  <title>Pavlos Panos - Biomedical Engineering PhD Candidate</title>
 
-  <!--
-    - favicon
-  -->
+  <!-- Favicon -->
   <link rel="shortcut icon" href="./assets/images/logo.png" type="image/x-icon">
 
-  <!--
-    - custom css link
-  -->
+  <!-- Custom CSS -->
   <link rel="stylesheet" href="./assets/css/style.css">
 
-  <!--
-    - google font link
-  -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
+  <!-- Particle Background Canvas -->
   <canvas id="particle-canvas"></canvas>
 
+  <!-- AJAX Science Modal Container -->
   <div id="project-modal" class="modal-case-study">
     <div class="modal-inner">
       <button class="modal-close" id="close-project-modal">&times;</button>
@@ -36,576 +32,239 @@
     </div>
   </div>
 
-  <!--
-    - #MAIN
-  -->
+  <!-- Header Navigation -->
+  <nav class="navbar">
+    <div class="name-brand" style="font-family: var(--ff-space); font-weight: 700; color: var(--accent-cyan);">PAVLOS PANOS</div>
+    
+    <button class="nav-toggle-btn" data-nav-toggler>
+      <ion-icon name="menu-outline"></ion-icon>
+    </button>
 
+    <ul class="navbar-list" data-navbar>
+      <li class="navbar-item">
+        <button class="navbar-link active" data-nav-link data-en="About" data-el="Σχετικά" data-de="Über mich">About</button>
+      </li>
+      <li class="navbar-item">
+        <button class="navbar-link" data-nav-link data-en="Research" data-el="Έρευνα" data-de="Forschung">Research</button>
+      </li>
+      <li class="navbar-item">
+        <button class="navbar-link" data-nav-link data-en="Portfolio" data-el="Έργα" data-de="Portfolio">Portfolio</button>
+      </li>
+      <li class="navbar-item">
+        <button class="navbar-link" data-nav-link data-en="Blogs" data-el="Ιστολόγιο" data-de="Blogs">Blogs</button>
+      </li>
+      <li class="navbar-item">
+        <button class="navbar-link" data-nav-link data-en="Interests" data-el="Ενδιαφέροντα" data-de="Hobbys">Interests</button>
+      </li>
+      <li class="navbar-item">
+        <button class="navbar-link" data-nav-link data-en="Contact" data-el="Επικοινωνία" data-de="Kontakt">Contact</button>
+      </li>
+    </ul>
+
+    <div class="lang-switcher">
+      <button class="lang-btn active" data-lang-btn="en">EN</button>
+      <button class="lang-btn" data-lang-btn="el">EL</button>
+      <button class="lang-btn" data-lang-btn="de">DE</button>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
   <main>
 
-    <!--
-      - #SIDEBAR
-    -->
-
-
-
+    <!-- Sidebar Profile Details -->
     <aside class="sidebar" data-sidebar>
-      
       <div class="sidebar-info">
-
         <figure class="avatar-box">
-          <img src="./assets/images/my-avatar.png" alt="Pavlos Panos" width="80">
+          <img src="./assets/images/my-avatar.png" alt="Pavlos Panos" width="120">
         </figure>
-
         <div class="info-content">
           <h1 class="name" title="Pavlos Panos">Pavlos Panos</h1>
-
-          <p class="title">PhD Candidate</p>
-          <p class="title-2">Department of Biomedical Engineering <br> University of Basel</p>
+          <p class="title" data-en="PhD Candidate" data-el="Υποψήφιος Διδάκτωρ" data-de="Doktorand">PhD Candidate</p>
+          <p class="title-2" data-en="Department of Biomedical Engineering<br>University of Basel" data-el="Τμήμα Βιοϊατρικής Μηχανικής<br>Πανεπιστήμιο της Βασιλείας" data-de="Departement Biomedical Engineering<br>Universität Basel">Department of Biomedical Engineering<br>University of Basel</p>
         </div>
-
-        <button class="info_more-btn" data-sidebar-btn>
-          <span>Show Contacts</span>
-
-          <ion-icon name="chevron-down"></ion-icon>
-        </button>
-
       </div>
 
+      <div class="separator"></div>
+
       <div class="sidebar-info_more">
-
-        <div class="separator"></div>
-
         <ul class="contacts-list">
-
           <li class="contact-item">
-
             <div class="icon-box">
               <ion-icon name="mail-outline"></ion-icon>
             </div>
-
             <div class="contact-info">
               <p class="contact-title">Email</p>
-
               <a href="mailto:pavlospanos@hotmail.com" class="contact-link">pavlospanos@hotmail.com</a>
             </div>
-
           </li>
-<!--
           <li class="contact-item">
-
-            <div class="icon-box">
-              <ion-icon name="phone-portrait-outline"></ion-icon>
-            </div>
-
-            <div class="contact-info">
-              <p class="contact-title">Phone</p>
-
-              <a href="tel:+306951413186" class="contact-link">+(30) 6951413186</a>
-            </div>
-
-          </li>
--->
-
-          <li class="contact-item">
-
-            <div class="icon-box">
-              <ion-icon name="calendar-outline"></ion-icon>
-            </div>
-
-            <div class="contact-info">
-              <p class="contact-title">Birthday</p>
-
-              <time datetime="2000-12-30">December 30, 2000</time>
-            </div>
-
-          </li>
-
-          <li class="contact-item">
-
             <div class="icon-box">
               <ion-icon name="location-outline"></ion-icon>
             </div>
-
             <div class="contact-info">
-              <p class="contact-title">Location</p>
-
-              <address>Basel, Switzerland</address>
+              <p class="contact-title" data-en="Location" data-el="Τοποθεσία" data-de="Standort">Location</p>
+              <address data-en="Basel, Switzerland" data-el="Βασιλεία, Ελβετία" data-de="Basel, Schweiz">Basel, Switzerland</address>
             </div>
-
           </li>
-
         </ul>
 
         <div class="separator"></div>
 
         <ul class="social-list">
-
           <li class="social-item">
             <a href="https://linkedin.com/in/pavlospanos" class="social-link" target="_blank" rel="noopener noreferrer">
               <ion-icon name="logo-linkedin"></ion-icon>
             </a>
           </li>
-
           <li class="social-item">
             <a href="https://github.com/pavlospanos" class="social-link" target="_blank" rel="noopener noreferrer">
               <ion-icon name="logo-github"></ion-icon>
             </a>
           </li>
-
-          <li class="social-item">
-            <a href="https://www.facebook.com/profile.php?id=100002869934907" class="social-link" target="_blank" rel="noopener noreferrer">
-              <ion-icon name="logo-facebook"></ion-icon>
-            </a>
-          </li>
-
         </ul>
-
       </div>
-
     </aside>
 
-
-
-
-
-    <!--
-      - #main-content
-    -->
-
+    <!-- Main Content Articles -->
     <div class="main-content">
 
-      <nav class="navbar">
-
-        <button class="nav-toggle-btn" data-nav-toggler>
-          <ion-icon name="menu-outline"></ion-icon>
-        </button>
-
-        <ul class="navbar-list" data-navbar>
-
-          <li class="navbar-item">
-            <button class="navbar-link active" data-nav-link data-en="About" data-el="Σχετικά" data-de="Über mich">About</button>
-          </li>
-
-          <li class="navbar-item">
-            <button class="navbar-link" data-nav-link data-en="Resume" data-el="Βιογραφικό" data-de="Lebenslauf">Resume</button>
-          </li>
-
-          <li class="navbar-item">
-            <button class="navbar-link" data-nav-link data-en="Portfolio" data-el="Έργα" data-de="Portfolio">Portfolio</button>
-          </li>
-
-          <li class="navbar-item">
-            <button class="navbar-link" data-nav-link data-en="Publications" data-el="Δημοσιεύσεις" data-de="Publikationen">Publications</button>
-          </li>
-
-          <li class="navbar-item">
-            <button class="navbar-link" data-nav-link data-en="Hobbies" data-el="Ενδιαφέροντα" data-de="Hobbys">Hobbies</button>
-          </li>
-
-          <li class="navbar-item">
-            <button class="navbar-link" data-nav-link data-en="Blog" data-el="Ιστολόγιο" data-de="Blog">Blog</button>
-          </li>
-
-          <li class="navbar-item">
-            <button class="navbar-link" data-nav-link data-en="Contact" data-el="Επικοινωνία" data-de="Kontakt">Contact</button>
-          </li>
-
-        </ul>
-
-        <div class="lang-switcher">
-          <button class="lang-btn active" data-lang-btn="en">EN</button>
-          <button class="lang-btn" data-lang-btn="el">EL</button>
-          <button class="lang-btn" data-lang-btn="de">DE</button>
-        </div>
-
-      </nav>
-
-
-
-
-
-      <!--
-        - #ABOUT
-      -->
-
-      <article class="about  active" data-page="about">
-
+      <!-- About Page -->
+      <article class="about active" data-page="about">
         <header>
-          <h2 class="h2 article-title">About me</h2>
+          <h2 class="article-title" data-en="About me" data-el="Σχετικά με μένα" data-de="Über mich">About me</h2>
         </header>
 
-          <p data-en="Welcome to my personal corner! I'm Pavlos Panos, a PhD Candidate in Biomedical Engineering at the University of Basel, Switzerland. My current research focuses on developing novel methods for Lung Magnetic Resonance Imaging (MRI), bridging the gap between advanced physics and clinical diagnostics." 
-             data-el="Καλώς ήρθατε στην προσωπική μου γωνιά! Είμαι ο Παύλος Πάνος, Υποψήφιος Διδάκτωρ Βιοϊατρικής Μηχανικής στο Πανεπιστήμιο της Βασιλείας, Ελβετία. Η έρευνά μου εστιάζει στην ανάπτυξη νέων μεθόδων για την Απεικόνιση Μαγνητικού Συντονισμού (MRI) Πνευμόνων."
-             data-de="Willkommen in meiner persönlichen Ecke! Ich bin Pavlos Panos, Doktorand in Biomedizintechnik an der Universität Basel, Schweiz. Meine aktuelle Forschung konzentriert sich auf die Entwicklung neuer Methoden für die Lungen-Magnetresonanztomographie (MRT).">
+        <div class="scroll-reveal">
+          <p data-en="Welcome to my personal corner! I'm <strong>Pavlos Panos</strong>, a PhD Candidate in Biomedical Engineering at the <strong>University of Basel</strong>, Switzerland. My current research focuses on developing novel methods for Lung Magnetic Resonance Imaging (MRI), bridging the gap between advanced physics and clinical diagnostics." 
+             data-el="Καλώς ήρθατε στην προσωπική μου γωνιά! Είμαι ο <strong>Παύλος Πάνος</strong>, Υποψήφιος Διδάκτωρ Βιοϊατρικής Μηχανικής στο <strong>Πανεπιστήμιο της Βασιλείας</strong>, Ελβετία. Η έρευνά μου εστιάζει στην ανάπτυξη νέων μεθόδων για την Απεικόνιση Μαγνητικού Συντονισμού (MRI) Πνευμόνων, γεφυρώνοντας το χάσμα μεταξύ προηγμένης φυσικής και κλινικής διάγνωσης."
+             data-de="Willkommen in meiner persönlichen Ecke! Ich bin <strong>Pavlos Panos</strong>, Doktorand in Biomedizintechnik an der <strong>Universität Basel</strong>, Schweiz. Meine aktuelle Forschung konzentriert sich auf die Entwicklung neuer Methoden für die Lungen-Magnetresonanztomographie (MRT), um die Lücke zwischen fortgeschrittener Physik und klinischer Diagnostik zu schließen.">
             Welcome to my personal corner! I'm <strong>Pavlos Panos</strong>, a PhD Candidate in Biomedical Engineering at the <strong>University of Basel</strong>, Switzerland. My current research focuses on developing novel methods for Lung Magnetic Resonance Imaging (MRI), bridging the gap between advanced physics and clinical diagnostics.
           </p>
-          <p data-en="Before transitioning to medical imaging, I spent years at the forefront of Particle Physics as a researcher for the CMS Experiment at CERN. I take great pride in academic excellence, having graduated 1st in my class for both my BSc and MSc at the National and Kapodistrian University of Athens."
-             data-el="Πριν μεταβώ στην ιατρική απεικόνιση, πέρασα χρόνια στην πρώτη γραμμή της Φυσικής Στοιχειωδών Σωματιδίων ως ερευνητής για το πείραμα CMS στο CERN. Είμαι ιδιαίτερα περήφανος για την ακαδημαϊκή μου αριστεία, έχοντας αποφοιτήσει 1ος στο έτος μου."
-             data-de="Bevor ich zur medizinischen Bildgebung wechselte, verbrachte ich Jahre an der Spitze der Teilchenphysik als Forscher für das CMS-Experiment am CERN. Ich bin sehr stolz auf meine akademische Exzellenz.">
+          <p data-en="Before transitioning to medical imaging, I spent years at the forefront of Particle Physics as a researcher for the <strong>CMS Experiment at CERN</strong>. I take great pride in academic excellence, having graduated <strong>1st in my class</strong> for both my BSc and MSc at the National and Kapodistrian University of Athens."
+             data-el="Πριν μεταβώ στην ιατρική απεικόνιση, πέρασα χρόνια στην πρώτη γραμμή της Φυσικής Στοιχειωδών Σωματιδίων ως ερευνητής για το πείραμα <strong>CMS στο CERN</strong>. Είμαι ιδιαίτερα περήφανος για την ακαδημαϊκή μου αριστεία, έχοντας αποφοιτήσει <strong>1ος στο έτος μου</strong> τόσο στο Πτυχίο όσο και στο Μεταπτυχιακό μου στο Εθνικό και Καποδιστριακό Πανεπιστήμιο Αθηνών."
+             data-de="Vor meinem Wechsel zur medizinischen Bildgebung verbrachte ich Jahre an der Spitze der Teilchenphysik als Forscher für das <strong>CMS-Experiment am CERN</strong>. Ich bin stolz auf meine akademische Exzellenz: Meinen Bachelor und Master an der Nationalen und Kapodistrianischen Universität Athen habe ich jeweils als <strong>Klassenbester</strong> abgeschlossen.">
             Before transitioning to medical imaging, I spent years at the forefront of Particle Physics as a researcher for the <strong>CMS Experiment at CERN</strong>. I take great pride in academic excellence, having graduated <strong>1st in my class</strong> for both my BSc and MSc at the National and Kapodistrian University of Athens.
           </p>
-          <p data-en="Beyond the lab, I am a passionate enthusiast of Piano, Chess, and more recently, a novice Wine Lover exploring oenology."
-             data-el="Πέρα από το εργαστήριο, είμαι λάτρης του πιάνου, του σκακιού και, πιο πρόσφατα, ένας νέος λάτρης του κρασιού που εξερευνά την οινολογία."
-             data-de="Außerhalb des Labors begeistere ich mich für Klavier, Schach und seit kurzem bin ich ein Weinliebhaber, der die Oenologie erkundet.">
-            Beyond the lab and the code, I am a passionate enthusiast of the <strong>Piano</strong> and <strong>Chess</strong>, and more recently, I have started exploring the rich world of <strong>Wine Tasting</strong>.
-          </p>
+        </div>
 
-
-        <!--
-          - service
-        -->
-
-        <section class="service">
-
-          <h3 class="h3 service-title">What I Do</h3>
-
+        <section class="service scroll-reveal">
+          <h3 class="service-title" data-en="What I Do" data-el="Τι Κάνω" data-de="Was ich tue">What I Do</h3>
           <ul class="service-list">
-
             <li class="service-item">
               <div class="service-icon-box">
                 <ion-icon name="pulse-outline" style="font-size: 30px;"></ion-icon>
               </div>
               <div class="service-content-box">
-                <h4 class="h4 service-item-title" data-en="Medical Imaging & MRI Physics" data-el="Ιατρική Απεικόνιση & Φυσική MRI" data-de="Medizinische Bildgebung & MRT-Physik">Medical Imaging & MRI Physics</h4>
-                <p class="service-item-text"
-                   data-en="Developing next-generation balanced Steady-State Free Precession (bSSFP) shimming and super-resolution image enhancement for human lung MRI at 3T and 0.55T."
-                   data-el="Ανάπτυξη επόμενης γενιάς μεθόδων bSSFP και ενίσχυση εικόνας υπερ-ανάλυσης για MRI πνευμόνων στα 3T και 0.55T."
-                   data-de="Entwicklung von bSSFP-Shimming der nächsten Generation und Super-Resolution-Bildverbesserung für die menschliche Lungen-MRT bei 3T und 0,55T.">
-                  Developing next-generation **balanced Steady-State Free Precession (bSSFP)** shimming and super-resolution image enhancement for human lung MRI at 3T and 0.55T.
-                </p>
+                <h4 class="service-item-title" data-en="Medical Imaging & MRI Physics" data-el="Ιατρική Απεικόνιση & Φυσική MRI" data-de="Medizinische Bildgebung & MRT-Physik">Medical Imaging & MRI Physics</h4>
+                <p class="service-item-text" data-en="Developing next-generation balanced Steady-State Free Precession (bSSFP) shimming and super-resolution image enhancement for human lung MRI at 3T and 0.55T." data-el="Ανάπτυξη επόμενης γενιάς shimming bSSFP και ενίσχυσης εικόνας υπερ-ανάλυσης για MRI ανθρώπινου πνεύμονα στα 3T και 0.55T." data-de="Entwicklung von bSSFP-Shimming der nächsten Generation und Super-Resolution-Bildverbesserung für die menschliche Lungen-MRT bei 3T und 0,55T.">Developing next-generation balanced Steady-State Free Precession (bSSFP) shimming and super-resolution image enhancement for human lung MRI at 3T and 0.55T.</p>
               </div>
             </li>
-
             <li class="service-item">
               <div class="service-icon-box">
                 <ion-icon name="flask-outline" style="font-size: 30px;"></ion-icon>
               </div>
               <div class="service-content-box">
-                <h4 class="h4 service-item-title" data-en="High Energy Physics Analysis" data-el="Φυσική Υψηλών Ενεργειών" data-de="Hochenergiephysik-Analyse">High Energy Physics Analysis</h4>
-                <p class="service-item-text"
-                   data-en="Advanced Machine Learning deployment for Dijet Resonance Searches and track reconstruction using Graph Neural Networks (GNNs) at the CMS experiment, CERN."
-                   data-el="Προηγμένη ανάπτυξη Μηχανικής Μάθησης για αναζητήσεις συντονισμού Dijet και ανακατασκευή τροχιών χρησιμοποιώντας GNN στο CMS, CERN."
-                   data-de="Fortgeschrittener Einsatz von maschinellem Lernen für Dijet-Resonanzsuche und Spur-Rekonstruktion mit GNNs am CMS-Experiment, CERN.">
-                  Advanced Machine Learning deployment for **Dijet Resonance Searches** and track reconstruction using Graph Neural Networks (GNNs) at the CMS experiment, CERN.
-                </p>
+                <h4 class="service-item-title" data-en="High Energy Physics Analysis" data-el="Φυσική Υψηλών Ενεργειών" data-de="Hochenergiephysik-Analyse">High Energy Physics Analysis</h4>
+                <p class="service-item-text" data-en="Advanced Machine Learning deployment for Dijet Resonance Searches and track reconstruction using Graph Neural Networks (GNNs) at the CMS experiment, CERN." data-el="Προηγμένη ανάπτυξη Μηχανικής Μάθησης για αναζητήσεις συντονισμού Dijet και ανακατασκευή τροχιών με GNN στο πείραμα CMS, CERN." data-de="Fortgeschrittene Anwendung von Machine Learning für Dijet-Resonanzsuchen und Spurrekonstruktion mit Graph Neural Networks (GNNs) beim CMS-Experiment am CERN.">Advanced Machine Learning deployment for Dijet Resonance Searches and track reconstruction using Graph Neural Networks (GNNs) at the CMS experiment, CERN.</p>
               </div>
             </li>
-
-            <li class="service-item">
-              <div class="service-icon-box">
-                <ion-icon name="code-working-outline" style="font-size: 30px;"></ion-icon>
-              </div>
-              <div class="service-content-box">
-                <h4 class="h4 service-item-title" data-en="Deep Learning & Data Science" data-el="Βαθιά Μάθηση & Επιστήμη Δεδομένων" data-de="Deep Learning & Data Science">Deep Learning & Data Science</h4>
-                <p class="service-item-text"
-                   data-en="Expertise in Multi-Layer Perceptrons, LSTMs, and Super-Resolution applied to complex scientific data."
-                   data-el="Εξειδίκευση σε MLP, LSTM και Υπερ-ανάλυση εφαρμοσμένη σε πολύπλοκα επιστημονικά δεδομένα."
-                   data-de="Expertise in Multi-Layer-Perzeptronen, LSTMs und Super-Resolution, angewendet auf komplexe wissenschaftliche Daten.">
-                  Expertise in Multi-Layer Perceptrons, LSTMs, and Super-Resolution applied to complex scientific data.
-                </p>
-              </div>
-            </li>
-
-            <li class="service-item">
-              <div class="service-icon-box">
-                <ion-icon name="cube-outline" style="font-size: 30px;"></ion-icon>
-              </div>
-              <div class="service-content-box">
-                <h4 class="h4 service-item-title" data-en="Numerical Simulations (FDTD/MC)" data-el="Αριθμητικές Προσομοιώσεις" data-de="Numerische Simulationen">Numerical Simulations (FDTD/MC)</h4>
-                <p class="service-item-text"
-                   data-en="Simulation of complex physical phenomena using Monte Carlo and Finite-Difference Time-Domain methods."
-                   data-el="Προσομοίωση πολύπλοκων φυσικών φαινομένων χρησιμοποιώντας μεθόδους Monte Carlo και FDTD."
-                   data-de="Simulation komplexer physikalischer Phänomene mit Monte-Carlo- und FDTD-Methoden.">
-                  Simulation of complex physical phenomena using Monte Carlo and Finite-Difference Time-Domain methods.
-                </p>
-              </div>
-            </li>
-
           </ul>
         </section>
-
-
-
-        <!--
-          - testimonials modal
-        -->
-        
-        <div class="modal-container" data-modal-container>
-
-          <div class="overlay" data-overlay></div>
-
-          <section class="testimonials-modal">
-
-            <button class="modal-close-btn" data-modal-close-btn>
-              <ion-icon name="close-outline"></ion-icon>
-            </button>
-
-            <div class="modal-img-wrapper">
-              <figure class="modal-avatar-box">
-                <img src="./assets/images/avatar-1.png" alt="Daniel lewis" width="80" data-modal-img>
-              </figure>
-
-              <img src="./assets/images/icon-quote.svg" alt="quote icon">
-            </div>
-
-            <div class="modal-content">
-
-              <h4 class="h3 modal-title" data-modal-title>--------------</h4>
-
-              <time datetime="2021-06-14">--------------</time>
-
-              <div data-modal-text>
-                <p>
-                </p>
-              </div>
-
-            </div>
-
-          </section>
-
-        </div>
-
-
       </article>
-      
 
-
-
-
-
-      <!--
-        - #RESUME
-      -->
-
-      <article class="resume" data-page="resume">
-
+      <!-- Research Page -->
+      <article class="research" data-page="research">
         <header>
-          <h2 class="h2 article-title">Resume</h2>
+          <h2 class="article-title" data-en="Academic Research" data-el="Ακαδημαϊκή Έρευνα" data-de="Forschung">Academic Research</h2>
         </header>
 
-        <section class="timeline">
+        <section class="timeline scroll-reveal">
+          <div class="title-wrapper">
+            <div class="icon-box">
+              <ion-icon name="journal-outline"></ion-icon>
+            </div>
+            <h3 data-en="Selected Publications" data-el="Επιλεγμένες Δημοσιεύσεις" data-de="Ausgewählte Publikationen">Selected Publications</h3>
+          </div>
 
+          <ol class="timeline-list">
+            <li class="timeline-item">
+              <h4 class="timeline-item-title">VQ-Wave: Spatiotemporal deep learning for functional lung MRI without contrast agent</h4>
+              <span>2025</span>
+              <p class="timeline-text">
+                <em>Preprint / ArXiv</em> — Physics-driven spatio-temporal deep learning network solving Matrix Pencil instability under irregular breathing.
+              </p>
+            </li>
+            <li class="timeline-item">
+              <h4 class="timeline-item-title">Rapid Free-Breathing and Automated 2D Shimming of the Lung at 3T</h4>
+              <span>2026</span>
+              <p class="timeline-text">
+                <em>Magnetic Resonance in Medicine (Magn Reson Med)</em>
+                <br>
+                <a href="https://pubmed.ncbi.nlm.nih.gov/41486104/" target="_blank" rel="noopener noreferrer" class="clickable-link">
+                  <ion-icon name="open-outline"></ion-icon> View Paper
+                </a>
+              </p>
+            </li>
+            <li class="timeline-item">
+              <h4 class="timeline-item-title">Active shimming of the lung for mitigation of bSSFP banding artifacts at high fields</h4>
+              <span>May 2025</span>
+              <p class="timeline-text"><em>ISMRM 2025, Hawaii</em> — e-Poster Presentation</p>
+            </li>
+            <li class="timeline-item">
+              <h4 class="timeline-item-title">Super-Resolution Image Enhancement for 3D Morphological Lung MRI with bSTAR at 0.55T</h4>
+              <span>May 2025</span>
+              <p class="timeline-text"><em>ISMRM 2025, Hawaii</em> — PowerPitch Presentation</p>
+            </li>
+          </ol>
+        </section>
+
+        <section class="timeline scroll-reveal">
           <div class="title-wrapper">
             <div class="icon-box">
               <ion-icon name="book-outline"></ion-icon>
             </div>
-
-            <h3 class="h3">Education</h3>
+            <h3 data-en="Education" data-el="Εκπαίδευση" data-de="Ausbildung">Education</h3>
           </div>
 
           <ol class="timeline-list">
-
             <li class="timeline-item">
-              <h4 class="h4 timeline-item-title">PhD Candidate in Biomedical Engineering</h4>
-              <h5 class="h4 timeline-item-title-2">University of Basel, Switzerland</h5>
-              <span>July 2024 — Present</span>
-              <p class="timeline-text">
-                Focus: Novel Methods for Lung Magnetic Resonance Imaging. Researching next-generation shimming and image enhancement techniques.
-              </p>
+              <h4 class="timeline-item-title" data-en="PhD Candidate in Biomedical Engineering" data-el="Υποψήφιος Διδάκτωρ Βιοϊατρικής Μηχανικής" data-de="Doktorand in Biomedizintechnik">PhD Candidate in Biomedical Engineering</h4>
+              <h5 class="timeline-item-title-2">University of Basel, Switzerland</h5>
+              <span>2024 — Present</span>
+              <p class="timeline-text">Focus on balanced Steady-State Free Precession sequences and inline shimming algorithms.</p>
             </li>
-
             <li class="timeline-item">
-
-              <h4 class="h4 timeline-item-title">MSc Nuclear and Particle Physics</h4>
-              <h5 class="h4 timeline-item-title-2">National and Kapodistrian University of Athens</h5>
-
-              <span>September 2022 — March 2024</span>
-
-              <p class="timeline-text">
-                <strong><u>Grade:</u></strong> 9.67/10 (Excellent) - <strong>Ranked 1st in class</strong>
-                <br>
-                <strong><u>Thesis:</u></strong> Development of Machine Learning techniques for resonance searches in events with four jets in the final state collected by the CMS experiment at the CERN LHC.
-                <br>(Supervisor: Associate Professor Niki Saoulidou)
-              </p>
-
+              <h4 class="timeline-item-title" data-en="MSc in Particle Physics" data-el="Μεταπτυχιακό στη Φυσική Σωματιδίων" data-de="Master in Teilchenphysik">MSc in Particle Physics</h4>
+              <h5 class="timeline-item-title-2">National and Kapodistrian University of Athens</h5>
+              <span>2022 — 2024</span>
+              <p class="timeline-text">Grade: 9.67/10 (Ranked 1st in class). Thesis in collaboration with CMS Experiment (CERN).</p>
             </li>
-
-            <li class="timeline-item">
-              <h4 class="h4 timeline-item-title">National & Kapodistrian University of Athens</h4>
-              <h5 class="h4 timeline-item-title-2">Bachelor's degree, Elementary Particle Physics</h5>
-              <span>September 2018 — September 2022</span>
-              <p class="timeline-text">
-                <strong><u>Grade:</u></strong> 8.95/10 (Excellent) - <strong>Ranked 1st in class</strong> (Awarded Scholarship of Excellence - IKY)
-                <br>
-                <strong><u>Thesis:</u></strong> Optimization of jet pairing of the pared dijet resonance search with the CMS experiment at the CERN LHC using machine learning.
-              </p>
-            </li>
-
-            <li class="timeline-item">
-
-              <h4 class="h4 timeline-item-title">38th High school of Athens</h4>
-
-              <span>2015-2018</span>
-
-              <p class="timeline-text">
-                <strong><u>Grade:</u></strong> 19.9/20 (Excellent)
-              </p>
-
-            </li>
-
-            <!-- <li class="timeline-item">
-
-              <h4 class="h4 timeline-item-title">High school of art and design</h4>
-
-              <span>2002 — 2004</span>
-
-              <p class="timeline-text">
-                Duis aute irure dolor in reprehenderit in voluptate, quila voluptas mag odit aut fugit, sed consequuntur
-                magni dolores
-                eos.
-              </p>
-
-            </li> -->
-
           </ol>
-
-        </section>
-
-        <section class="timeline">
-
-          <div class="title-wrapper">
-            <div class="icon-box">
-              <ion-icon name="book-outline"></ion-icon>
-            </div>
-
-            <h3 class="h3">Experience</h3>
-          </div>
-
-          <ol class="timeline-list">
-
-            <li class="timeline-item">
-
-              <h4 class="h4 timeline-item-title">Researcher / Data Analyst for the CERN LHC</h4>
-              <h5 class="h4 timeline-item-title-2">Hellenic Foundation for Research and Innovation (HFRI)</h5>
-              <span>November 2022 — September 2023</span>
-
-              <p class="timeline-text">
-                Collaborated with the CMS experiment team to enhance resonance searches using Machine Learning (MLPs). Optimized jet pairing techniques and signal-to-background selection criteria, significantly improving experimental precision.
-              </p>
-
-            </li>
-
-            <li class="timeline-item">
-
-              <h4 class="h4 timeline-item-title">Teacher - Private Tutor</h4>
-
-              <span>2018 — Present</span>
-
-              <p class="timeline-text">
-                Providing additional academic support to high school and university students in Greece through private tutoring and supplementary courses.
-              </p>
-
-            </li>
-
-          </ol>
-
-        </section>
-        <section class="skill">
-
-          <h3 class="h3 skills-title">Technical Skills</h3>
-
-          <ul class="skills-list content-card">
-
-            <li class="skills-item">
-              <div class="title-wrapper">
-                <h5 class="h5">Python & C++</h5>
-                <data value="95">95%</data>
-              </div>
-              <div class="skill-progress-bg">
-                <div class="skill-progress-fill" style="width: 95%;"></div>
-              </div>
-            </li>
-
-            <li class="skills-item">
-              <div class="title-wrapper">
-                <h5 class="h5">Deep Learning (TensorFlow/Keras)</h5>
-                <data value="90">90%</data>
-              </div>
-              <div class="skill-progress-bg">
-                <div class="skill-progress-fill" style="width: 90%;"></div>
-              </div>
-            </li>
-
-            <li class="skills-item">
-              <div class="title-wrapper">
-                <h5 class="h5">Data Analysis (ROOT/MATLAB)</h5>
-                <data value="92">92%</data>
-              </div>
-              <div class="skill-progress-bg">
-                <div class="skill-progress-fill" style="width: 92%;"></div>
-              </div>
-            </li>
-
-            <li class="skills-item">
-              <div class="title-wrapper">
-                <h5 class="h5">MRI Physics & Shimming</h5>
-                <data value="85">85%</data>
-              </div>
-              <div class="skill-progress-bg">
-                <div class="skill-progress-fill" style="width: 85%;"></div>
-              </div>
-            </li>
-
-          </ul>
-
         </section>
       </article>
 
-
-
-
-
-      <!--
-        - #PORTFOLIO
-      -->
-
+      <!-- Portfolio Page -->
       <article class="portfolio" data-page="portfolio">
-
         <header>
-          <h2 class="h2 article-title">Portfolio</h2>
+          <h2 class="article-title" data-en="Research Blueprints" data-el="Σχέδια Έργων" data-de="Projektentwürfe">Research Blueprints</h2>
         </header>
 
-        <section class="projects">
-
-
-
-          <div class="filter-select-box">
-
-            <button class="filter-select" data-select>
-
-              <div class="select-value" data-selecct-value>Select category</div>
-
-              <div class="select-icon">
-                <ion-icon name="chevron-down"></ion-icon>
-              </div>
-
-            </button>
-
-            <ul class="select-list">
-
-              <li class="select-item">
-                <button data-select-item>Physics Related Projects</button>
-              </li>
-
-              <li class="select-item">
-                <button data-select-item>Machine Learning Projects</button>
-              </li>
-
-              <li class="select-item">
-                <button data-select-item>General Algorithm Projects</button>
-              </li>
-
-              <li class="select-item">
-                <button data-select-item>Interesting </button>
-              </li>
-
-            </ul>
-
-          </div>
-
+        <section class="projects scroll-reveal">
           <ul class="project-list">
+            <li class="project-item active" data-filter-item data-category="medical imaging">
+              <a href="./projects/vq-wave.html">
+                <figure class="project-img">
+                  <div class="project-item-icon-box">
+                    <ion-icon name="eye-outline"></ion-icon>
+                  </div>
+                  <img src="./assets/images/MRI_Lung.png" alt="VQ-Wave Model" loading="lazy">
+                </figure>
+                <h3 class="project-title">VQ-Wave Framework</h3>
+                <p class="project-category">Functional Lung MRI Deep Learning</p>
+              </a>
+            </li>
 
-            <li class="project-item active" data-filter-item data-category="physics related projects" data-project-id="solar">
+            <li class="project-item active" data-filter-item data-category="physics">
               <a href="./projects/solar-prediction.html">
                 <figure class="project-img">
                   <div class="project-item-icon-box">
@@ -613,13 +272,12 @@
                   </div>
                   <img src="./assets/images/170608-solar-flare-mn-0850.jpg" alt="Solar" loading="lazy">
                 </figure>
-                <h3 class="project-title" data-en="Solar Cycle 25 Prediction" data-el="Πρόβλεψη Ηλιακού Κύκλου 25" data-de="Sonnenzyklus 25 Vorhersage">Solar Cycle 25 Prediction</h3>
-                <p class="project-category">Machine Learning Projects</p>
+                <h3 class="project-title" data-en="Solar Cycle Prediction" data-el="Πρόβλεψη Ηλιακού Κύκλου" data-de="Sonnenzyklus Vorhersage">Solar Cycle Prediction</h3>
+                <p class="project-category">Machine Learning / LSTM Networks</p>
               </a>
             </li>
-            
 
-            <li class="project-item active" data-filter-item data-category="physics related projects" data-project-id="drone">
+            <li class="project-item active" data-filter-item data-category="simulation">
               <a href="./projects/drone-guidance.html">
                 <figure class="project-img">
                   <div class="project-item-icon-box">
@@ -627,71 +285,52 @@
                   </div>
                   <img src="./assets/images/istockphoto-911190112-612x612.jpg" alt="Drone" loading="lazy">
                 </figure>
-                <h3 class="project-title" data-en="Drone Guidance & Autonomous Navigation" data-el="Καθοδήγηση Drone & Αυτόνομη Πλοήγηση" data-de="Drohnensteuerung & Autonome Navigation">Drone Guidance & Autonomous Navigation</h3>
-                <p class="project-category">Simulation Projects</p>
+                <h3 class="project-title" data-en="Autonomous Drone Navigation" data-el="Αυτόνομη Πλοήγηση Drone" data-de="Autonome Drohnensteuerung">Autonomous Drone Navigation</h3>
+                <p class="project-category">Spatio-Temporal Simulation Algorithms</p>
               </a>
             </li>
-
-            <li class="project-item active" data-filter-item data-category="physics related projects" data-project-id="mc">
-              <a href="./projects/mc-simulation.html">
-                <figure class="project-img">
-                  <div class="project-item-icon-box">
-                    <ion-icon name="eye-outline"></ion-icon>
-                  </div>
-                  <img src="./assets/images/cascade.png" alt="Monte Carlo Simulation" loading="lazy">
-                </figure>
-                <h3 class="project-title" data-en="Monte Carlo EM Cascade Simulations" data-el="Προσομοιώσεις Monte Carlo ΗΜ Καταιγίδας" data-de="Monte-Carlo-EM-Kaskadensimulationen">Monte Carlo EM Cascade Simulations</h3>
-                <p class="project-category">Physics Related Projects</p>
-              </a>
-            </li>
-
-            <li class="project-item active" data-filter-item data-category="physics related projects" data-project-id="fdtd">
-              <a href="./projects/fdtd-wave.html">
-                <figure class="project-img">
-                  <div class="project-item-icon-box">
-                    <ion-icon name="eye-outline"></ion-icon>
-                  </div>
-                  <img src="./assets/images/2D_PML_Material_epsilon=10_heatmap.gif" alt="FDTD Simulation" loading="lazy">
-                </figure>
-                <h3 class="project-title" data-en="FDTD Simulation: Topological Materials" data-el="Προσομοίωση FDTD: Τοπολογικά Υλικά" data-de="FDTD-Simulation: Topologische Materialien">FDTD Simulation: Topological Materials</h3>
-                <p class="project-category">Physics Related Projects</p>
-              </a>
-            </li>
-            
           </ul>
         </section>
       </article>
 
-
-
-
-
-      <!--
-        - #BLOG
-      -->
-
-      <article class="blog" data-page="blog">
+      <!-- Blogs Page -->
+      <article class="blog" data-page="blogs">
         <header>
-          <h2 class="h2 article-title">My Blog</h2>
+          <h2 class="article-title" data-en="Technical Blogs" data-el="Τεχνικά Άρθρα" data-de="Technische Blogs">Technical Blogs</h2>
         </header>
-      
-        <section class="blog-posts">
-      
+
+        <section class="blog-posts scroll-reveal">
           <ul class="blog-posts-list">
-      
             <li class="blog-post-item">
-              <a href="./blog/ai-in-physics.html">
+              <a href="./blog/vq-wave-blog.html">
                 <figure class="blog-banner-box">
-                  <img src="./assets/images/e107_1.png" alt="AI impact on Particle Physics" loading="lazy">
+                  <img src="./assets/images/cascade.png" alt="VQ-Wave Deep Learning" loading="lazy">
                 </figure>
                 <div class="blog-content">
                   <div class="blog-meta">
-                    <p class="blog-category" data-en="Physics" data-el="Φυσική" data-de="Physik">Physics</p>
+                    <p class="blog-category">Functional MRI</p>
                     <span class="dot"></span>
-                    <time datetime="2022-02-23">Feb 23, 2022</time>
+                    <time datetime="2025-10-12">Oct 12, 2025</time>
                   </div>
-                  <h3 class="h3 blog-item-title">AI Impact on Particle Physics</h3>
-                  <p class="blog-text">How Deep Learning is revolutionizing data analysis at the LHC.</p>
+                  <h3 class="blog-item-title">VQ-Wave: Physics-Driven DL for Functional Lung MRI</h3>
+                  <p class="blog-text">How neural networks reconstruct lung dynamics from free-breathing signals in 15 seconds.</p>
+                </div>
+              </a>
+            </li>
+
+            <li class="blog-post-item">
+              <a href="./blog/ai-in-physics.html">
+                <figure class="blog-banner-box">
+                  <img src="./assets/images/e107_1.png" alt="CMS CERN experiment" loading="lazy">
+                </figure>
+                <div class="blog-content">
+                  <div class="blog-meta">
+                    <p class="blog-category">Particle Physics</p>
+                    <span class="dot"></span>
+                    <time datetime="2023-09-15">Sep 15, 2023</time>
+                  </div>
+                  <h3 class="blog-item-title">Hunting Resonances: Deep Learning for Dijet Searches at CMS</h3>
+                  <p class="blog-text">Deploying Kinematic MLPs to optimize jet pairing signals in high-mass hadronic search windows.</p>
                 </div>
               </a>
             </li>
@@ -699,16 +338,16 @@
             <li class="blog-post-item">
               <a href="./blog/mri-physics.html">
                 <figure class="blog-banner-box">
-                  <img src="./assets/images/MRI_Lung.png" alt="MRI Physics" loading="lazy">
+                  <img src="./assets/images/MRI_Lung.png" alt="Lung Shimming" loading="lazy">
                 </figure>
                 <div class="blog-content">
                   <div class="blog-meta">
-                    <p class="blog-category" data-en="Medical Imaging" data-el="Ιατρική Απεικόνιση" data-de="Μεδιζινισκε Μπιλντγκέμπουνγκ">Medical Imaging</p>
+                    <p class="blog-category">MRI Physics</p>
                     <span class="dot"></span>
-                    <time datetime="2025-04-18">Apr 18, 2025</time>
+                    <time datetime="2025-05-10">May 10, 2025</time>
                   </div>
-                  <h3 class="h3 blog-item-title">MRI: From Physics to Clinical Application</h3>
-                  <p class="blog-text">Understanding the transition from theoretical shimming to saving lives.</p>
+                  <h3 class="blog-item-title">Overcoming Inhomogeneity: Active Shimming at 3T</h3>
+                  <p class="blog-text">Mitigating off-resonance banding in bSSFP sequences at air-tissue interfaces in the chest.</p>
                 </div>
               </a>
             </li>
@@ -716,245 +355,135 @@
             <li class="blog-post-item">
               <a href="./blog/phd-life-basel.html">
                 <figure class="blog-banner-box">
-                  <img src="./assets/images/basel_view.jpg" alt="Basel" loading="lazy">
+                  <img src="./assets/images/basel_view.jpg" alt="Rhine river Basel" loading="lazy">
                 </figure>
                 <div class="blog-content">
                   <div class="blog-meta">
-                    <p class="blog-category" data-en="Life" data-el="Ζωή" data-de="Leben">Life</p>
+                    <p class="blog-category">Academic Life</p>
                     <span class="dot"></span>
-                    <time datetime="2026-01-10">Jan 10, 2026</time>
+                    <time datetime="2026-01-20">Jan 20, 2026</time>
                   </div>
-                  <h3 class="h3 blog-item-title">PhD Life in Basel: Science at the Border</h3>
-                  <p class="blog-text">Reflections on pursuing a doctorate in Switzerland's medical hub.</p>
+                  <h3 class="blog-item-title">Physics at the Border: Bridging CERN and MedTech</h3>
+                  <p class="blog-text">Reflections on transitioning algorithms from LHC collisions to Swiss clinical lung imaging.</p>
                 </div>
               </a>
             </li>
-
           </ul>
         </section>
       </article>
 
-
-
-
-
-
-
-      <article class="publications" data-page="publications">
-
+      <!-- Interests Page -->
+      <article class="interests" data-page="interests">
         <header>
-          <h2 class="h2 article-title">Publications & Proceedings</h2>
+          <h2 class="article-title" data-en="Interests & Play" data-el="Ενδιαφέροντα & Παιχνίδι" data-de="Hobbys & Spiele">Interests & Play</h2>
         </header>
 
-        <section class="timeline">
-
-          <div class="title-wrapper">
-            <div class="icon-box">
-              <ion-icon name="book-outline"></ion-icon>
+        <!-- Piano Synthesis -->
+        <section class="service scroll-reveal">
+          <h3 class="service-title" data-en="Web Audio Piano Synthesizer" data-el="Συνθεσάιζερ Πιάνου Web Audio" data-de="Web-Audio-Klaviersynthesizer">Web Audio Piano Synthesizer</h3>
+          <div class="piano-container">
+            <div class="piano-keyboard">
+              <div class="piano-key white" data-note="C4">A</div>
+              <div class="piano-key black" data-note="C#4">W</div>
+              <div class="piano-key white" data-note="D4">S</div>
+              <div class="piano-key black" data-note="D#4">E</div>
+              <div class="piano-key white" data-note="E4">D</div>
+              <div class="piano-key white" data-note="F4">F</div>
+              <div class="piano-key black" data-note="F#4">T</div>
+              <div class="piano-key white" data-note="G4">G</div>
+              <div class="piano-key black" data-note="G#4">Y</div>
+              <div class="piano-key white" data-note="A4">H</div>
+              <div class="piano-key black" data-note="A#4">U</div>
+              <div class="piano-key white" data-note="B4">J</div>
+              <div class="piano-key white" data-note="C5">K</div>
+              <div class="piano-key black" data-note="C#5">O</div>
+              <div class="piano-key white" data-note="D5">L</div>
+              <div class="piano-key black" data-note="D#5">P</div>
+              <div class="piano-key white" data-note="E5">;</div>
             </div>
-
-            <h3 class="h3">Journal Papers</h3>
+            <div class="piano-controls" data-en="Press your keyboard keys or click to make music." data-el="Πατήστε τα πλήκτρα του πληκτρολογίου ή κάντε κλικ." data-de="Tastatur drücken oder anklicken.">Press your keyboard keys or click to make music.</div>
           </div>
-
-          <ol class="timeline-list">
-
-            <li class="timeline-item">
-              <h4 class="h4 timeline-item-title">Rapid Free-Breathing and Automated 2D Shimming of the Lung at 3T</h4>
-              <span>2026</span>
-              <p class="timeline-text">
-                <em>Magnetic Resonance in Medicine (Magn Reson Med)</em>
-                <br>
-                <a href="https://pubmed.ncbi.nlm.nih.gov/41486104/" target="_blank" rel="noopener noreferrer" class="clickable-link">View Publication</a>
-              </p>
-            </li>
-
-          </ol>
-
         </section>
 
-        <section class="timeline">
-
-          <div class="title-wrapper">
-            <div class="icon-box">
-              <ion-icon name="megaphone-outline"></ion-icon>
-            </div>
-
-            <h3 class="h3">Conference Proceedings</h3>
+        <!-- Chess Interactive Puzzle -->
+        <section class="service scroll-reveal" style="margin-top: 30px;">
+          <h3 class="service-title" data-en="Chess Puzzle: Mate in 1" data-el="Γρίφος Σκακιού: Ματ σε 1" data-de="Schachrätsel: Matt in 1">Chess Puzzle: Mate in 1</h3>
+          <div class="chess-container">
+            <div class="chess-board" id="chess-board"></div>
+            <div class="chess-status-msg" id="chess-status-msg" data-en="White to move. Select the Queen." data-el="Παίζουν τα λευκά. Επιλέξτε τη Βασίλισσα." data-de="Weiß zieht. Wählen Sie die Dame.">White to move. Select the Queen.</div>
           </div>
-
-          <ol class="timeline-list">
-
-            <li class="timeline-item">
-              <h4 class="h4 timeline-item-title">Active shimming of the lung for mitigation of bSSFP banding artifacts at high fields</h4>
-              <span>May 2025</span>
-              <p class="timeline-text">
-                <em>ISMRM 2025, Hawaii</em> — e-Poster Presentation
-              </p>
-            </li>
-
-            <li class="timeline-item">
-              <h4 class="h4 timeline-item-title">Super-Resolution Image Enhancement for 3D Morphological Lung MRI with bSTAR at 0.55T</h4>
-              <span>May 2025</span>
-              <p class="timeline-text">
-                <em>ISMRM 2025, Hawaii</em> — PowerPitch Presentation
-              </p>
-            </li>
-
-          </ol>
-
         </section>
 
-      </article>
-
-      <article class="hobbies" data-page="hobbies" id="hobbies-section">
-
-        <header>
-          <h2 class="h2 article-title" data-en="Passions & Interests" data-el="Πάθη & Ενδιαφέροντα" data-de="Leidenschaften & Interessen">Passions & Interests</h2>
-        </header>
-
-        <!-- Wine Tasting -->
-        <section class="service">
-          <h3 class="h3 service-title" data-en="Wine Tasting" data-el="Οινογνωσία" data-de="Weinprobe">Wine Tasting</h3>
-          <p class="about-text">
-            My journey into Oenology is driven by a scientific curiosity for chemistry and terroir. I am currently building my knowledge in sensory analysis and regional variations.
-          </p>
-          <ul class="service-list">
-            <li class="service-item">
-              <div class="service-icon-box" style="background: rgba(128, 0, 32, 0.2);"><ion-icon name="wine-outline" style="color: #800020;"></ion-icon></div>
-              <div class="service-content-box">
-                <h4 class="h4 service-item-title">Current Study</h4>
-                <p class="service-item-text">Exploring Pinot Noirs from Valais and Old World structures.</p>
-              </div>
-            </li>
-          </ul>
-        </section>
-
-        <!-- Wine Log -->
-        <section class="timeline">
-          <div class="title-wrapper">
-            <div class="icon-box" style="color: #800020;"><ion-icon name="journal-outline"></ion-icon></div>
-            <h3 class="h3">Tasting Log</h3>
-          </div>
-          
-          <table style="width: 100%; color: var(--text-secondary); border-collapse: collapse; margin-top: 15px;">
+        <!-- Wine tasting register -->
+        <section class="service scroll-reveal" style="margin-top: 30px;">
+          <h3 class="service-title" data-en="Oenological Tasting Registry" data-el="Ημερολόγιο Οινογνωσίας" data-de="Weinverkostungsregister">Oenological Tasting Registry</h3>
+          <input type="text" id="wine-search" class="wine-search-bar" placeholder="Filter by region or grape..." data-en="Filter by region or grape..." data-el="Φίλτρο κατά περιοχή ή ποικιλία..." data-de="Nach Region oder Traube filtern...">
+          <table class="wine-table">
             <thead>
-              <tr style="border-bottom: 1px solid var(--border-glass); text-align: left;">
-                <th style="padding: 10px;">Vintage</th>
-                <th style="padding: 10px;">Region</th>
-                <th style="padding: 10px;">Rating</th>
+              <tr>
+                <th data-en="Vintage / Grape" data-el="Όνομα / Ποικιλία" data-de="Jahrgang / Traube">Vintage / Grape</th>
+                <th data-en="Region" data-el="Περιοχή" data-de="Region">Region</th>
+                <th data-en="Sensory Rating" data-el="Βαθμολογία" data-de="Bewertung">Sensory Rating</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td style="padding: 10px;">Pinot Noir 2021</td>
-                <td style="padding: 10px;">Valais, CH</td>
-                <td style="padding: 10px;">★★★★☆</td>
+                <td>Pinot Noir 2021</td>
+                <td>Valais, Switzerland</td>
+                <td class="wine-rating">★★★★☆</td>
               </tr>
               <tr>
-                <td style="padding: 10px;">Chasselas 2022</td>
-                <td style="padding: 10px;">Vaud, CH</td>
-                <td style="padding: 10px;">★★★☆☆</td>
+                <td>Chasselas 2022</td>
+                <td>Vaud, Switzerland</td>
+                <td class="wine-rating">★★★☆☆</td>
+              </tr>
+              <tr>
+                <td>Assyrtiko 2020</td>
+                <td>Santorini, Greece</td>
+                <td class="wine-rating">★★★★★</td>
               </tr>
             </tbody>
           </table>
         </section>
-
-        <!-- Piano & Chess -->
-        <section class="service" style="margin-top: 40px;">
-          <h3 class="h3 service-title">Piano & Chess</h3>
-          <ul class="service-list">
-            <li class="service-item">
-              <div class="service-icon-box" style="background: rgba(34, 211, 238, 0.1);"><ion-icon name="musical-notes-outline" style="color: var(--accent-cyan);"></ion-icon></div>
-              <div class="service-content-box">
-                <h4 class="h4 service-item-title">The Piano</h4>
-                <p class="service-item-text">Classical training with a focus on Romantic era composers.</p>
-              </div>
-            </li>
-            <li class="service-item">
-              <div class="service-icon-box" style="background: rgba(34, 211, 238, 0.1);"><ion-icon name="trophy-outline" style="color: var(--accent-cyan);"></ion-icon></div>
-              <div class="service-content-box">
-                <h4 class="h4 service-item-title">Chess</h4>
-                <p class="service-item-text">Competitive player focusing on positional theory and end-game tactics.</p>
-              </div>
-            </li>
-          </ul>
-        </section>
-
       </article>
 
-
-      <!--
-        - #CONTACT
-      -->
-
+      <!-- Contact Page -->
       <article class="contact" data-page="contact">
-
         <header>
-          <h2 class="h2 article-title" data-en="Contact" data-el="Επικοινωνία" data-de="Kontakt">Contact</h2>
+          <h2 class="article-title" data-en="Contact" data-el="Επικοινωνία" data-de="Kontakt">Contact</h2>
         </header>
 
-        <section class="mapbox" data-mapbox>
+        <section class="mapbox scroll-reveal">
           <figure>
             <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2692.651586745143!2d7.545864176882!3d47.5550291915437!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!2m2!1s0x4791ba3d977464a9%3A0xe5a3c5006d644781!2sDepartment%20of%20Biomedical%20Engineering%2C%20University%20of%20Basel!5e0!3m2!1sen!2sch!4v1713456412341!5m2!1sen!2sch"
-              width="400" height="300" loading="lazy"></iframe>
+              loading="lazy"></iframe>
           </figure>
         </section>
-        
-        
-        
-        
-        
-        
 
-        <section class="contact-form">
-          <h3 class="h3 form-title" data-en="Contact Form" data-el="Φόρμα Επικοινωνίας" data-de="Kontaktformular">Contact Form</h3>
-          <div class="container">
-            <form id="contact-form" action="https://formsubmit.co/pavlospanos.website@gmail.com" method="POST" class="form">
-              <div class="input-wrapper">
-                <input type="text" name="fullname" class="form-input" placeholder="Full name" data-en="Full name" data-el="Ονοματεπώνυμο" data-de="Vollständiger Name" required>
-                <input type="email" name="_replyto" class="form-input" placeholder="Email address" data-en="Email address" data-el="Διεύθυνση Email" data-de="Email-Addresse" required>
-                <textarea name="message" class="form-input" placeholder="Your Message" data-en="Your Message" data-el="Το Μήνυμά σας" data-de="Ihre Nachricht" required></textarea>
-              </div>
-              <button class="form-btn" type="submit">
-                <ion-icon name="paper-plane"></ion-icon>
-                <span data-en="Send Message" data-el="Αποστολή Μηνύματος" data-de="Nachricht Senden">Send Message</span>
-              </button>
-            </form>
-          </div>
+        <section class="contact-form scroll-reveal">
+          <h3 class="form-title" data-en="Send an Inquiry" data-el="Φόρμα Επικοινωνίας" data-de="Kontaktformular">Send an Inquiry</h3>
+          <form id="contact-form" class="form">
+            <div class="input-wrapper">
+              <input type="text" name="fullname" class="form-input" placeholder="Full name" data-en="Full name" data-el="Ονοματεπώνυμο" data-de="Vollständiger Name" required>
+              <input type="email" name="email" class="form-input" placeholder="Email address" data-en="Email address" data-el="Διεύθυνση Email" data-de="E-Mail-Adresse" required>
+              <textarea name="message" class="form-input" placeholder="Your Message" data-en="Your Message" data-el="Το Μήνυμά σας" data-de="Ihre Nachricht" required></textarea>
+            </div>
+            <button class="form-btn" type="submit">
+              <ion-icon name="paper-plane"></ion-icon>
+              <span data-en="Send Message" data-el="Αποστολή" data-de="Absenden">Send Message</span>
+            </button>
+          </form>
         </section>
-        
-        <script>
-          document.getElementById('contact-form').addEventListener('submit', function (event) {
-            event.preventDefault();
-            var form = event.target;
-            var messageInput = form.querySelector('textarea[name="message"]');
-            var replyToInput = form.querySelector('input[name="_replyto"]');
-            var message = messageInput.value;
-            var email = replyToInput.value;
-            messageInput.value = message + '\n\n' + email;
-            form.submit();
-          });
-        </script>
       </article>
+
     </div>
   </main>
 
-
-
-  <!--
-    - custom js link
-  -->
-  <script src="./assets/js/script.js"></script>
-
-  <!--
-    - ionicon link
-  -->
   <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
-
-
+  <!-- Core JS -->
+  <script src="./assets/js/script.js"></script>
 
 </body>
-
 </html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VQ-Wave Framework | Pavlos Panos</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+  <div class="project-container">
+    <a href="../index.html" class="back-btn">Back</a>
+    <header>
+      <h1>VQ-Wave Framework</h1>
+      <p class="subtitle">Physics-driven spatio-temporal deep learning for functional lung MRI</p>
+    </header>
+
+    <div class="meta-grid">
+      <div class="meta-item">
+        <h5>Field</h5>
+        <p>Medical Imaging & Deep Learning</p>
+      </div>
+      <div class="meta-item">
+        <h5>Institution</h5>
+        <p>University of Basel</p>
+      </div>
+      <div class="meta-item">
+        <h5>Co-authors</h5>
+        <p>G. Bauman, P. Latzin, O. Bieri</p>
+      </div>
+    </div>
+
+    <img src="../assets/images/MRI_Lung.png" alt="VQ-Wave Ventilation Output" class="hero-img">
+
+    <section>
+      <h2>Abstract</h2>
+      <p>
+        Non-contrast-enhanced functional lung MRI provides critical metrics for ventilation and perfusion in pulmonary diseases like cystic fibrosis. Traditional spectral decomposition methods, such as Matrix Pencil (MP) decomposition, suffer from spectral leakage, noise susceptibility, and physiological non-stationarity (e.g., irregular breathing). Here, we introduce <strong>VQ-Wave</strong>, a physics-driven, spatio-temporal deep learning framework that stabilizes parameter estimation and significantly shortens scan times.
+      </p>
+
+      <h2>Methodology</h2>
+      <p>
+        VQ-Wave utilizes an <strong>inception-based convolutional neural network</strong> trained on high-fidelity synthetic signal models. By processing local spatial context alongside temporal signal evolution, the framework decouples breathing and cardiac oscillations from background noise and scanner drifts.
+      </p>
+      <p>
+        Unlike pure black-box models, VQ-Wave integrates the physical equations of signal decay and flow dynamics, ensuring that the network's predictions conform to biological constraints.
+      </p>
+
+      <h2>Results & Clinical Impact</h2>
+      <p>
+        Validation in healthy subjects and clinical cohorts shows that VQ-Wave achieves comparable diagnostic quality to standard MP decomposition while reducing required acquisition scans from 45 seconds to just 15 seconds. The framework exhibits superior robustness against breathing irregularities, offering a stable clinical pathway for pediatric and dyspneic patients who struggle with long breath-holds.
+      </p>
+    </section>
+  </div>
+</body>
+</html>

@@ -2,96 +2,287 @@
 <html lang="el">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Χρυσάνθη - Κατάστημα Εσωρούχων</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-el="Χρυσάνθη - Κατάστημα Εσωρούχων Αθήνα" data-en="Chrysanthi - Lingerie Boutique Athens">Χρυσάνθη - Κατάστημα Εσωρούχων Αθήνα</title>
+  
+  <!-- Custom CSS stylesheet -->
   <link rel="stylesheet" href="style_magazi.css" />
+  
+  <!-- Google Fonts: Playfair Display & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
 </head>
 <body>
 
+  <!-- Store Hours Banner -->
+  <div class="hours-banner" data-el="Ωράριο Λειτουργίας: Δευ - Τετ - Σαβ: 09:00 - 15:00 | Τρι - Πεμ - Παρ: 09:00 - 14:00 & 17:00 - 21:00" data-en="Opening Hours: Mon - Wed - Sat: 09:00 - 15:00 | Tue - Thu - Fri: 09:00 - 14:00 & 17:00 - 21:00">
+    Ωράριο Λειτουργίας: Δευ - Τετ - Σαβ: 09:00 - 15:00 | Τρι - Πεμ - Παρ: 09:00 - 14:00 & 17:00 - 21:00
+  </div>
+
+  <!-- Header Navigation -->
   <header>
-    <h1>Χρυσάνθη</h1>
-    <p>Εσώρουχα με στυλ και ποιότητα</p>
+    <div class="logo-section">
+      <h1 data-el="Χρυσάνθη" data-en="Chrysanthi">Χρυσάνθη</h1>
+      <p data-el="Boutique Εσωρούχων" data-en="Lingerie Boutique">Boutique Εσωρούχων</p>
+    </div>
+    
+    <div class="burger">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+    
     <nav>
-      <div class="burger" onclick="toggleMenu()">
-        <div></div><div></div><div></div>
-      </div>
       <ul>
-        <li><a href="#" onclick="showSection('home')">Αρχική</a></li>
-        <li><a href="#" onclick="showSection('info')">Πληροφορίες</a></li>
-        <li><a href="#" onclick="showSection('gallery')">Φωτογραφίες</a></li>
-        <li><a href="#" onclick="showSection('products')">Προϊόντα</a></li>
-        <li><a href="#" onclick="showSection('contact')">Επικοινωνία</a></li>
+        <li><a href="#" onclick="showSection('home')" class="active" data-el="Αρχικη" data-en="Home">Αρχικη</a></li>
+        <li><a href="#" onclick="showSection('about')" data-el="Η Ιστορια μας" data-en="Our Story">Η Ιστορια μας</a></li>
+        <li><a href="#" onclick="showSection('catalog')" data-el="Προϊοντα" data-en="Products">Προϊοντα</a></li>
+        <li><a href="#" onclick="showSection('brands')" data-el="Συλλογες" data-en="Collections">Συλλογες</a></li>
+        <li><a href="#" onclick="showSection('contact')" data-el="Επικοινωνια" data-en="Contact">Επικοινωνια</a></li>
       </ul>
+      
+      <!-- Language Switcher -->
+      <div class="lang-switch">
+        <button class="lang-btn active" data-lang="el">GR</button>
+        <button class="lang-btn" data-lang="en">EN</button>
+      </div>
+      
+      <!-- Wishlist Drawer Trigger -->
+      <button class="wishlist-trigger-btn" onclick="toggleWishlistDrawer()" aria-label="Άνοιγμα Λίστας">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+        <span class="wishlist-badge" id="wishlistCountIcon">0</span>
+      </button>
     </nav>
   </header>
 
+  <!-- Main Showcase Container -->
   <main>
+    
+    <!-- Home / Hero Section -->
     <section id="home" class="section active">
-      <h2>Καλώς ήρθατε στη Χρυσάνθη</h2>
-      <p>Το κατάστημα εσωρούχων Χρυσάνθη βρίσκεται στην καρδιά των Αμπελοκήπων και προσφέρει διαλεγμένα προϊόντα υψηλής ποιότητας και αισθητικής.</p>
-    </section>
-
-    <section id="info" class="section">
-      <h2>Πληροφορίες</h2>
-      <p><strong>Διεύθυνση:</strong> Οδός Κεδρινού 66, Αμπελόκηποι, Αθήνα</p>
-      <p><strong>Ιστορία:</strong> Το κατάστημα ιδρύθηκε το 2005 με αγάπη για τη γυναικεία φροντίδα και εμφάνιση. Από τότε, προσφέρει κορυφαίες επιλογές με εξειδίκευση στα εσώρουχα πολυτελείας.</p>
-      <h3>Πού θα μας βρείτε:</h3>
-      <iframe
-        src="https://www.google.com/maps?q=Οδός+Κεδρινού+66,+Αμπελόκηποι,+Αθήνα&output=embed"
-        width="100%"
-        height="300"
-        style="border:0;"
-        allowfullscreen=""
-        loading="lazy"
-      ></iframe>
-    </section>
-
-    <section id="gallery" class="section">
-      <h2>Φωτογραφίες</h2>
-      <div class="gallery-buttons">
-        <button onclick="loadGallery('exterior')">Εξωτερικό</button>
-        <button onclick="loadGallery('interior')">Εσωτερικός Χώρος</button>
+      <div class="hero-wrapper scroll-reveal">
+        <div class="hero-text">
+          <h3 data-el="Κομψότητα, άνεση και στυλ κάθε μέρα." data-en="Elegance, comfort and style every day.">Κομψότητα, άνεση και στυλ κάθε μέρα.</h3>
+          <p data-el="Στο κατάστημα Χρυσάνθη, επιλέγουμε εσώρουχα, νυχτικά και homewear εξαιρετικής ποιότητας για να νιώθετε μοναδική. Ανακαλύψτε τις συλλογές μας από επώνυμα brands." data-en="At Chrysanthi boutique, we select lingerie, sleepwear and homewear of exceptional quality to make you feel unique. Discover our collections from premium brands.">Στο κατάστημα Χρυσάνθη, επιλέγουμε εσώρουχα, νυχτικά και homewear εξαιρετικής ποιότητας για να νιώθετε μοναδική. Ανακαλύψτε τις συλλογές μας από επώνυμα brands.</p>
+          <button class="cta-btn" onclick="showSection('catalog')" data-el="Δειτε τον Καταλογο" data-en="View Catalog">Δειτε τον Καταλογο</button>
+        </div>
+        <div class="hero-gallery">
+          <img src="https://images.unsplash.com/photo-1610444583731-97217983ffef?auto=compress&cs=tinysrgb&w=600" alt="Boutique Lingerie">
+          <img src="https://images.unsplash.com/photo-1549045337-9670077d206a?auto=compress&cs=tinysrgb&w=600" alt="Silk Sleepwear">
+        </div>
       </div>
-      <div id="galleryImages" class="gallery-grid"></div>
+    </section>
+    
+    <!-- About / History Page -->
+    <section id="about" class="section">
+      <h2 data-el="Η Ιστορία μας" data-en="Our Story">Η Ιστορία μας</h2>
+      <div class="story-wrapper scroll-reveal">
+        <div class="story-text">
+          <p data-el="Το κατάστημα εσωρούχων &lt;strong&gt;Χρυσάνθη&lt;/strong&gt; ιδρύθηκε το 2005 στους Αμπελοκήπους, Αθήνα, με σκοπό να προσφέρει ποιοτικές επιλογές εσωρούχων και νυχτικών που συνδυάζουν την κομψότητα με την καθημερινή άνεση." data-en="The &lt;strong&gt;Chrysanthi&lt;/strong&gt; lingerie store was established in 2005 in Ampelokipoi, Athens, aiming to offer quality underwear and sleepwear choices that combine elegance with daily comfort.">Το κατάστημα εσωρούχων <strong>Χρυσάνθη</strong> ιδρύθηκε το 2005 στους Αμπελοκήπους, Αθήνα, με σκοπό να προσφέρει ποιοτικές επιλογές εσωρούχων και νυχτικών που συνδυάζουν την κομψότητα με την καθημερινή άνεση.</p>
+          <p data-el="Με πάνω από 20 χρόνια εμπειρίας, εστιάζουμε στην προσωπική εξυπηρέτηση. Κάθε κομμάτι στις κρεμάστρες μας επιλέγεται με φροντίδα για τις ραφές, τα υλικά και την αίσθηση στο δέρμα." data-en="With over 20 years of experience, we focus on personalized service. Each piece on our hangers is carefully selected for its seams, fabrics, and feel against the skin.">Με πάνω από 20 χρόνια εμπειρίας, εστιάζουμε στην προσωπική εξυπηρέτηση. Κάθε κομμάτι στις κρεμάστρες μας επιλέγεται με φροντίδα για τις ραφές, τα υλικά και την αίσθηση στο δέρμα.</p>
+          <p data-el="&lt;strong&gt;Διεύθυνση:&lt;/strong&gt; Οδός Κεδρινού 66, Αμπελόκηποι, Αθήνα (κοντά στο μετρό Πανόρμου)." data-en="&lt;strong&gt;Address:&lt;/strong&gt; 66 Kedrinou Street, Ampelokipoi, Athens (near Panormou Metro station)."><strong>Διεύθυνση:</strong> Οδός Κεδρινού 66, Αμπελόκηποι, Αθήνα (κοντά στο μετρό Πανόρμου).</p>
+        </div>
+        <div class="map-container">
+          <iframe
+            src="https://www.google.com/maps?q=Οδός+Κεδρινού+66,+Αμπελόκηποι,+Αθήνα&output=embed"
+            allowfullscreen=""
+            loading="lazy"
+          ></iframe>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Interactive Catalog Page -->
+    <section id="catalog" class="section">
+      <h2 data-el="Ο Κατάλογός μας" data-en="Our Catalog">Ο Κατάλογός μας</h2>
+      
+      <!-- Catalog Category Filter -->
+      <div class="catalog-menu">
+        <button class="catalog-btn active" onclick="renderCatalog('all')" data-el="Ολα" data-en="All">Ολα</button>
+        <button class="catalog-btn" onclick="renderCatalog('bras')" data-el="Σουτιεν" data-en="Bras">Σουτιεν</button>
+        <button class="catalog-btn" onclick="renderCatalog('slips')" data-el="Σλιπ" data-en="Slips">Σλιπ</button>
+        <button class="catalog-btn" onclick="renderCatalog('nightwear')" data-el="Νυχτικα" data-en="Nightwear">Νυχτικα</button>
+        <button class="catalog-btn" onclick="renderCatalog('sets')" data-el="Σετ" data-en="Sets">Σετ</button>
+        <button class="catalog-btn size-guide-trigger" onclick="toggleSizeGuide()" data-el="Οδηγός Μεγεθών" data-en="Size Guide" style="background-color: var(--color-rose-light); border-color: var(--color-rose); color: var(--color-rose);">Οδηγός Μεγεθών</button>
+      </div>
+      
+      <!-- Products Grid -->
+      <div class="product-grid" id="productGrid"></div>
+    </section>
+    
+    <!-- Brands Section -->
+    <section id="brands" class="section">
+      <h2 data-el="Επώνυμες Συλλογές" data-en="Premium Collections">Επώνυμες Συλλογές</h2>
+      <p style="text-align: center; margin-bottom: 2rem; color: #78716c;" data-el="Κάντε κλικ σε ένα brand για να δείτε φωτογραφίες από τις συλλογές τους:" data-en="Click on a brand to view photos from their collections:">Κάντε κλικ σε ένα brand για να δείτε φωτογραφίες από τις συλλογές τους:</p>
+      
+      <div class="brand-grid scroll-reveal">
+        <div class="brand-item" onclick="openBrandGallery('laperla')">La Perla</div>
+        <div class="brand-item" onclick="openBrandGallery('intimissimi')">Intimissimi</div>
+        <div class="brand-item" onclick="openBrandGallery('vs')">Victoria's Secret</div>
+        <div class="brand-item" onclick="openBrandGallery('ck')">Calvin Klein</div>
+        <div class="brand-item" onclick="openBrandGallery('triumph')">Triumph</div>
+      </div>
     </section>
 
-    <section id="products" class="section">
-      <h2>Προϊόντα - Εταιρίες Εσωρούχων</h2>
-      <ul class="brand-list">
-        <li onclick="loadBrand('Calvin Klein')">Calvin Klein</li>
-        <li onclick="loadBrand('Victoria\'s Secret')">Victoria's Secret</li>
-        <li onclick="loadBrand('Intimissimi')">Intimissimi</li>
-        <li onclick="loadBrand('Tezenis')">Tezenis</li>
-        <li onclick="loadBrand('La Perla')">La Perla</li>
-        <li onclick="loadBrand('Triumph')">Triumph</li>
-        <li onclick="loadBrand('Chantelle')">Chantelle</li>
-        <li onclick="loadBrand('Hunkemöller')">Hunkemöller</li>
-        <li onclick="loadBrand('Agent Provocateur')">Agent Provocateur</li>
-        <li onclick="loadBrand('Oysho')">Oysho</li>
-      </ul>
-      <div id="brandGallery" class="gallery-grid"></div>
+    <!-- Testimonials Slider Section -->
+    <section class="testimonials-section scroll-reveal">
+      <h2 data-el="Τι είπαν οι πελάτισσές μας" data-en="What our clients say">Τι είπαν οι πελάτισσές μας</h2>
+      <div class="testimonial-container">
+        <div class="testimonial-slide active">
+          <p class="testimonial-quote" data-el="&ldquo;Εξαιρετική ποιότητα εσωρούχων και άψογη εξυπηρέτηση. Βρήκα ακριβώς το σωστό μέγεθος.&rdquo;" data-en="&ldquo;Excellent quality of lingerie and perfect service. I found exactly the right size.&rdquo;">&ldquo;Εξαιρετική ποιότητα εσωρούχων και άψογη εξυπηρέτηση. Βρήκα ακριβώς το σωστό μέγεθος.&rdquo;</p>
+          <span class="testimonial-author" data-el="Μαρία Κ., Αθήνα" data-en="Maria K., Athens">Μαρία Κ., Αθήνα</span>
+        </div>
+        <div class="testimonial-slide">
+          <p class="testimonial-quote" data-el="&ldquo;Τα μεταξωτά νυχτικά είναι απίστευτα απαλά. Η καλύτερη επιλογή για δώρο στον εαυτό μου!&rdquo;" data-en="&ldquo;The silk sleepwear is incredibly soft. The best self-gift choice!&rdquo;">&ldquo;Τα μεταξωτά νυχτικά είναι απίστευτα απαλά. Η καλύτερη επιλογή για δώρο στον εαυτό μου!&rdquo;</p>
+          <span class="testimonial-author" data-el="Ελένη Π., Αμπελόκηποι" data-en="Eleni P., Abelokipoi">Ελένη Π., Αμπελόκηποι</span>
+        </div>
+        <div class="testimonial-slide">
+          <p class="testimonial-quote" data-el="&ldquo;Πολύ φιλικό περιβάλλον και μεγάλη ποικιλία από επώνυμα brands. Το προτείνω ανεπιφύλακτα.&rdquo;" data-en="&ldquo;Very friendly environment and a wide variety of designer brands. Highly recommended.&rdquo;">&ldquo;Πολύ φιλικό περιβάλλον και μεγάλη ποικιλία από επώνυμα brands. Το προτείνω ανεπιφύλακτα.&rdquo;</p>
+          <span class="testimonial-author" data-el="Κατερίνα Α., Παγκράτι" data-en="Katerina A., Pagkrati">Κατερίνα Α., Pagkrati</span>
+        </div>
+      </div>
     </section>
-
+    
+    <!-- Contact Page -->
     <section id="contact" class="section">
-      <h2>Επικοινωνία</h2>
-      <p>📧 Email: <a href="mailto:info@chrysanthi.gr">info@chrysanthi.gr</a></p>
-      <form>
-        <label for="name">Όνομα:</label><br />
-        <input type="text" id="name" name="name" /><br />
-        <label for="email">Email:</label><br />
-        <input type="email" id="email" name="email" /><br />
-        <label for="message">Μήνυμα:</label><br />
-        <textarea id="message" name="message" rows="5"></textarea><br />
-        <button type="submit" disabled>Αποστολή (μη λειτουργικό ακόμα)</button>
-      </form>
+      <h2 data-el="Επικοινωνήστε μαζί μας" data-en="Contact Us">Επικοινωνήστε μαζί μας</h2>
+      <div class="contact-wrapper scroll-reveal">
+        <form onsubmit="event.preventDefault(); alert(activeLang === 'el' ? 'Ευχαριστούμε! Το μήνυμά σας στάλθηκε.' : 'Thank you! Your message has been sent.'); this.reset();">
+          <div class="form-group">
+            <label for="c-name" data-el="Ονοματεπώνυμο" data-en="Full Name">Ονοματεπώνυμο</label>
+            <input type="text" id="c-name" required placeholder="π.χ. Μαρία Παπαδοπούλου" data-el="π.χ. Μαρία Παπαδοπούλου" data-en="e.g. Maria Papadopoulou">
+          </div>
+          <div class="form-group">
+            <label for="c-email" data-el="Email" data-en="Email">Email</label>
+            <input type="email" id="c-email" required placeholder="π.χ. maria@example.com" data-el="π.χ. maria@example.com" data-en="e.g. maria@example.com">
+          </div>
+          <div class="form-group">
+            <label for="c-msg" data-el="Μήνυμα" data-en="Message">Μήνυμα</label>
+            <textarea id="c-msg" rows="5" required placeholder="Γράψτε το μήνυμά σας εδώ..." data-el="Γράψτε το μήνυμά σας εδώ..." data-en="Write your message here..."></textarea>
+          </div>
+          <button type="submit" class="cta-btn" style="width: 100%;" data-el="Αποστολη Μηνυματος" data-en="Send Message">Αποστολη Μηνυματος</button>
+        </form>
+      </div>
     </section>
   </main>
 
-  <footer>
-    <p>© 2025 Χρυσάνθη - Κατάστημα Εσωρούχων</p>
-  </footer>
+  <!-- Wishlist/Inquiry Slide Drawer -->
+  <div class="wishlist-drawer" id="wishlistDrawer">
+    <div class="drawer-header">
+      <h3 data-el="Η Λίστα μου" data-en="My List">Η Λίστα μου</h3>
+      <button class="drawer-close-btn" onclick="toggleWishlistDrawer()">&times;</button>
+    </div>
+    
+    <div class="drawer-body" id="wishlistItems">
+      <!-- Items will load dynamically via JS -->
+    </div>
+    
+    <div class="drawer-footer">
+      <div class="total-inquiry-box">
+        <span data-el="Σύνολο Τεμαχίων:" data-en="Total Items:">Σύνολο Τεμαχίων:</span>
+        <span id="wishlistCount">0</span>
+      </div>
+      <div class="total-inquiry-box" style="margin-top: 5px; margin-bottom: 15px;">
+        <span data-el="Συνολική Αξία:" data-en="Total Value:">Συνολική Αξία:</span>
+        <span id="totalPrice">€0.00</span>
+      </div>
+      
+      <!-- Inquiry Form -->
+      <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
+        <input type="text" id="clientName" data-el="Το Όνομά σας" data-en="Your Name" placeholder="Το Όνομά σας" style="width: 100%; border: 1px solid var(--border-light); padding: 8px; border-radius: 6px; font-size: 0.8rem; outline: none;" />
+        <input type="tel" id="clientPhone" data-el="Το Τηλέφωνό σας" data-en="Your Phone" placeholder="Το Τηλέφωνό σας" style="width: 100%; border: 1px solid var(--border-light); padding: 8px; border-radius: 6px; font-size: 0.8rem; outline: none;" />
+      </div>
+      
+      <button class="whatsapp-inquiry-btn" onclick="sendWhatsAppInquiry()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-whatsapp" viewBox="0 0 16 16"><path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.949h.004c4.368 0 7.926-3.558 7.93-7.93a7.9 7.9 0 0 0-2.327-5.603zM7.995 13.06a6.6 6.6 0 0 1-3.278-.872l-.234-.14-2.43.638.649-2.368-.154-.245a6.6 6.6 0 0 1-1.054-3.48c0-3.633 2.96-6.594 6.602-6.594a6.6 6.6 0 0 1 4.665 1.93 6.6 6.6 0 0 1 1.929 4.668c-.001 3.633-2.961 6.593-6.602 6.593m3.657-4.424c-.196-.098-1.162-.574-1.339-.636-.177-.062-.307-.094-.438.096-.13.197-.5 1.002-.613 1.14-.113.137-.227.155-.423.056-1.928-.964-2.72-1.485-4.084-3.83-.36-.618.36-.574.832-1.66.079-.163.039-.307-.02-.404-.061-.097-.504-1.217-.69-1.666-.182-.439-.368-.38-.504-.388-.13-.007-.278-.008-.426-.008a.8.8 0 0 0-.582.271c-.2.22-0.763.746-.763 1.82s.783 2.116.892 2.262c.11.146 1.542 2.355 3.738 3.303.522.227.93.362 1.25.464.524.167.1.14.7.052.748-.112 1.162-.474 1.339-.933.178-.459.178-.853.124-.933-.055-.08-.19-.128-.387-.226"/></svg>
+        <span data-el="Ερώτηση διαθεσιμότητας στο WhatsApp" data-en="Inquire availability on WhatsApp">Ερώτηση διαθεσιμότητας στο WhatsApp</span>
+      </button>
+    </div>
+  </div>
 
-  <!-- ✅ Lightbox Modal -->
+  <!-- Size Guide Modal -->
+  <div id="sizeGuideModal" class="size-guide-modal">
+    <div class="size-modal-inner">
+      <button class="size-close-btn" onclick="toggleSizeGuide()">&times;</button>
+      <h3 data-el="Οδηγός Μεγεθών" data-en="Size Guide">Οδηγός Μεγεθών</h3>
+      
+      <div class="size-tabs">
+        <h4 style="margin-top: 15px; margin-bottom: 5px; color: var(--color-rose);" data-el="Σουτιέν (EU vs UK/US)" data-en="Bras (EU vs UK/US)">Σουτιέν (EU vs UK/US)</h4>
+        <table class="size-table">
+          <thead>
+            <tr>
+              <th data-el="EU" data-en="EU">EU</th>
+              <th data-el="UK/US" data-en="UK/US">UK/US</th>
+              <th data-el="Underbust (cm) / Περιφέρεια (cm)" data-en="Underbust (cm)">Underbust (cm) / Περιφέρεια (cm)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>70</td>
+              <td>32</td>
+              <td>68-72</td>
+            </tr>
+            <tr>
+              <td>75</td>
+              <td>34</td>
+              <td>73-77</td>
+            </tr>
+            <tr>
+              <td>80</td>
+              <td>36</td>
+              <td>78-82</td>
+            </tr>
+            <tr>
+              <td>85</td>
+              <td>38</td>
+              <td>83-87</td>
+            </tr>
+            <tr>
+              <td>90</td>
+              <td>40</td>
+              <td>88-92</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h4 style="margin-top: 20px; margin-bottom: 5px; color: var(--color-rose);" data-el="Σλιπ & Homewear" data-en="Slips & Homewear">Σλιπ & Homewear</h4>
+        <table class="size-table">
+          <thead>
+            <tr>
+              <th data-el="Size / Μέγεθος" data-en="Size">Size / Μέγεθος</th>
+              <th data-el="EU" data-en="EU">EU</th>
+              <th data-el="Hips (cm) / Περιφέρεια Γοφών (cm)" data-en="Hips (cm)">Hips (cm) / Περιφέρεια Γοφών (cm)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>S</td>
+              <td>36</td>
+              <td>90-94</td>
+            </tr>
+            <tr>
+              <td>M</td>
+              <td>38</td>
+              <td>95-98</td>
+            </tr>
+            <tr>
+              <td>L</td>
+              <td>40</td>
+              <td>99-102</td>
+            </tr>
+            <tr>
+              <td>XL</td>
+              <td>42</td>
+              <td>103-106</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Brand Photos Lightbox Modal -->
   <div id="lightbox" class="lightbox" onclick="closeLightbox()">
     <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
     <img class="lightbox-img" id="lightboxImage" src="" />
@@ -101,6 +292,7 @@
     </div>
   </div>
 
+  <!-- Core Boutique Client Script -->
   <script src="script_magazi.js"></script>
 </body>
 </html>
