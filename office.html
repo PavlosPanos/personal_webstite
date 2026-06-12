@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Espresso Master — office coffee club manager. Track beans, contributions, cleaning schedules, and leaderboards.">
+    <meta name="theme-color" content="#150f0c">
     <title>Espresso Master - Coffee Club Manager</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -65,6 +67,86 @@
         ::-webkit-scrollbar-track { background: #150f0c; }
         ::-webkit-scrollbar-thumb { background: #3c2820; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #c5a880; }
+
+        /* Premium iPhone 16 Pro Mobile Specific Styles */
+        @media (max-width: 767px) {
+            aside {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 60px;
+                flex-direction: row !important;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0 1rem !important;
+                z-index: 100;
+                border-bottom: 1px solid rgba(197, 168, 128, 0.15);
+                border-right: none !important;
+                background: rgba(21, 15, 12, 0.95);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+            }
+            aside .flex-grow {
+                display: none !important;
+            }
+            #mobile-bottom-nav {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 65px;
+                background: rgba(38, 27, 23, 0.95);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                border-top: 1px solid rgba(197, 168, 128, 0.15);
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+                z-index: 100;
+                padding: 0.25rem 0;
+            }
+            .mobile-nav-button {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                color: #ebcfc4;
+                opacity: 0.7;
+                font-size: 8px;
+                transition: all 0.2s;
+            }
+            .mobile-nav-button.active {
+                color: #c5a880;
+                opacity: 1;
+                font-weight: bold;
+            }
+            .mobile-nav-button svg {
+                width: 18px;
+                height: 18px;
+                margin-bottom: 2px;
+                margin-right: 0 !important;
+            }
+            main {
+                margin-top: 60px;
+                margin-bottom: 65px;
+                padding: 1rem !important;
+                max-height: calc(100vh - 125px) !important;
+                max-height: calc(100dvh - 125px) !important; /* iOS Safari dynamic toolbar */
+            }
+            #mobile-bottom-nav {
+                padding-bottom: calc(0.25rem + env(safe-area-inset-bottom)); /* iPhone home bar */
+                height: calc(65px + env(safe-area-inset-bottom));
+            }
+            aside div.mt-6 {
+                display: none !important;
+            }
+        }
+        @media (min-width: 768px) {
+            #mobile-bottom-nav {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 <body class="font-sans antialiased">
@@ -102,7 +184,6 @@
         // --- Core Configurations ---
         const ADMIN_EMAIL = "pavlospanos@hotmail.com"; 
         const DEFAULT_PASSWORD = "ILoveCoffee"; 
-        const GRAMS_PER_CUP = 10; 
 
         const firebaseConfig = {
           apiKey: "AIzaSyBqThTqWZxNg1nyXpDRNBSM-wPNpDEGodA",
@@ -125,9 +206,12 @@
             financials: { totalCollected: 0, totalSpent: 0 },
             inventoryHistory: [],
             payments: [],
+            requests: [],
+            broadcast: { message: '', active: false },
             activeTab: 'dashboard',
             userProfile: null,
-            machineStats: { cupsSinceClean: 48, lastCleanedBy: 'Sarah Connor' } // machine maintenance state
+            machineStats: { cupsSinceClean: 48, lastCleanedBy: 'Sarah Connor' },
+            waterIntake: {} // Local storage for daily hydration tracker
         };
 
         const appId = firebaseConfig.projectId || 'coffee-club-default';
@@ -146,27 +230,31 @@
 
             const initialSeeds = {
                 members: [
-                    { id: 'm1', name: 'Pavlos Panos', email: 'pavlospanos@hotmail.com', phone: '+41 79 123 4567', totalContributed: 150.0, joinedDate: new Date() },
-                    { id: 'm2', name: 'Sarah Connor', email: 'sarah.connor@office.com', phone: '+41 79 987 6543', totalContributed: 40.0, joinedDate: new Date() },
-                    { id: 'm3', name: 'Alex Mercer', email: 'alex.mercer@office.com', phone: '+41 79 555 4433', totalContributed: 60.0, joinedDate: new Date() }
+                    { id: 'm1', name: 'Pavlos Panos', email: 'pavlospanos@hotmail.com', phone: '+41 79 123 4567', totalContributed: 150.0, joinedDate: new Date().toISOString(), preference: { favoriteCoffee: 'lavazza-crema', roastLevel: 'medium', favoriteDrink: 'Double Espresso', dailyGoal: 3 } },
+                    { id: 'm2', name: 'Sarah Connor', email: 'sarah.connor@office.com', phone: '+41 79 987 6543', totalContributed: 40.0, joinedDate: new Date().toISOString(), preference: { favoriteCoffee: 'tchibo-1kg', roastLevel: 'dark', favoriteDrink: 'Cappuccino/Latte', dailyGoal: 2 } },
+                    { id: 'm3', name: 'Alex Mercer', email: 'alex.mercer@office.com', phone: '+41 79 555 4433', totalContributed: 60.0, joinedDate: new Date().toISOString(), preference: { favoriteCoffee: 'tchibo-1kg', roastLevel: 'medium', favoriteDrink: 'Single Espresso', dailyGoal: 4 } }
                 ],
                 coffeeTypes: [
-                    { id: 'tchibo-1kg', name: 'Tchibo Exclusive 1Kg', brand: 'Tchibo', stockKg: 1.4, totalCostAllTime: 32.0, totalWeightAllTime: 2.0, imageUrl: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=compress&cs=tinysrgb&w=600' },
-                    { id: 'lavazza-crema', name: 'Lavazza Caffè Crema', brand: 'Lavazza', stockKg: 0.8, totalCostAllTime: 24.5, totalWeightAllTime: 1.0, imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=compress&cs=tinysrgb&w=600' }
+                    { id: 'tchibo-1kg', name: 'Tchibo Exclusive 1Kg', brand: 'Tchibo', stockKg: 1.4, totalCostAllTime: 32.0, totalWeightAllTime: 2.0, imageUrl: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=compress&cs=tinysrgb&w=600', ratings: [{ stars: 5, comment: 'Strong kick, perfect crema!', reviewer: 'Sarah Connor' }] },
+                    { id: 'lavazza-crema', name: 'Lavazza Caffè Crema', brand: 'Lavazza', stockKg: 0.8, totalCostAllTime: 24.5, totalWeightAllTime: 1.0, imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=compress&cs=tinysrgb&w=600', ratings: [{ stars: 4, comment: 'Mild taste, great for afternoon!', reviewer: 'Pavlos Panos' }] }
                 ],
                 financials: { totalCollected: 250.0, totalSpent: 56.50 },
                 inventoryHistory: [
                     { id: 'h1', type: 'purchase', name: 'Tchibo Exclusive 1Kg', amountKg: 1.0, totalCost: 16.0, date: new Date(Date.now() - 86400000 * 5).toISOString() },
                     { id: 'h2', type: 'purchase', name: 'Lavazza Caffè Crema', amountKg: 1.0, totalCost: 24.5, date: new Date(Date.now() - 86400000 * 3).toISOString() },
-                    { id: 'h3', type: 'consumption', coffeeId: 'tchibo-1kg', name: 'Tchibo Exclusive 1Kg', amountKg: 0.6, memberId: 'm2', memberName: 'Sarah Connor', date: new Date(Date.now() - 86400000 * 2).toISOString() },
-                    { id: 'h4', type: 'consumption', coffeeId: 'lavazza-crema', name: 'Lavazza Caffè Crema', amountKg: 0.2, memberId: 'm1', memberName: 'Pavlos Panos', date: new Date(Date.now() - 86400000).toISOString() }
+                    { id: 'h3', type: 'consumption', coffeeId: 'tchibo-1kg', name: 'Tchibo Exclusive 1Kg', amountKg: 0.014, memberId: 'm2', memberName: 'Sarah Connor', date: new Date(Date.now() - 86400000 * 2).toISOString(), drinkType: 'Cappuccino/Latte' },
+                    { id: 'h4', type: 'consumption', coffeeId: 'lavazza-crema', name: 'Lavazza Caffè Crema', amountKg: 0.018, memberId: 'm1', memberName: 'Pavlos Panos', date: new Date(Date.now() - 86400000).toISOString(), drinkType: 'Double Espresso' }
                 ],
                 payments: [
-                    { id: 'p1', memberId: 'm1', memberName: 'Pavlos Panos', amount: 50.0, date: new Date(Date.now() - 86400000 * 6).toISOString() },
-                    { id: 'p2', memberId: 'm2', memberName: 'Sarah Connor', amount: 40.0, date: new Date(Date.now() - 86400000 * 4).toISOString() },
-                    { id: 'p3', memberId: 'm3', memberName: 'Alex Mercer', amount: 60.0, date: new Date(Date.now() - 86400000 * 2).toISOString() },
-                    { id: 'p4', memberId: 'm1', memberName: 'Pavlos Panos', amount: 100.0, date: new Date(Date.now() - 3600000).toISOString() }
+                    { id: 'p1', memberId: 'm1', memberName: 'Pavlos Panos', amount: 50.0, date: new Date(Date.now() - 86400000 * 6).toISOString(), status: 'approved' },
+                    { id: 'p2', memberId: 'm2', memberName: 'Sarah Connor', amount: 40.0, date: new Date(Date.now() - 86400000 * 4).toISOString(), status: 'approved' },
+                    { id: 'p3', memberId: 'm3', memberName: 'Alex Mercer', amount: 60.0, date: new Date(Date.now() - 86400000 * 2).toISOString(), status: 'approved' },
+                    { id: 'p4', memberId: 'm1', memberName: 'Pavlos Panos', amount: 100.0, date: new Date(Date.now() - 3600000).toISOString(), status: 'approved' }
                 ],
+                requests: [
+                    { id: 'r1', brand: 'Kimbo', name: 'Kimbo Extra Intense Roast', requestedBy: 'Sarah Connor', votes: ['m2', 'm3'], status: 'pending' }
+                ],
+                broadcast: { message: 'We need new cleaning tablets soon. Please handle with care!', active: true },
                 machineStats: { cupsSinceClean: 48, lastCleanedBy: 'Sarah Connor' }
             };
             localStorage.setItem(MOCK_STORAGE_KEY, JSON.stringify(initialSeeds));
@@ -184,13 +272,6 @@
             modal.classList.remove('hidden');
         };
         const closeModal = () => modal.classList.add('hidden');
-        const showError = (elementId, message) => {
-            const errorEl = document.getElementById(elementId);
-            if(errorEl) {
-                errorEl.textContent = message;
-                errorEl.classList.remove('hidden');
-            }
-        };
 
         const renderApp = () => {
             if (!currentUser) {
@@ -206,7 +287,7 @@
                 const remaining = (financials.totalCollected || 0) - (financials.totalSpent || 0);
                 appRoot.innerHTML = `
                     <div class="min-h-screen flex flex-col justify-center items-center p-4 bg-espresso-950 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-espresso-900 via-espresso-950 to-black">
-                        ${isMockMode ? `<div class="bg-amber-600/20 border border-amber-600/40 text-amber-200 px-4 py-2 rounded-lg text-sm mb-6 max-w-md text-center"><strong>Demo Mode Active:</strong> Running local database setup.</div>` : ''}
+                        ${isMockMode ? `<div class="bg-amber-600/20 border border-amber-600/40 text-amber-200 px-4 py-2 rounded-lg text-sm mb-6 max-w-md text-center"><strong>Demo Mode Active:</strong> Running local database setup.<br><span class="text-xs opacity-80">Sign in with e.g. <strong>pavlospanos@hotmail.com</strong> (any password)</span></div>` : ''}
                         
                         <div class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-5 gap-8">
                             <div class="lg:col-span-3 flex flex-col justify-center">
@@ -218,71 +299,53 @@
                                     <div class="coffee-glass p-4 rounded-xl"><p class="text-xs text-espresso-400 uppercase">Spent</p><p class="text-xl font-bold text-rose-400">$${(financials.totalSpent || 0).toFixed(2)}</p></div>
                                     <div class="coffee-glass p-4 rounded-xl"><p class="text-xs text-espresso-400 uppercase">Balance</p><p class="text-xl font-bold text-goldAccent-500">$${remaining.toFixed(2)}</p></div>
                                 </div>
-                                
-                                <h3 class="text-lg font-serif font-bold text-goldAccent-500 mb-3">On Tap Today</h3>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    ${coffeeTypes.map(c => `
-                                        <div class="coffee-glass p-3 rounded-xl flex items-center gap-3">
-                                            <img src="${c.imageUrl}" onerror="this.src='https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=compress&cs=tinysrgb&w=100';" class="w-12 h-12 object-cover rounded-lg">
-                                            <div>
-                                                <h4 class="font-bold text-sm">${c.name}</h4>
-                                                <p class="text-xs text-espresso-300">${c.brand} &bull; ${(c.stockKg || 0).toFixed(1)}kg left</p>
-                                            </div>
-                                        </div>
-                                    `).join('')}
-                                </div>
                             </div>
                             
-                            <div class="lg:col-span-2 flex items-center">
-                                <div class="w-full coffee-glass p-8 rounded-2xl shadow-xl">
-                                    <h2 class="text-2xl font-serif font-bold text-goldAccent-500 mb-6 text-center">Member Access</h2>
+                            <div class="lg:col-span-2 w-full">
+                                <div class="coffee-glass p-8 rounded-2xl border border-goldAccent-500/10 shadow-2xl">
+                                    <h3 class="text-2xl font-serif font-bold text-goldAccent-500 mb-6">Welcome Back</h3>
+                                    
+                                    <div id="login-error" class="hidden bg-rose-500/15 border border-rose-500/30 text-rose-300 px-4 py-2.5 rounded-xl text-xs mb-4"></div>
+                                    
                                     <form id="login-form" class="space-y-4">
                                         <div>
-                                            <label class="block text-xs font-semibold uppercase tracking-wider text-espresso-300 mb-1">Email Address</label>
-                                            <input type="email" id="email" required class="w-full bg-espresso-950 border border-espresso-800 focus:border-goldAccent-500 rounded-xl px-4 py-3 text-espresso-100 outline-none transition-colors">
+                                            <label class="block text-xs uppercase tracking-wider text-espresso-300 mb-1">Email</label>
+                                            <input type="email" id="login-email" required class="w-full bg-espresso-950/60 border border-espresso-800 focus:border-goldAccent-500 rounded-xl px-4 py-3 text-espresso-100 outline-none text-sm transition-colors">
                                         </div>
                                         <div>
-                                            <label class="block text-xs font-semibold uppercase tracking-wider text-espresso-300 mb-1">Password</label>
-                                            <input type="password" id="password" required class="w-full bg-espresso-950 border border-espresso-800 focus:border-goldAccent-500 rounded-xl px-4 py-3 text-espresso-100 outline-none transition-colors">
+                                            <label class="block text-xs uppercase tracking-wider text-espresso-300 mb-1">Password</label>
+                                            <input type="password" id="login-password" required class="w-full bg-espresso-950/60 border border-espresso-800 focus:border-goldAccent-500 rounded-xl px-4 py-3 text-espresso-100 outline-none text-sm transition-colors">
                                         </div>
-                                        <button type="submit" class="w-full bg-goldAccent-500 hover:bg-goldAccent-600 text-espresso-950 font-bold py-3 px-4 rounded-xl transition-colors mt-2 shadow-lg">Enter Lounge</button>
-                                        <p id="login-error" class="text-rose-400 text-xs text-center hidden"></p>
-                                        <div class="text-[10px] text-espresso-400 text-center leading-relaxed mt-4">
-                                            Members: Use your office email and default password <span class="text-goldAccent-500 font-mono">'ILoveCoffee'</span>.
-                                        </div>
+                                        <button type="submit" class="w-full bg-goldAccent-500 hover:bg-goldAccent-600 text-espresso-950 font-bold py-3.5 px-4 rounded-xl transition-all font-semibold shadow-lg text-sm mt-6">Login to Club</button>
                                     </form>
+                                    
+                                    <div class="mt-6 text-center text-xs text-espresso-400">
+                                        <p>Use your registered corporate email</p>
+                                        <p class="mt-1">Default Password: <span class="font-bold text-espresso-300">${DEFAULT_PASSWORD}</span></p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>`;
+                    </div>
+                `;
+                
                 document.getElementById('login-form').addEventListener('submit', handleLogin);
             };
 
             if (isMockMode) {
                 const dbState = loadMockDB();
-                loadScreen(dbState.coffeeTypes.filter(c => c.stockKg > 0), dbState.financials);
+                loadScreen(dbState.coffeeTypes, dbState.financials);
             } else {
-                Promise.all([
-                    getDocs(collection(db, getCollectionPath('coffeeTypes'))),
-                    getDoc(doc(db, getCollectionPath('financials'), 'summary'))
-                ]).then(([coffeeSnapshot, financialSnapshot]) => {
-                    const coffeeList = coffeeSnapshot.docs.map(d => ({id: d.id, ...d.data()})).filter(c => (c.stockKg || 0) > 0);
-                    const financials = financialSnapshot.exists() ? financialSnapshot.data() : { totalCollected: 0, totalSpent: 0 };
-                    loadScreen(coffeeList, financials);
-                }).catch(err => {
-                    console.warn("Firebase unconfigured. Switching to Local Mock Database.", err);
-                    isMockMode = true;
-                    const dbState = loadMockDB();
-                    loadScreen(dbState.coffeeTypes.filter(c => c.stockKg > 0), dbState.financials);
-                });
+                loadScreen(appState.coffeeTypes, appState.financials);
             }
         };
 
         const handleLogin = async (e) => {
             e.preventDefault();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            const errorEl = document.getElementById('login-error');
+
             if (isMockMode) {
                 const dbState = loadMockDB();
                 const matched = dbState.members.find(m => m.email.toLowerCase() === email.toLowerCase());
@@ -290,40 +353,28 @@
                     currentUser = { email: matched.email, uid: matched.id };
                     setupListeners();
                     renderApp();
-                } else if (email.toLowerCase() === ADMIN_EMAIL) {
-                    currentUser = { email: ADMIN_EMAIL, uid: 'm1' };
-                    setupListeners();
-                    renderApp();
                 } else {
-                    showError('login-error', 'Email not registered in this club.');
+                    errorEl.textContent = "User not registered in Espresso Club.";
+                    errorEl.classList.remove('hidden');
                 }
                 return;
             }
 
             try {
-                await signInWithEmailAndPassword(auth, email, password);
-            } catch (error) {
-                if ((error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') && password === DEFAULT_PASSWORD) {
-                    try {
-                        const userQuery = query(collection(db, getCollectionPath('users')), where("email", "==", email.toLowerCase()));
-                        const querySnapshot = await getDocs(userQuery);
-                        if (querySnapshot.empty) {
-                            showError('login-error', 'This email is not registered.');
-                            return;
-                        }
-                        await createUserWithEmailAndPassword(auth, email, password);
-                    } catch (createError) {
-                        showError('login-error', `Registration failed: ${createError.message}`);
-                    }
-                } else {
-                     showError('login-error', 'Authentication failed.');
-                }
+                const credential = await signInWithEmailAndPassword(auth, email, password);
+                currentUser = credential.user;
+                renderApp();
+            } catch (err) {
+                console.error(err);
+                errorEl.textContent = err.message || "Invalid Credentials.";
+                errorEl.classList.remove('hidden');
             }
         };
 
         const handleLogout = () => {
+            currentUser = null;
+            isAdmin = false;
             if (isMockMode) {
-                currentUser = null;
                 renderApp();
                 return;
             }
@@ -334,7 +385,7 @@
             appRoot.innerHTML = `
                 <div class="min-h-screen flex flex-col md:flex-row bg-espresso-950">
                     <aside class="w-full md:w-64 coffee-glass p-6 md:min-h-screen flex flex-col border-r border-goldAccent-500/10">
-                        <div class="flex items-center gap-3 mb-8">
+                        <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-xl bg-goldAccent-500 flex items-center justify-center text-espresso-950 font-serif font-black text-xl">E</div>
                             <div>
                                 <h1 class="text-lg font-serif font-bold text-goldAccent-500">Espresso Club</h1>
@@ -353,6 +404,7 @@
                         </div>
                     </aside>
                     <main id="main-content" class="flex-1 p-6 md:p-8 overflow-y-auto max-h-screen"></main>
+                    <div id="mobile-bottom-nav"></div>
                 </div>`;
             
             document.getElementById('logout-btn').addEventListener('click', handleLogout);
@@ -363,38 +415,63 @@
                     renderCurrentView();
                 }
             });
+
+            document.getElementById('mobile-bottom-nav').addEventListener('click', (e) => {
+                const btn = e.target.closest('.mobile-nav-button');
+                if (btn) {
+                    appState.activeTab = btn.dataset.tab;
+                    renderCurrentView();
+                }
+            });
+
             renderCurrentView();
         };
 
         const renderCurrentView = () => {
             const mainContent = document.getElementById('main-content');
             const navMenu = document.getElementById('nav-menu');
+            const mobileBottomNav = document.getElementById('mobile-bottom-nav');
             if (!mainContent || !navMenu) return;
 
             const tabs = isAdmin 
-                ? ['dashboard', 'members', 'stats', 'inventory', 'payments_log']
-                : ['dashboard', 'members', 'stats', 'my_payments'];
+                ? ['dashboard', 'members', 'requests', 'stats', 'inventory', 'payments_log']
+                : ['dashboard', 'members', 'requests', 'stats', 'preferences', 'my_payments'];
 
             const tabIcons = {
-                dashboard: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>',
-                members: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
-                stats: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>',
-                inventory: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>',
-                payments_log: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="12" y1="4" x2="12" y2="20"></line></svg>',
-                my_payments: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="12" y1="4" x2="12" y2="20"></line></svg>'
+                dashboard: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>',
+                members: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
+                requests: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>',
+                stats: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>',
+                inventory: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>',
+                preferences: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>',
+                payments_log: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="12" y1="4" x2="12" y2="20"></line></svg>',
+                my_payments: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="12" y1="4" x2="12" y2="20"></line></svg>'
             };
 
+            // Render desktop side menu
             navMenu.innerHTML = tabs.map(tab => `
                 <button data-tab="${tab}" class="nav-button flex items-center w-full text-left py-3 px-4 rounded-xl transition-all ${appState.activeTab === tab ? 'bg-goldAccent-500 text-espresso-950 font-bold shadow-lg' : 'text-espresso-200 hover:bg-espresso-800/40'}">
                     ${tabIcons[tab]}<span class="capitalize text-sm">${tab.replace('_', ' ')}</span>
                 </button>
             `).join('');
 
+            // Render mobile bottom tab bar
+            if (mobileBottomNav) {
+                mobileBottomNav.innerHTML = tabs.map(tab => `
+                    <button data-tab="${tab}" class="mobile-nav-button ${appState.activeTab === tab ? 'active' : ''}">
+                        ${tabIcons[tab]}
+                        <span class="text-[8px] uppercase tracking-wider mt-0.5">${tab.replace('_', ' ').split(' ')[0]}</span>
+                    </button>
+                `).join('');
+            }
+
             switch (appState.activeTab) {
                 case 'dashboard': renderDashboardView(mainContent); break;
                 case 'members': renderMembersView(mainContent); break;
+                case 'requests': renderRequestsView(mainContent); break;
                 case 'stats': renderStatsView(mainContent); break;
                 case 'inventory': renderInventoryView(mainContent); break;
+                case 'preferences': renderPreferencesView(mainContent); break;
                 case 'payments_log': renderPaymentsLogView(mainContent); break;
                 case 'my_payments': renderMyPaymentsView(mainContent); break;
             }
@@ -416,8 +493,54 @@
             const cupsLeft = Math.max(0, cleanLimit - (appState.machineStats?.cupsSinceClean || 0));
             const needsClean = cupsLeft <= 0;
 
+            // Compute user caffeine logs for today
+            const activeMember = appState.members.find(m => m.email === currentUser.email) || { id: 'm1', name: 'Pavlos Panos', preference: {} };
+            const todayStr = new Date().toDateString();
+            const todayConsumptions = appState.inventoryHistory.filter(h => {
+                if (h.type !== 'consumption' || h.memberId !== activeMember.id) return false;
+                const d = new Date(isMockMode ? h.date : h.date.toDate());
+                return d.toDateString() === todayStr;
+            });
+            const todayCups = todayConsumptions.reduce((sum, h) => {
+                if (h.drinkType === 'Double Espresso') return sum + 2;
+                if (h.drinkType === 'Cappuccino/Latte') return sum + 1.5;
+                return sum + 1; // single espresso or americano
+            }, 0);
+
+            const userGoal = activeMember.preference?.dailyGoal || 3;
+            const goalPercent = Math.min(100, (todayCups / userGoal) * 100);
+
+            // Water intake tracker
+            const waterKey = `espresso_club_water_${activeMember.id}_${todayStr}`;
+            const waterGlasses = parseInt(localStorage.getItem(waterKey) || '0');
+
+            // Pending verifications queue (Admin only)
+            const pendingPayments = appState.payments.filter(p => p.status === 'pending');
+
             container.innerHTML = `
                 <div class="space-y-8">
+                    <!-- Host Broadcast Banner -->
+                    ${appState.broadcast?.active ? `
+                        <div class="bg-indigo-900/40 border border-indigo-500/30 text-indigo-100 p-5 rounded-2xl flex justify-between items-center shadow-lg relative overflow-hidden">
+                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500"></div>
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-lg animate-bounce">📢</div>
+                                <div>
+                                    <p class="text-[10px] uppercase tracking-widest text-indigo-400 font-bold">Lounge Broadcast Announcement</p>
+                                    <p class="text-sm mt-0.5 text-indigo-100">${appState.broadcast.message}</p>
+                                </div>
+                            </div>
+                            ${isAdmin ? `
+                                <button id="admin-disable-broadcast" class="bg-indigo-500 hover:bg-indigo-600 text-espresso-950 font-bold text-xs py-1.5 px-3 rounded-lg transition-all">Dismiss Broadcast</button>
+                            ` : ''}
+                        </div>
+                    ` : (isAdmin ? `
+                        <div class="bg-espresso-900/30 border border-espresso-800/40 p-4 rounded-xl flex justify-between items-center text-xs text-espresso-400">
+                            <span>No active announcement. Broadcast to all members?</span>
+                            <button id="admin-create-broadcast" class="text-goldAccent-500 hover:text-goldAccent-600 font-bold underline transition-colors">Create Broadcast</button>
+                        </div>
+                    ` : '')}
+
                     <div class="flex justify-between items-center">
                         <h2 class="text-3xl font-serif font-bold text-goldAccent-500">Dashboard</h2>
                         ${remainingBalance < 15.0 ? `
@@ -445,21 +568,38 @@
                     
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <div class="lg:col-span-2 space-y-6">
-                            <h3 class="text-xl font-serif text-goldAccent-500">Quick Espresso Logger</h3>
+                            <h3 class="text-xl font-serif text-goldAccent-500">Espresso Bar Log System</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                ${availableCoffee.map(c => `
-                                    <div class="coffee-glass p-5 rounded-2xl flex gap-4 hover:border-goldAccent-500/40 transition-all group">
-                                        <img src="${c.imageUrl}" onerror="this.src='https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=compress&cs=tinysrgb&w=100';" class="w-20 h-20 object-cover rounded-xl border border-espresso-800">
-                                        <div class="flex-grow flex flex-col justify-between">
-                                            <div>
-                                                <h4 class="font-bold text-sm">${c.name}</h4>
-                                                <p class="text-xs text-espresso-300">${c.brand}</p>
-                                                <p class="text-xs text-goldAccent-500 font-bold mt-1">${(c.stockKg * 100).toFixed(0)} cups left</p>
+                                ${availableCoffee.map(c => {
+                                    const ratings = c.ratings || [];
+                                    const avgRating = ratings.length ? (ratings.reduce((sum, r) => sum + r.stars, 0) / ratings.length).toFixed(1) : '—';
+                                    return `
+                                        <div class="coffee-glass p-5 rounded-2xl flex flex-col justify-between hover:border-goldAccent-500/40 transition-all group">
+                                            <div class="flex gap-4">
+                                                <img src="${c.imageUrl}" onerror="this.src='https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=compress&cs=tinysrgb&w=100';" class="w-16 h-16 object-cover rounded-xl border border-espresso-800">
+                                                <div>
+                                                    <h4 class="font-bold text-sm text-espresso-100">${c.name}</h4>
+                                                    <p class="text-xs text-espresso-300">${c.brand}</p>
+                                                    <div class="flex items-center gap-1.5 mt-1">
+                                                        <span class="text-goldAccent-500 text-xs">⭐ ${avgRating}</span>
+                                                        <span class="text-[10px] text-espresso-400 hover:underline cursor-pointer" onclick="showTastingNotes('${c.id}')">(${ratings.length} reviews)</span>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <button data-id="${c.id}" class="quick-cup-btn w-full bg-goldAccent-500 hover:bg-goldAccent-600 group-hover:scale-[1.02] text-espresso-950 font-bold text-xs py-1.5 px-3 rounded-lg transition-all text-center mt-2">Log Cup</button>
+                                            <div class="mt-4 flex justify-between items-center border-t border-espresso-800 pt-3">
+                                                <span class="text-xs text-goldAccent-500 font-bold">${(c.stockKg * 100).toFixed(0)} cups left</span>
+                                                <button class="bg-espresso-800 text-[10px] text-espresso-200 border border-goldAccent-500/10 hover:bg-goldAccent-500 hover:text-espresso-950 font-bold py-1 px-2.5 rounded-lg transition-all" onclick="openReviewModal('${c.id}')">Rate Bean</button>
+                                            </div>
+                                            <!-- Custom Brew Buttons -->
+                                            <div class="mt-3 grid grid-cols-2 gap-1.5">
+                                                <button data-id="${c.id}" data-type="Single Espresso" data-weight="0.009" class="custom-brew-btn bg-espresso-900/60 hover:bg-goldAccent-500 hover:text-espresso-950 text-[10px] text-espresso-300 font-bold py-1.5 px-2 rounded-lg transition-all text-center">Espresso (9g)</button>
+                                                <button data-id="${c.id}" data-type="Double Espresso" data-weight="0.018" class="custom-brew-btn bg-espresso-900/60 hover:bg-goldAccent-500 hover:text-espresso-950 text-[10px] text-espresso-300 font-bold py-1.5 px-2 rounded-lg transition-all text-center">Double (18g)</button>
+                                                <button data-id="${c.id}" data-type="Cappuccino/Latte" data-weight="0.014" class="custom-brew-btn bg-espresso-900/60 hover:bg-goldAccent-500 hover:text-espresso-950 text-[10px] text-espresso-300 font-bold py-1.5 px-2 rounded-lg transition-all text-center">Latte (14g)</button>
+                                                <button data-id="${c.id}" data-type="Americano" data-weight="0.010" class="custom-brew-btn bg-espresso-900/60 hover:bg-goldAccent-500 hover:text-espresso-950 text-[10px] text-espresso-300 font-bold py-1.5 px-2 rounded-lg transition-all text-center">Americano (10g)</button>
+                                            </div>
                                         </div>
-                                    </div>
-                                `).join('')}
+                                    `;
+                                }).join('')}
                             </div>
 
                             <!-- Machine Descaling Logger -->
@@ -476,9 +616,61 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Admin Verification Queue Widget -->
+                            ${isAdmin && pendingPayments.length ? `
+                                <div class="coffee-glass p-6 rounded-2xl shadow-xl border border-espresso-800 space-y-4">
+                                    <h3 class="text-lg font-serif font-bold text-emerald-400">Payment Verification Queue</h3>
+                                    <div class="divide-y divide-espresso-800">
+                                        ${pendingPayments.map(p => `
+                                            <div class="flex justify-between items-center py-3 text-xs">
+                                                <div>
+                                                    <p class="font-bold text-espresso-100">${p.memberName}</p>
+                                                    <p class="text-espresso-400 mt-0.5">Note: ${p.reference || 'None'}</p>
+                                                </div>
+                                                <div class="flex items-center gap-3">
+                                                    <span class="font-bold text-emerald-400 font-mono">$${p.amount.toFixed(2)}</span>
+                                                    <button class="bg-emerald-500 hover:bg-emerald-600 text-espresso-950 px-2.5 py-1 rounded font-bold transition-all" onclick="approvePayment('${p.id}')">Verify</button>
+                                                    <button class="bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 px-2.5 py-1 rounded font-bold border border-rose-500/20 transition-all" onclick="rejectPayment('${p.id}')">Reject</button>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
                         </div>
                         
                         <div class="space-y-6">
+                            <!-- Caffeine Intake Goal & Hydration Tracker Widget -->
+                            <div class="coffee-glass p-5 rounded-2xl space-y-4">
+                                <h3 class="text-lg font-serif font-bold text-goldAccent-500">Daily Health Tracker</h3>
+                                
+                                <!-- Caffeine progress bar -->
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-espresso-300">Caffeine Goal Progress</span>
+                                        <span class="font-bold ${todayCups > userGoal ? 'text-rose-400' : 'text-goldAccent-500'}">${todayCups.toFixed(1)} / ${userGoal} cups</span>
+                                    </div>
+                                    <div class="w-full bg-espresso-950 rounded-full h-2 overflow-hidden border border-espresso-800">
+                                        <div class="h-full rounded-full transition-all ${todayCups > userGoal ? 'bg-rose-500' : 'bg-goldAccent-500'}" style="width: ${goalPercent}%"></div>
+                                    </div>
+                                    ${todayCups > userGoal ? `
+                                        <p class="text-[10px] text-rose-400 font-semibold mt-1">⚠️ You have exceeded your daily caffeine limit!</p>
+                                    ` : `
+                                        <p class="text-[10px] text-espresso-400 mt-1">Logs calculate 1 cup for Single/Americano, 2 for Double, 1.5 for Latte.</p>
+                                    `}
+                                </div>
+
+                                <!-- Water intake logger -->
+                                <div class="border-t border-espresso-800 pt-3 flex justify-between items-center">
+                                    <div>
+                                        <span class="text-xs text-espresso-300 block">Hydration Goal</span>
+                                        <span class="font-mono text-sm text-sky-400 font-bold">${waterGlasses} / 8 glasses 💧</span>
+                                    </div>
+                                    <button class="bg-sky-500 hover:bg-sky-600 text-espresso-950 font-bold text-xs py-1.5 px-3 rounded-lg transition-all" onclick="addWaterGlass('${activeMember.id}', '${todayStr}')">+ Log Water</button>
+                                </div>
+                            </div>
+
                             <!-- Leaderboard widget -->
                             <div class="coffee-glass p-5 rounded-2xl">
                                 <h3 class="text-lg font-serif font-bold text-goldAccent-500 mb-3">Lounge Leaderboard</h3>
@@ -492,8 +684,9 @@
                                 </div>
                             </div>
 
+                            <!-- Live Feed -->
                             <div class="coffee-glass p-5 rounded-2xl">
-                                <h3 class="text-lg font-serif text-goldAccent-500 mb-3">Live Lounge Feed</h3>
+                                <h3 class="text-lg font-serif font-bold text-goldAccent-500 mb-3">Live Lounge Feed</h3>
                                 <div class="space-y-2 max-h-[220px] overflow-y-auto">
                                     ${appState.inventoryHistory.slice(0, 10).map(h => {
                                         const dateStr = h.date ? new Date(isMockMode ? h.date : h.date.toDate()).toLocaleDateString() : 'Just now';
@@ -501,6 +694,10 @@
                                         let title = `${h.memberName || 'Someone'} drank ${h.name}`;
                                         let desc = `-${(h.amountKg * 1000).toFixed(0)}g`;
                                         
+                                        if (h.drinkType) {
+                                            title = `${h.memberName || 'Someone'} brewed a ${h.drinkType} using ${h.name}`;
+                                        }
+
                                         if (h.type === 'purchase') {
                                             icon = '🟢';
                                             title = `Restocked: ${h.name}`;
@@ -531,11 +728,77 @@
                     </div>
                 </div>`;
             
-            container.querySelectorAll('.quick-cup-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => handleQuickLogCup(e.currentTarget.dataset.id));
+            container.querySelectorAll('.custom-brew-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.currentTarget.dataset.id;
+                    const type = e.currentTarget.dataset.type;
+                    const weight = parseFloat(e.currentTarget.dataset.weight);
+                    handleCustomBrew(id, type, weight);
+                });
             });
             document.getElementById('descale-btn')?.addEventListener('click', handleDescaleMachine);
             document.getElementById('broadcast-btn')?.addEventListener('click', handleBroadcastRequest);
+            document.getElementById('admin-disable-broadcast')?.addEventListener('click', handleDisableBroadcast);
+            document.getElementById('admin-create-broadcast')?.addEventListener('click', handleShowBroadcastForm);
+        };
+
+        const handleCustomBrew = async (coffeeId, type, weight) => {
+            const selectedCoffee = appState.coffeeTypes.find(c => c.id === coffeeId);
+            if (!selectedCoffee || selectedCoffee.stockKg < weight) {
+                alert("This coffee is out of stock or does not have enough weight!");
+                return;
+            }
+            const activeMember = appState.members.find(m => m.email === currentUser.email) || { id: 'm1', name: 'Pavlos Panos' };
+
+            if (isMockMode) {
+                const dbState = loadMockDB();
+                const coffee = dbState.coffeeTypes.find(c => c.id === coffeeId);
+                coffee.stockKg = Math.max(0, coffee.stockKg - weight);
+                dbState.machineStats.cupsSinceClean = (dbState.machineStats.cupsSinceClean || 0) + 1;
+                
+                dbState.inventoryHistory.unshift({
+                    id: Math.random().toString(),
+                    type: 'consumption',
+                    coffeeId: coffee.id,
+                    name: coffee.name,
+                    amountKg: weight,
+                    drinkType: type,
+                    memberId: activeMember.id,
+                    memberName: activeMember.name,
+                    date: new Date().toISOString()
+                });
+                
+                saveMockDB(dbState);
+                triggerMockSnapshot();
+                alert(`Enjoy your freshly brewed ${type}! ☕`);
+                return;
+            }
+
+            try {
+                const batch = writeBatch(db);
+                const coffeeRef = doc(db, getCollectionPath('coffeeTypes'), coffeeId);
+                batch.update(coffeeRef, { stockKg: increment(-weight) });
+                
+                const machineRef = doc(db, getCollectionPath('machine'), 'status');
+                batch.set(machineRef, { cupsSinceClean: increment(1) }, { merge: true });
+                
+                const historyRef = doc(collection(db, getCollectionPath('inventoryHistory')));
+                batch.set(historyRef, {
+                    type: 'consumption',
+                    coffeeId,
+                    name: selectedCoffee.name,
+                    amountKg: weight,
+                    drinkType: type,
+                    memberId: activeMember.id,
+                    memberName: activeMember.name,
+                    date: serverTimestamp()
+                });
+                await batch.commit();
+                alert(`Enjoy your freshly brewed ${type}! ☕`);
+            } catch (err) {
+                console.error(err);
+                alert("Failed to log cup.");
+            }
         };
 
         const handleDescaleMachine = async () => {
@@ -605,66 +868,354 @@
                     memberName: activeMember.name,
                     date: serverTimestamp()
                 });
-                alert("Recharge request broadcast to the lounge feed!");
-            } catch(err) { console.error(err); }
+            } catch (err) { console.error(err); }
         };
 
-        const handleQuickLogCup = async (coffeeId) => {
-            const selectedCoffee = appState.coffeeTypes.find(c => c.id === coffeeId);
-            if (!selectedCoffee || selectedCoffee.stockKg <= 0.01) {
-                alert("This coffee is out of stock!");
+        // --- Announcemnt/Broadcast Operations ---
+        const handleShowBroadcastForm = () => {
+            showModal("Create Office Announcement", `
+                <form id="create-announcement-form" class="space-y-4">
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-espresso-300 mb-1">Message</label>
+                        <textarea name="msg" rows="3" required placeholder="e.g. New coffee beans arriving on Tuesday!" class="w-full bg-espresso-950 border border-espresso-800 focus:border-goldAccent-500 rounded-xl px-4 py-2 text-espresso-100 outline-none text-sm transition-colors"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-goldAccent-500 hover:bg-goldAccent-600 text-espresso-950 font-bold py-2 px-4 rounded-xl transition-all">Publish Broadcast</button>
+                </form>
+            `);
+            document.getElementById('create-announcement-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const text = e.target.elements.msg.value.trim();
+                if (!text) return;
+                
+                if (isMockMode) {
+                    const dbState = loadMockDB();
+                    dbState.broadcast = { message: text, active: true };
+                    saveMockDB(dbState);
+                    triggerMockSnapshot();
+                    closeModal();
+                    return;
+                }
+                const ref = doc(db, getCollectionPath('broadcast'), 'active');
+                setDoc(ref, { message: text, active: true }).then(() => closeModal());
+            });
+        };
+
+        const handleDisableBroadcast = async () => {
+            if (isMockMode) {
+                const dbState = loadMockDB();
+                dbState.broadcast = { message: '', active: false };
+                saveMockDB(dbState);
+                triggerMockSnapshot();
                 return;
             }
-            const activeMember = appState.members.find(m => m.email === currentUser.email) || { id: 'm1', name: 'Pavlos Panos' };
-            const amountKg = 0.01; // 10g
+            try {
+                const ref = doc(db, getCollectionPath('broadcast'), 'active');
+                await setDoc(ref, { message: '', active: false });
+            } catch(e) { console.error(e); }
+        };
+
+        // --- Tasting Reviews & Rating Systems ---
+        window.showTastingNotes = (coffeeId) => {
+            const coffee = appState.coffeeTypes.find(c => c.id === coffeeId);
+            if (!coffee) return;
+            const ratings = coffee.ratings || [];
+            
+            const commentsHtml = ratings.map(r => `
+                <div class="border-b border-espresso-800 pb-3 mb-3 text-xs">
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-goldAccent-500">${r.reviewer || 'Anonymous'}</span>
+                        <span class="text-goldAccent-500">⭐ ${r.stars}</span>
+                    </div>
+                    <p class="text-espresso-300 mt-1 font-serif italic">"${r.comment || ''}"</p>
+                </div>
+            `).join('') || '<p class="text-espresso-400 text-xs">No reviews yet. Be the first to rate it!</p>';
+
+            showModal(`${coffee.name} - Tasting Notes`, `
+                <div class="max-h-[300px] overflow-y-auto pr-1">
+                    ${commentsHtml}
+                </div>
+            `);
+        };
+
+        window.openReviewModal = (coffeeId) => {
+            const coffee = appState.coffeeTypes.find(c => c.id === coffeeId);
+            if (!coffee) return;
+
+            showModal(`Rate & Review ${coffee.name}`, `
+                <form id="review-form" class="space-y-4">
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-espresso-300 mb-1">Stars (1-5)</label>
+                        <select name="stars" class="w-full bg-espresso-950 border border-espresso-800 focus:border-goldAccent-500 rounded-xl px-4 py-2 text-espresso-100 outline-none text-sm transition-colors">
+                            <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+                            <option value="4">⭐⭐⭐⭐ Great</option>
+                            <option value="3">⭐⭐⭐ Good</option>
+                            <option value="2">⭐⭐ Fair</option>
+                            <option value="1">⭐ Poor</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-espresso-300 mb-1">Tasting Comment</label>
+                        <textarea name="comment" rows="3" required placeholder="Describe notes, aroma, crema..." class="w-full bg-espresso-950 border border-espresso-800 focus:border-goldAccent-500 rounded-xl px-4 py-2 text-espresso-100 outline-none text-sm transition-colors"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-goldAccent-500 hover:bg-goldAccent-600 text-espresso-950 font-bold py-2.5 px-4 rounded-xl transition-all">Submit Review</button>
+                </form>
+            `);
+
+            document.getElementById('review-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const stars = parseInt(e.target.elements.stars.value);
+                const comment = e.target.elements.comment.value.trim();
+                const reviewer = appState.members.find(m => m.email === currentUser.email)?.name || 'Anonymous';
+
+                if (isMockMode) {
+                    const dbState = loadMockDB();
+                    const targetCoffee = dbState.coffeeTypes.find(c => c.id === coffeeId);
+                    if (!targetCoffee.ratings) targetCoffee.ratings = [];
+                    targetCoffee.ratings.push({ stars, comment, reviewer });
+                    
+                    saveMockDB(dbState);
+                    triggerMockSnapshot();
+                    closeModal();
+                    alert("Tasting notes submitted! Thank you.");
+                    return;
+                }
+
+                const targetCoffee = appState.coffeeTypes.find(c => c.id === coffeeId);
+                const ratings = targetCoffee.ratings || [];
+                ratings.push({ stars, comment, reviewer });
+                
+                const ref = doc(db, getCollectionPath('coffeeTypes'), coffeeId);
+                updateDoc(ref, { ratings }).then(() => {
+                    closeModal();
+                    alert("Tasting notes submitted! Thank you.");
+                });
+            });
+        };
+
+        // --- Water Hydration Tracker ---
+        window.addWaterGlass = (memberId, dateStr) => {
+            const waterKey = `espresso_club_water_${memberId}_${dateStr}`;
+            const current = parseInt(localStorage.getItem(waterKey) || '0');
+            localStorage.setItem(waterKey, (current + 1).toString());
+            renderCurrentView();
+        };
+
+        // --- Coffee Requests Board ---
+        const renderRequestsView = (container) => {
+            const requestRows = appState.requests.map(r => {
+                const userHasVoted = r.votes?.includes(currentUser.uid || 'mock-user');
+                return `
+                    <tr class="border-b border-espresso-800 text-espresso-200 text-sm hover:bg-espresso-900/10">
+                        <td class="p-3 font-semibold">${r.name}</td>
+                        <td class="p-3 text-xs text-espresso-300">${r.brand}</td>
+                        <td class="p-3 text-xs text-espresso-400">${r.requestedBy}</td>
+                        <td class="p-3 text-center font-mono font-bold text-goldAccent-500">${r.votes?.length || 0}</td>
+                        <td class="p-3 text-right">
+                            <div class="flex gap-2 justify-end">
+                                ${userHasVoted ? `
+                                    <button class="bg-emerald-600/20 text-emerald-300 border border-emerald-500/20 px-3 py-1 rounded-lg text-xs font-bold" disabled>Voted</button>
+                                ` : `
+                                    <button class="bg-espresso-800 hover:bg-goldAccent-500 hover:text-espresso-950 text-espresso-200 px-3 py-1 rounded-lg text-xs font-bold transition-all" onclick="upvoteRequest('${r.id}')">👍 Vote</button>
+                                `}
+                                ${isAdmin ? `
+                                    <button class="bg-emerald-500 hover:bg-emerald-600 text-espresso-950 px-3 py-1 rounded-lg text-xs font-bold transition-all" onclick="buyRequestStock('${r.id}')">Buy Stock</button>
+                                    <button class="text-rose-400 hover:text-rose-300 p-1" onclick="deleteRequest('${r.id}')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            container.innerHTML = `
+                <div class="space-y-8">
+                    <h2 class="text-3xl font-serif font-bold text-goldAccent-500">Coffee Request Board</h2>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2 coffee-glass p-6 rounded-2xl shadow-xl overflow-x-auto">
+                            <h3 class="text-xl font-serif text-goldAccent-500 mb-4">Current Requests</h3>
+                            <table class="w-full text-left min-w-[500px]">
+                                <thead>
+                                    <tr class="border-b border-espresso-800 text-xs font-semibold uppercase tracking-wider text-espresso-300">
+                                        <th class="p-3">Coffee Blend</th>
+                                        <th class="p-3">Brand</th>
+                                        <th class="p-3">Requested By</th>
+                                        <th class="p-3 text-center">Votes</th>
+                                        <th class="p-3 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${requestRows || '<tr><td colspan="5" class="p-4 text-center text-espresso-400 text-sm">No active coffee requests. Suggest one!</td></tr>'}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="coffee-glass p-6 rounded-2xl shadow-xl">
+                            <h3 class="text-xl font-serif text-goldAccent-500 mb-4">Request New Coffee Blend</h3>
+                            <form id="add-request-form" class="space-y-4">
+                                <div>
+                                    <label class="block text-xs uppercase tracking-wider text-espresso-300 mb-1">Blend Name</label>
+                                    <input name="name" type="text" required placeholder="e.g. Crema e Gusto" class="w-full bg-espresso-950 border border-espresso-800 focus:border-goldAccent-500 rounded-xl px-4 py-2.5 text-espresso-100 outline-none text-sm transition-colors">
+                                </div>
+                                <div>
+                                    <label class="block text-xs uppercase tracking-wider text-espresso-300 mb-1">Brand</label>
+                                    <input name="brand" type="text" required placeholder="e.g. Lavazza" class="w-full bg-espresso-950 border border-espresso-800 focus:border-goldAccent-500 rounded-xl px-4 py-2.5 text-espresso-100 outline-none text-sm transition-colors">
+                                </div>
+                                <button type="submit" class="w-full bg-goldAccent-500 hover:bg-goldAccent-600 text-espresso-950 font-bold py-2.5 px-4 rounded-xl transition-all shadow-md">Post Suggestion</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('add-request-form').addEventListener('submit', handleCreateRequest);
+        };
+
+        const handleCreateRequest = async (e) => {
+            e.preventDefault();
+            const name = e.target.elements.name.value.trim();
+            const brand = e.target.elements.brand.value.trim();
+            const reviewer = appState.members.find(m => m.email === currentUser.email)?.name || 'Someone';
 
             if (isMockMode) {
                 const dbState = loadMockDB();
-                const coffee = dbState.coffeeTypes.find(c => c.id === coffeeId);
-                coffee.stockKg = Math.max(0, coffee.stockKg - amountKg);
-                dbState.machineStats.cupsSinceClean = (dbState.machineStats.cupsSinceClean || 0) + 1;
-                
-                dbState.inventoryHistory.unshift({
-                    id: Math.random().toString(),
-                    type: 'consumption',
-                    coffeeId: coffee.id,
-                    name: coffee.name,
-                    amountKg: amountKg,
-                    memberId: activeMember.id,
-                    memberName: activeMember.name,
-                    date: new Date().toISOString()
+                if (!dbState.requests) dbState.requests = [];
+                dbState.requests.unshift({
+                    id: 'req_' + Math.random().toString(36).substr(2, 9),
+                    name,
+                    brand,
+                    requestedBy: reviewer,
+                    votes: [currentUser.uid],
+                    status: 'pending'
                 });
-                
                 saveMockDB(dbState);
                 triggerMockSnapshot();
-                alert(`Logged cup of ${selectedCoffee.name}! ☕`);
+                e.target.reset();
                 return;
             }
 
             try {
-                const batch = writeBatch(db);
-                const coffeeRef = doc(db, getCollectionPath('coffeeTypes'), coffeeId);
-                batch.update(coffeeRef, { stockKg: increment(-amountKg) });
-                
-                const machineRef = doc(db, getCollectionPath('machine'), 'status');
-                batch.set(machineRef, { cupsSinceClean: increment(1) }, { merge: true });
-                
-                const historyRef = doc(collection(db, getCollectionPath('inventoryHistory')));
-                batch.set(historyRef, {
-                    type: 'consumption',
-                    coffeeId,
-                    name: selectedCoffee.name,
-                    amountKg,
-                    memberId: activeMember.id,
-                    memberName: activeMember.name,
-                    date: serverTimestamp()
+                await addDoc(collection(db, getCollectionPath('requests')), {
+                    name, brand, requestedBy: reviewer, votes: [currentUser.uid], status: 'pending', date: serverTimestamp()
                 });
-                await batch.commit();
-                alert(`Logged cup of ${selectedCoffee.name}! ☕`);
-            } catch (err) {
-                console.error(err);
-                alert("Failed to log cup.");
+                e.target.reset();
+            } catch(e) { console.error(e); }
+        };
+
+        window.upvoteRequest = async (id) => {
+            if (isMockMode) {
+                const dbState = loadMockDB();
+                const req = dbState.requests.find(r => r.id === id);
+                if (req && !req.votes.includes(currentUser.uid)) {
+                    req.votes.push(currentUser.uid);
+                    saveMockDB(dbState);
+                    triggerMockSnapshot();
+                }
+                return;
             }
+            try {
+                const docRef = doc(db, getCollectionPath('requests'), id);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    const votes = data.votes || [];
+                    if (!votes.includes(currentUser.uid)) {
+                        votes.push(currentUser.uid);
+                        await updateDoc(docRef, { votes });
+                    }
+                }
+            } catch(e) { console.error(e); }
+        };
+
+        window.deleteRequest = async (id) => {
+            if (!confirm("Are you sure you want to delete this suggestion?")) return;
+            if (isMockMode) {
+                const dbState = loadMockDB();
+                dbState.requests = dbState.requests.filter(r => r.id !== id);
+                saveMockDB(dbState);
+                triggerMockSnapshot();
+                return;
+            }
+            try {
+                await deleteDoc(doc(db, getCollectionPath('requests'), id));
+            } catch(e) { console.error(e); }
+        };
+
+        window.buyRequestStock = (id) => {
+            const req = appState.requests.find(r => r.id === id);
+            if (!req) return;
+            appState.activeTab = 'inventory';
+            renderCurrentView();
+            fillPreset(req.name, req.brand, 1.0, 20.00, '');
+        };
+
+        // --- Taste Preferences Tab ---
+        const renderPreferencesView = (container) => {
+            const activeMember = appState.members.find(m => m.email === currentUser.email) || { id: 'm1', name: 'Pavlos Panos', preference: {} };
+            const pref = activeMember.preference || {};
+
+            container.innerHTML = `
+                <div class="space-y-8">
+                    <h2 class="text-3xl font-serif font-bold text-goldAccent-500">My Coffee Taste Profile</h2>
+                    
+                    <div class="max-w-2xl coffee-glass p-8 rounded-2xl border border-goldAccent-500/10 shadow-2xl">
+                        <form id="save-preference-form" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-xs uppercase tracking-wider text-espresso-300 mb-1">Favorite Drink Style</label>
+                                    <select name="favoriteDrink" class="w-full bg-espresso-950 border border-espresso-800 focus:border-goldAccent-500 rounded-xl px-4 py-2.5 text-espresso-100 outline-none text-sm transition-colors">
+                                        <option value="Single Espresso" ${pref.favoriteDrink === 'Single Espresso' ? 'selected' : ''}>Single Espresso</option>
+                                        <option value="Double Espresso" ${pref.favoriteDrink === 'Double Espresso' ? 'selected' : ''}>Double Espresso</option>
+                                        <option value="Cappuccino/Latte" ${pref.favoriteDrink === 'Cappuccino/Latte' ? 'selected' : ''}>Cappuccino / Latte</option>
+                                        <option value="Americano" ${pref.favoriteDrink === 'Americano' ? 'selected' : ''}>Americano</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs uppercase tracking-wider text-espresso-300 mb-1">Roast Level Preference</label>
+                                    <select name="roastLevel" class="w-full bg-espresso-950 border border-espresso-800 focus:border-goldAccent-500 rounded-xl px-4 py-2.5 text-espresso-100 outline-none text-sm transition-colors">
+                                        <option value="light" ${pref.roastLevel === 'light' ? 'selected' : ''}>Light Roast</option>
+                                        <option value="medium" ${pref.roastLevel === 'medium' ? 'selected' : ''}>Medium Roast</option>
+                                        <option value="dark" ${pref.roastLevel === 'dark' ? 'selected' : ''}>Dark Roast</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs uppercase tracking-wider text-espresso-300 mb-1">Favorite Brand/Origin</label>
+                                    <input name="favoriteCoffee" type="text" value="${pref.favoriteCoffee || ''}" placeholder="e.g. Ethiopian Yirgacheffe" class="w-full bg-espresso-950 border border-espresso-800 focus:border-goldAccent-500 rounded-xl px-4 py-2.5 text-espresso-100 outline-none text-sm transition-colors">
+                                </div>
+                                <div>
+                                    <label class="block text-xs uppercase tracking-wider text-espresso-300 mb-1">Daily Caffeine Goal (cups)</label>
+                                    <input name="dailyGoal" type="number" min="1" max="10" value="${pref.dailyGoal || 3}" class="w-full bg-espresso-950 border border-espresso-800 focus:border-goldAccent-500 rounded-xl px-4 py-2.5 text-espresso-100 outline-none text-sm transition-colors">
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-goldAccent-500 hover:bg-goldAccent-600 text-espresso-950 font-bold py-3 px-4 rounded-xl transition-all shadow-lg text-sm">Save Profile Preferences</button>
+                        </form>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('save-preference-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const favoriteDrink = e.target.elements.favoriteDrink.value;
+                const roastLevel = e.target.elements.roastLevel.value;
+                const favoriteCoffee = e.target.elements.favoriteCoffee.value.trim();
+                const dailyGoal = parseInt(e.target.elements.dailyGoal.value);
+
+                if (isMockMode) {
+                    const dbState = loadMockDB();
+                    const m = dbState.members.find(u => u.id === activeMember.id);
+                    m.preference = { favoriteDrink, roastLevel, favoriteCoffee, dailyGoal };
+                    saveMockDB(dbState);
+                    triggerMockSnapshot();
+                    alert("Preferences updated!");
+                    return;
+                }
+
+                const ref = doc(db, getCollectionPath('users'), activeMember.id);
+                updateDoc(ref, { preference: { favoriteDrink, roastLevel, favoriteCoffee, dailyGoal } }).then(() => {
+                    alert("Preferences updated!");
+                });
+            });
         };
 
         const renderMembersView = (container) => {
@@ -711,7 +1262,7 @@
                     <h2 class="text-3xl font-serif font-bold text-goldAccent-500">Club Members</h2>
                     <div class="grid grid-cols-1 ${isAdmin ? 'lg:grid-cols-3' : ''} gap-8">
                         <div class="${isAdmin ? 'lg:col-span-2' : 'col-span-full'} coffee-glass p-6 rounded-2xl shadow-xl overflow-x-auto">
-                            <table class="w-full text-left">
+                            <table class="w-full text-left min-w-[500px]">
                                 <thead>
                                     <tr class="border-b border-espresso-800 text-xs font-semibold uppercase tracking-wider text-espresso-300">
                                         <th class="p-3">Name</th>
@@ -813,23 +1364,21 @@
                     
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <div class="lg:col-span-2 space-y-6">
-                            <div class="coffee-glass p-6 rounded-2xl shadow-xl">
+                            <div class="coffee-glass p-6 rounded-2xl shadow-xl overflow-x-auto">
                                 <h3 class="text-xl font-serif text-goldAccent-500 mb-4">Stock Overview</h3>
-                                <div class="overflow-x-auto">
-                                    <table class="w-full text-left">
-                                        <thead>
-                                            <tr class="border-b border-espresso-800 text-xs font-semibold uppercase tracking-wider text-espresso-300">
-                                                <th class="p-3">Coffee Name</th>
-                                                <th class="p-3">Brand</th>
-                                                <th class="p-3">Remaining Stock</th>
-                                                <th class="p-3 text-right">Total Cost</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            ${coffeeRows}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                <table class="w-full text-left min-w-[500px]">
+                                    <thead>
+                                        <tr class="border-b border-espresso-800 text-xs font-semibold uppercase tracking-wider text-espresso-300">
+                                            <th class="p-3">Coffee Name</th>
+                                            <th class="p-3">Brand</th>
+                                            <th class="p-3">Remaining Stock</th>
+                                            <th class="p-3 text-right">Total Cost</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${coffeeRows}
+                                    </tbody>
+                                </table>
                             </div>
                             
                             <div class="coffee-glass p-6 rounded-2xl shadow-xl">
@@ -882,7 +1431,7 @@
                                     </div>
                                     <div>
                                         <label class="block text-xs uppercase tracking-wider text-espresso-300 mb-1">Amount Consumed (kg)</label>
-                                        <input name="consumption" type="number" step="0.05" required placeholder="e.g. 0.1 for 100g" class="w-full bg-espresso-950 border border-espresso-800 focus:border-goldAccent-500 rounded-xl px-4 py-2 text-espresso-100 outline-none text-sm transition-colors">
+                                        <input name="consumption" type="number" step="0.001" required placeholder="e.g. 0.01 for 10g" class="w-full bg-espresso-950 border border-espresso-800 focus:border-goldAccent-500 rounded-xl px-4 py-2 text-espresso-100 outline-none text-sm transition-colors">
                                     </div>
                                     <button type="submit" class="w-full bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 font-bold py-2.5 px-4 rounded-xl transition-colors text-sm shadow-md mt-2">Deduct Beans</button>
                                 </form>
@@ -932,7 +1481,7 @@
                     coffee.totalCostAllTime += totalCost;
                     coffee.totalWeightAllTime += weightKg;
                 } else {
-                    dbState.coffeeTypes.push({ id, name, brand, stockKg: weightKg, totalCostAllTime: totalCost, totalWeightAllTime: weightKg, imageUrl });
+                    dbState.coffeeTypes.push({ id, name, brand, stockKg: weightKg, totalCostAllTime: totalCost, totalWeightAllTime: weightKg, imageUrl, ratings: [] });
                 }
                 dbState.financials.totalSpent += totalCost;
                 dbState.inventoryHistory.unshift({
@@ -943,6 +1492,11 @@
                     totalCost,
                     date: new Date().toISOString()
                 });
+                
+                if (dbState.requests) {
+                    dbState.requests = dbState.requests.filter(r => r.name.toLowerCase() !== name.toLowerCase());
+                }
+
                 saveMockDB(dbState);
                 triggerMockSnapshot();
                 form.reset();
@@ -1064,28 +1618,55 @@
                 </tr>
             `).join('');
 
+            const totalMembersCount = appState.members.length;
+            const roasts = appState.members.reduce((acc, m) => {
+                const r = m.preference?.roastLevel || 'medium';
+                acc[r] = (acc[r] || 0) + 1;
+                return acc;
+            }, {});
+
             container.innerHTML = `
                 <div class="space-y-8">
                     <h2 class="text-3xl font-serif font-bold text-goldAccent-500">Club Statistics</h2>
                     
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div class="coffee-glass p-6 rounded-2xl shadow-xl lg:col-span-2">
+                        <div class="coffee-glass p-6 rounded-2xl shadow-xl lg:col-span-2 overflow-x-auto">
                             <h3 class="text-xl font-serif text-goldAccent-500 mb-4">Club Ledger</h3>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left">
-                                    <thead>
-                                        <tr class="border-b border-espresso-800 text-xs font-semibold uppercase tracking-wider text-espresso-300">
-                                            <th class="p-3">Member</th>
-                                            <th class="p-3">Total Paid</th>
-                                            <th class="p-3">Logged Cups</th>
-                                            <th class="p-3">Est. Cost Consumed</th>
-                                            <th class="p-3 text-right">Net Balance</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${balanceRows}
-                                    </tbody>
-                                </table>
+                            <table class="w-full text-left min-w-[500px]">
+                                <thead>
+                                    <tr class="border-b border-espresso-800 text-xs font-semibold uppercase tracking-wider text-espresso-300">
+                                        <th class="p-3">Member</th>
+                                        <th class="p-3">Total Paid</th>
+                                        <th class="p-3">Logged Cups</th>
+                                        <th class="p-3">Est. Cost Consumed</th>
+                                        <th class="p-3 text-right">Net Balance</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${balanceRows}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Roast preferences summary card -->
+                        <div class="coffee-glass p-6 rounded-2xl shadow-xl">
+                            <h3 class="text-xl font-serif text-goldAccent-500 mb-4">Office Roast Preferences</h3>
+                            <div class="space-y-4">
+                                ${['light', 'medium', 'dark'].map(type => {
+                                    const count = roasts[type] || 0;
+                                    const percent = totalMembersCount ? ((count / totalMembersCount) * 100).toFixed(0) : 0;
+                                    return `
+                                        <div>
+                                            <div class="flex justify-between text-xs mb-1">
+                                                <span class="capitalize text-espresso-300">${type} Roast</span>
+                                                <span class="text-espresso-400 font-bold">${count} members (${percent}%)</span>
+                                            </div>
+                                            <div class="w-full bg-espresso-950 rounded-full h-1.5 overflow-hidden">
+                                                <div class="bg-goldAccent-500 h-full" style="width: ${percent}%"></div>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
                             </div>
                         </div>
 
@@ -1094,7 +1675,7 @@
                             <canvas id="monthly-expenses-chart"></canvas>
                         </div>
                         
-                        <div class="coffee-glass p-6 rounded-2xl shadow-xl flex flex-col justify-between">
+                        <div class="coffee-glass p-6 rounded-2xl shadow-xl flex flex-col justify-between lg:col-span-2">
                             <div>
                                 <h3 class="text-xl font-serif text-goldAccent-500 mb-4">Weekly Consumption Speed</h3>
                                 <div id="weekly-consumption" class="text-sm space-y-2"></div>
@@ -1172,7 +1753,8 @@
         };
 
         const renderPaymentsLogView = (container) => {
-            const rowHTML = appState.payments.map(p => `
+            const approvedReceipts = appState.payments.filter(p => p.status === 'approved' || !p.status);
+            const rowHTML = approvedReceipts.map(p => `
                 <tr class="border-b border-espresso-800 hover:bg-espresso-900/10 text-sm text-espresso-200">
                     <td class="p-3 text-xs text-espresso-400">${new Date(isMockMode ? p.date : p.date.toDate()).toLocaleString()}</td>
                     <td class="p-3 font-semibold">${p.memberName}</td>
@@ -1185,22 +1767,20 @@
                     <h2 class="text-3xl font-serif font-bold text-goldAccent-500">Payments Ledger</h2>
                     
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div class="lg:col-span-2 coffee-glass p-6 rounded-2xl shadow-xl">
+                        <div class="lg:col-span-2 coffee-glass p-6 rounded-2xl shadow-xl overflow-x-auto">
                             <h3 class="text-xl font-serif text-goldAccent-500 mb-4">Receipts</h3>
-                            <div class="overflow-x-auto max-h-[350px]">
-                                <table class="w-full text-left">
-                                    <thead>
-                                        <tr class="border-b border-espresso-800 text-xs font-semibold uppercase tracking-wider text-espresso-300">
-                                            <th class="p-3">Date</th>
-                                            <th class="p-3">Member</th>
-                                            <th class="p-3 text-right">Cash</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${rowHTML}
-                                    </tbody>
-                                </table>
-                            </div>
+                            <table class="w-full text-left min-w-[500px]">
+                                <thead>
+                                    <tr class="border-b border-espresso-800 text-xs font-semibold uppercase tracking-wider text-espresso-300">
+                                        <th class="p-3">Date</th>
+                                        <th class="p-3">Member</th>
+                                        <th class="p-3 text-right">Cash</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${rowHTML}
+                                </tbody>
+                            </table>
                         </div>
                         
                         <div class="coffee-glass p-6 rounded-2xl shadow-xl">
@@ -1245,7 +1825,8 @@
                     memberId,
                     memberName: member.name,
                     amount,
-                    date: new Date().toISOString()
+                    date: new Date().toISOString(),
+                    status: 'approved'
                 });
                 
                 saveMockDB(dbState);
@@ -1257,7 +1838,7 @@
             try {
                 const batch = writeBatch(db);
                 const paymentRef = doc(collection(db, getCollectionPath('payments')));
-                batch.set(paymentRef, { memberId: member.id, memberName: member.name, amount, date: serverTimestamp() });
+                batch.set(paymentRef, { memberId: member.id, memberName: member.name, amount, date: serverTimestamp(), status: 'approved' });
                 
                 const memberRef = doc(db, getCollectionPath('users'), memberId);
                 batch.update(memberRef, { totalContributed: increment(amount) });
@@ -1278,6 +1859,11 @@
             const paymentRows = myPaymentsList.map(p => `
                 <tr class="border-b border-espresso-800 text-espresso-200 text-sm">
                     <td class="p-3 text-xs text-espresso-400">${new Date(isMockMode ? p.date : p.date.toDate()).toLocaleString()}</td>
+                    <td class="p-3 font-semibold text-center">
+                        ${p.status === 'pending' 
+                            ? `<span class="bg-amber-600/20 border border-amber-500/30 text-amber-300 px-2 py-0.5 rounded text-[10px]">Pending</span>` 
+                            : `<span class="bg-emerald-600/20 border border-emerald-500/30 text-emerald-300 px-2 py-0.5 rounded text-[10px]">Verified</span>`}
+                    </td>
                     <td class="p-3 text-right font-mono font-bold text-emerald-400">+$${p.amount.toFixed(2)}</td>
                 </tr>
             `).join('');
@@ -1285,7 +1871,7 @@
             const consumptionRows = myConsumptions.map(h => `
                 <tr class="border-b border-espresso-800 text-espresso-200 text-sm">
                     <td class="p-3 text-xs text-espresso-400">${new Date(isMockMode ? h.date : h.date.toDate()).toLocaleString()}</td>
-                    <td class="p-3">${h.name}</td>
+                    <td class="p-3">${h.drinkType ? `${h.name} (${h.drinkType})` : h.name}</td>
                     <td class="p-3 text-right font-mono font-bold text-rose-400">-${(h.amountKg * 1000).toFixed(0)}g</td>
                 </tr>
             `).join('');
@@ -1294,42 +1880,146 @@
                 <div class="space-y-8">
                     <h2 class="text-3xl font-serif font-bold text-goldAccent-500">My Statement</h2>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div class="coffee-glass p-6 rounded-2xl shadow-xl">
-                            <h3 class="text-xl font-serif text-goldAccent-500 mb-4">My Contributions</h3>
-                            <div class="overflow-x-auto max-h-[300px]">
-                                <table class="w-full text-left">
+                        <div class="space-y-6">
+                            <!-- Contributions List -->
+                            <div class="coffee-glass p-6 rounded-2xl shadow-xl overflow-x-auto">
+                                <h3 class="text-xl font-serif text-goldAccent-500 mb-4">My Contributions</h3>
+                                <table class="w-full text-left min-w-[300px]">
                                     <thead>
                                         <tr class="border-b border-espresso-800 text-xs font-semibold uppercase tracking-wider text-espresso-300">
                                             <th class="p-3">Date</th>
+                                            <th class="p-3 text-center">Status</th>
                                             <th class="p-3 text-right">Amount</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        ${paymentRows}
+                                        ${paymentRows || '<tr><td colspan="3" class="p-4 text-center text-espresso-400 text-sm">No cash contributions logged.</td></tr>'}
                                     </tbody>
                                 </table>
+                            </div>
+
+                            <!-- Settle Balance Form -->
+                            <div class="coffee-glass p-6 rounded-2xl shadow-xl">
+                                <h3 class="text-xl font-serif text-goldAccent-500 mb-4">Submit Payment Verification</h3>
+                                <form id="settle-balance-form" class="space-y-4">
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-xs uppercase tracking-wider text-espresso-300 mb-1">Amount ($)</label>
+                                            <input name="amount" type="number" step="0.01" required placeholder="e.g. 20.00" class="w-full bg-espresso-950 border border-espresso-800 focus:border-goldAccent-500 rounded-xl px-4 py-2 text-espresso-100 outline-none text-sm transition-colors">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs uppercase tracking-wider text-espresso-300 mb-1">Reference Info</label>
+                                            <input name="reference" type="text" required placeholder="e.g. Revolut transaction ID" class="w-full bg-espresso-950 border border-espresso-800 focus:border-goldAccent-500 rounded-xl px-4 py-2 text-espresso-100 outline-none text-sm transition-colors">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-espresso-950 font-bold py-2 px-4 rounded-xl transition-all shadow-md">Submit Contribution Claim</button>
+                                </form>
                             </div>
                         </div>
 
-                        <div class="coffee-glass p-6 rounded-2xl shadow-xl">
+                        <div class="coffee-glass p-6 rounded-2xl shadow-xl overflow-x-auto">
                             <h3 class="text-xl font-serif text-goldAccent-500 mb-4">My Coffee Consumption</h3>
-                            <div class="overflow-x-auto max-h-[300px]">
-                                <table class="w-full text-left">
-                                    <thead>
-                                        <tr class="border-b border-espresso-800 text-xs font-semibold uppercase tracking-wider text-espresso-300">
-                                            <th class="p-3">Date</th>
-                                            <th class="p-3">Brand</th>
-                                            <th class="p-3 text-right">Deducted</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${consumptionRows}
-                                    </tbody>
-                                </table>
-                            </div>
+                            <table class="w-full text-left min-w-[300px]">
+                                <thead>
+                                    <tr class="border-b border-espresso-800 text-xs font-semibold uppercase tracking-wider text-espresso-300">
+                                        <th class="p-3">Date</th>
+                                        <th class="p-3">Brand</th>
+                                        <th class="p-3 text-right">Deducted</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${consumptionRows || '<tr><td colspan="3" class="p-4 text-center text-espresso-400 text-sm">No coffee cups logged yet. Grab a brew!</td></tr>'}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>`;
+            
+            document.getElementById('settle-balance-form')?.addEventListener('submit', handleSettleBalanceSubmit);
+        };
+
+        const handleSettleBalanceSubmit = async (e) => {
+            e.preventDefault();
+            const amount = parseFloat(e.target.elements.amount.value);
+            const reference = e.target.elements.reference.value.trim();
+            const activeMember = appState.members.find(m => m.email === currentUser.email) || { id: 'm1', name: 'Pavlos Panos' };
+
+            if (isMockMode) {
+                const dbState = loadMockDB();
+                dbState.payments.unshift({
+                    id: 'pay_' + Math.random().toString(36).substr(2, 9),
+                    memberId: activeMember.id,
+                    memberName: activeMember.name,
+                    amount,
+                    date: new Date().toISOString(),
+                    reference,
+                    status: 'pending'
+                });
+                saveMockDB(dbState);
+                triggerMockSnapshot();
+                e.target.reset();
+                alert("Payment claim submitted! Pending admin verification.");
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, getCollectionPath('payments')), {
+                    memberId: activeMember.id, memberName: activeMember.name, amount, reference, status: 'pending', date: serverTimestamp()
+                });
+                e.target.reset();
+                alert("Payment claim submitted! Pending admin verification.");
+            } catch(e) { console.error(e); }
+        };
+
+        window.approvePayment = async (id) => {
+            if (isMockMode) {
+                const dbState = loadMockDB();
+                const payment = dbState.payments.find(p => p.id === id);
+                if (payment) {
+                    payment.status = 'approved';
+                    const member = dbState.members.find(m => m.id === payment.memberId);
+                    if (member) member.totalContributed += payment.amount;
+                    dbState.financials.totalCollected += payment.amount;
+                    
+                    saveMockDB(dbState);
+                    triggerMockSnapshot();
+                    alert("Payment contribution verified and approved!");
+                }
+                return;
+            }
+
+            try {
+                const docRef = doc(db, getCollectionPath('payments'), id);
+                const snap = await getDoc(docRef);
+                if (snap.exists()) {
+                    const payment = snap.data();
+                    const batch = writeBatch(db);
+                    batch.update(docRef, { status: 'approved' });
+                    
+                    const memberRef = doc(db, getCollectionPath('users'), payment.memberId);
+                    batch.update(memberRef, { totalContributed: increment(payment.amount) });
+                    
+                    const financialsRef = doc(db, getCollectionPath('financials'), 'summary');
+                    batch.set(financialsRef, { totalCollected: increment(payment.amount) }, { merge: true });
+                    
+                    await batch.commit();
+                    alert("Payment contribution verified and approved!");
+                }
+            } catch(e) { console.error(e); }
+        };
+
+        window.rejectPayment = async (id) => {
+            if (!confirm("Reject this payment claim?")) return;
+            if (isMockMode) {
+                const dbState = loadMockDB();
+                dbState.payments = dbState.payments.filter(p => p.id !== id);
+                saveMockDB(dbState);
+                triggerMockSnapshot();
+                return;
+            }
+            try {
+                await deleteDoc(doc(db, getCollectionPath('payments'), id));
+            } catch(e) { console.error(e); }
         };
 
         let dbListeners = [];
@@ -1341,17 +2031,19 @@
         const triggerMockSnapshot = () => {
             if (!isMockMode) return;
             const dbState = loadMockDB();
-            appState.coffeeTypes = dbState.coffeeTypes;
-            appState.financials = dbState.financials;
-            appState.members = dbState.members;
-            appState.inventoryHistory = dbState.inventoryHistory;
-            appState.payments = dbState.payments;
+            appState.coffeeTypes = dbState.coffeeTypes || [];
+            appState.financials = dbState.financials || { totalCollected: 0, totalSpent: 0 };
+            appState.members = dbState.members || [];
+            appState.inventoryHistory = dbState.inventoryHistory || [];
+            appState.payments = dbState.payments || [];
+            appState.requests = dbState.requests || [];
+            appState.broadcast = dbState.broadcast || { message: '', active: false };
             appState.machineStats = dbState.machineStats || { cupsSinceClean: 0, lastCleanedBy: 'None' };
             
             if (currentUser) {
                 appState.userProfile = appState.members.find(m => m.email.toLowerCase() === currentUser.email.toLowerCase());
             }
-            if (document.getElementById('app-container')) {
+            if (document.getElementById('main-content')) {
                 renderCurrentView();
             }
         };
@@ -1383,18 +2075,29 @@
                     if (!isAdmin) {
                         appState.userProfile = appState.members.find(m => m.email === currentUser.email);
                     }
-                    if(document.getElementById('app-container')) renderCurrentView();
+                    if(document.getElementById('main-content')) renderCurrentView();
                 }));
 
                 dbListeners.push(onSnapshot(query(collection(db, getCollectionPath('inventoryHistory'))), snap => {
                     appState.inventoryHistory = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                     appState.inventoryHistory.sort((a,b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0));
-                    if(document.getElementById('app-container')) renderCurrentView();
+                    if(document.getElementById('main-content')) renderCurrentView();
                 }));
 
                 dbListeners.push(onSnapshot(doc(db, getCollectionPath('machine'), 'status'), doc => {
                     appState.machineStats = doc.exists() ? doc.data() : { cupsSinceClean: 0, lastCleanedBy: 'None' };
-                    if(document.getElementById('app-container')) renderCurrentView();
+                    if(document.getElementById('main-content')) renderCurrentView();
+                }));
+
+                dbListeners.push(onSnapshot(query(collection(db, getCollectionPath('requests'))), snap => {
+                    appState.requests = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    appState.requests.sort((a,b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0));
+                    if(document.getElementById('main-content')) renderCurrentView();
+                }));
+
+                dbListeners.push(onSnapshot(doc(db, getCollectionPath('broadcast'), 'active'), doc => {
+                    appState.broadcast = doc.exists() ? doc.data() : { message: '', active: false };
+                    if(document.getElementById('main-content')) renderCurrentView();
                 }));
 
                 const pQuery = isAdmin 
@@ -1404,7 +2107,7 @@
                 dbListeners.push(onSnapshot(pQuery, snap => {
                     appState.payments = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                     appState.payments.sort((a,b) => (b.date?.toMillis() || 0) - (a.date?.toMillis() || 0));
-                    if(document.getElementById('app-container')) renderCurrentView();
+                    if(document.getElementById('main-content')) renderCurrentView();
                 }));
             }
         };

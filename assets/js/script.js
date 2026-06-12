@@ -17,8 +17,21 @@ if (navToggler) {
   navToggler.addEventListener("click", () => {
     elementToggleFunc(navbar);
     elementToggleFunc(navToggler);
+    const icon = navToggler.querySelector('ion-icon');
+    if (icon) {
+      icon.setAttribute('name', navbar.classList.contains('active') ? 'close-outline' : 'menu-outline');
+    }
   });
 }
+
+const closeMobileNav = () => {
+  if (navbar) navbar.classList.remove("active");
+  if (navToggler) {
+    navToggler.classList.remove("active");
+    const icon = navToggler.querySelector('ion-icon');
+    if (icon) icon.setAttribute('name', 'menu-outline');
+  }
+};
 
 // --- SCROLL REVEAL ANIMATOR ---
 const initScrollReveal = () => {
@@ -44,7 +57,8 @@ const initScrollReveal = () => {
 const canvas = document.getElementById('particle-canvas');
 let ctx = null;
 let particles = [];
-const particleCount = 40;
+const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+const particleCount = isTouchDevice || window.innerWidth < 768 ? 22 : 40;
 const mouse = { x: null, y: null, radius: 120 };
 
 window.addEventListener('mousemove', (event) => {
@@ -233,6 +247,12 @@ if (projectModal) {
     }
   });
 }
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && projectModal && projectModal.classList.contains('active')) {
+    projectModal.classList.remove('active');
+    modalContentArea.innerHTML = '';
+  }
+});
 
 // --- ARTICLE TABS NAVIGATION ---
 const navigationLinks = document.querySelectorAll("[data-nav-link]");
@@ -258,9 +278,8 @@ for (let i = 0; i < navigationLinks.length; i++) {
       }
     });
 
-    if (navbar) navbar.classList.remove("active");
-    if (navToggler) navToggler.classList.remove("active");
-    
+    closeMobileNav();
+
     if (found) {
       window.scrollTo(0, 0);
     }
@@ -313,16 +332,24 @@ const keyMapping = {
 
 const initPiano = () => {
   const keys = document.querySelectorAll('.piano-key');
+  const pressKey = (key) => {
+    const note = key.dataset.note;
+    if (note && noteFrequencies[note]) {
+      playNote(noteFrequencies[note]);
+      key.classList.add('active');
+    }
+  };
   keys.forEach(key => {
-    key.addEventListener('mousedown', () => {
-      const note = key.dataset.note;
-      if (note && noteFrequencies[note]) {
-        playNote(noteFrequencies[note]);
-        key.classList.add('active');
-      }
-    });
+    key.addEventListener('mousedown', () => pressKey(key));
     key.addEventListener('mouseup', () => key.classList.remove('active'));
     key.addEventListener('mouseleave', () => key.classList.remove('active'));
+    // Touch support for phones/tablets
+    key.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      pressKey(key);
+    }, { passive: false });
+    key.addEventListener('touchend', () => key.classList.remove('active'));
+    key.addEventListener('touchcancel', () => key.classList.remove('active'));
   });
   
   window.addEventListener('keydown', (e) => {

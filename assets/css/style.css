@@ -78,6 +78,27 @@ ul, ol {
   list-style: none;
 }
 
+button {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
+
 /* Layout */
 main {
   max-width: 1250px;
@@ -1093,49 +1114,100 @@ textarea.form-input {
   opacity: 1;
 }
 
+/* Scrollable table wrapper (mobile) */
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 /* Responsiveness */
 @media (max-width: 1024px) {
   main {
     grid-template-columns: 1fr;
     padding-top: 90px;
   }
-  
+
   .sidebar {
     position: relative;
     top: 0;
   }
 }
 
-@media (max-width: 768px) {
+/* Collapse the navbar earlier — brand + 6 links + language switcher
+   overflow between 768px and ~1100px */
+@media (max-width: 1100px) {
   .navbar {
     padding: 15px 20px;
   }
-  
+
   .navbar-list {
     position: absolute;
     top: 100%;
     left: 0;
     width: 100%;
     background: var(--bg-nav);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
     border-bottom: 1px solid var(--border-glass);
     flex-direction: column;
     padding: 15px;
     gap: 5px;
     display: none;
   }
-  
+
   .navbar-list.active {
     display: flex;
   }
-  
+
+  .navbar-link {
+    width: 100%;
+    text-align: left;
+    padding: 12px 16px;
+  }
+
   .nav-toggle-btn {
     display: block;
     color: var(--text-primary);
     font-size: 28px;
+    line-height: 1;
+    padding: 6px;
   }
-  
+}
+
+@media (max-width: 768px) {
   .service-list, .project-list, .blog-posts-list {
     grid-template-columns: 1fr;
+  }
+
+  article {
+    padding: 25px 20px;
+  }
+
+  .article-title {
+    font-size: 24px;
+  }
+
+  .scientific-content {
+    padding: 25px 20px;
+  }
+
+  .scientific-content .meta-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .modal-close {
+    top: 12px;
+    right: 16px;
+  }
+
+  .name-brand {
+    font-size: 14px;
+  }
+
+  .mapbox iframe {
+    height: 250px;
   }
   
   .input-wrapper {
@@ -1171,5 +1243,35 @@ textarea.form-input {
     width: 32px;
     height: 32px;
     font-size: 20px;
+  }
+}
+
+@media (max-width: 380px) {
+  main {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .chess-board {
+    width: 224px;
+    height: 224px;
+    grid-template-columns: repeat(8, 28px);
+    grid-template-rows: repeat(8, 28px);
+  }
+
+  .chess-cell {
+    width: 28px;
+    height: 28px;
+    font-size: 18px;
+  }
+
+  .piano-key.white {
+    width: 24px;
+  }
+
+  .piano-key.black {
+    width: 16px;
+    margin-left: -8px;
+    margin-right: -8px;
   }
 }

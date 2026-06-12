@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Κατάστημα εσωρούχων Χρυσάνθη στους Αμπελοκήπους, Αθήνα. Εσώρουχα, νυχτικά και homewear από επώνυμα brands από το 2005." />
+  <meta name="theme-color" content="#fdf8f6" />
   <title data-el="Χρυσάνθη - Κατάστημα Εσωρούχων Αθήνα" data-en="Chrysanthi - Lingerie Boutique Athens">Χρυσάνθη - Κατάστημα Εσωρούχων Αθήνα</title>
   
   <!-- Custom CSS stylesheet -->
@@ -16,8 +18,9 @@
 <body>
 
   <!-- Store Hours Banner -->
-  <div class="hours-banner" data-el="Ωράριο Λειτουργίας: Δευ - Τετ - Σαβ: 09:00 - 15:00 | Τρι - Πεμ - Παρ: 09:00 - 14:00 & 17:00 - 21:00" data-en="Opening Hours: Mon - Wed - Sat: 09:00 - 15:00 | Tue - Thu - Fri: 09:00 - 14:00 & 17:00 - 21:00">
-    Ωράριο Λειτουργίας: Δευ - Τετ - Σαβ: 09:00 - 15:00 | Τρι - Πεμ - Παρ: 09:00 - 14:00 & 17:00 - 21:00
+  <div class="hours-banner">
+    <span data-el="Ωράριο Λειτουργίας: Δευ - Τετ - Σαβ: 09:00 - 15:00 | Τρι - Πεμ - Παρ: 09:00 - 14:00 & 17:00 - 21:00" data-en="Opening Hours: Mon - Wed - Sat: 09:00 - 15:00 | Tue - Thu - Fri: 09:00 - 14:00 & 17:00 - 21:00">Ωράριο Λειτουργίας: Δευ - Τετ - Σαβ: 09:00 - 15:00 | Τρι - Πεμ - Παρ: 09:00 - 14:00 & 17:00 - 21:00</span>
+    <span id="openStatusBadge" class="open-status-badge"></span>
   </div>
 
   <!-- Header Navigation -->
@@ -27,13 +30,8 @@
       <p data-el="Boutique Εσωρούχων" data-en="Lingerie Boutique">Boutique Εσωρούχων</p>
     </div>
     
-    <div class="burger">
-      <div></div>
-      <div></div>
-      <div></div>
-    </div>
-    
-    <nav>
+    <!-- Collapsible Menu links -->
+    <nav id="navMenuLinks">
       <ul>
         <li><a href="#" onclick="showSection('home')" class="active" data-el="Αρχικη" data-en="Home">Αρχικη</a></li>
         <li><a href="#" onclick="showSection('about')" data-el="Η Ιστορια μας" data-en="Our Story">Η Ιστορια μας</a></li>
@@ -41,7 +39,19 @@
         <li><a href="#" onclick="showSection('brands')" data-el="Συλλογες" data-en="Collections">Συλλογες</a></li>
         <li><a href="#" onclick="showSection('contact')" data-el="Επικοινωνια" data-en="Contact">Επικοινωνια</a></li>
       </ul>
-      
+    </nav>
+
+    <!-- Header Controls (Always visible) -->
+    <div class="header-controls">
+      <!-- Currency Switcher -->
+      <div class="currency-box">
+        <select id="currencySelect" onchange="changeCurrency()" class="currency-select">
+          <option value="EUR">€ EUR</option>
+          <option value="USD">$ USD</option>
+          <option value="GBP">£ GBP</option>
+        </select>
+      </div>
+
       <!-- Language Switcher -->
       <div class="lang-switch">
         <button class="lang-btn active" data-lang="el">GR</button>
@@ -53,7 +63,14 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-heart"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
         <span class="wishlist-badge" id="wishlistCountIcon">0</span>
       </button>
-    </nav>
+
+      <!-- Burger Menu Trigger (mobile only) -->
+      <div class="burger" id="burgerBtn">
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+    </div>
   </header>
 
   <!-- Main Showcase Container -->
@@ -106,6 +123,21 @@
         <button class="catalog-btn" onclick="renderCatalog('sets')" data-el="Σετ" data-en="Sets">Σετ</button>
         <button class="catalog-btn size-guide-trigger" onclick="toggleSizeGuide()" data-el="Οδηγός Μεγεθών" data-en="Size Guide" style="background-color: var(--color-rose-light); border-color: var(--color-rose); color: var(--color-rose);">Οδηγός Μεγεθών</button>
       </div>
+
+      <!-- Catalog Controls (Search & Sort) -->
+      <div class="catalog-controls">
+        <div class="search-box">
+          <input type="text" id="catalogSearch" placeholder="Αναζήτηση..." data-el="Αναζήτηση..." data-en="Search products..." oninput="filterAndSortCatalog()" />
+        </div>
+        <div class="sort-box">
+          <select id="catalogSort" onchange="filterAndSortCatalog()" class="sort-select">
+            <option value="default" data-el="Ταξινόμηση" data-en="Sort by">Ταξινόμηση</option>
+            <option value="price-asc" data-el="Τιμή: Χαμηλή σε Υψηλή" data-en="Price: Low to High">Τιμή: Χαμηλή σε Υψηλή</option>
+            <option value="price-desc" data-el="Τιμή: Υψηλή σε Χαμηλή" data-en="Price: High to Low">Τιμή: Υψηλή σε Χαμηλή</option>
+            <option value="name-asc" data-el="Όνομα: Α-Ω" data-en="Name: A-Z">Όνομα: Α-Ω</option>
+          </select>
+        </div>
+      </div>
       
       <!-- Products Grid -->
       <div class="product-grid" id="productGrid"></div>
@@ -139,7 +171,7 @@
         </div>
         <div class="testimonial-slide">
           <p class="testimonial-quote" data-el="&ldquo;Πολύ φιλικό περιβάλλον και μεγάλη ποικιλία από επώνυμα brands. Το προτείνω ανεπιφύλακτα.&rdquo;" data-en="&ldquo;Very friendly environment and a wide variety of designer brands. Highly recommended.&rdquo;">&ldquo;Πολύ φιλικό περιβάλλον και μεγάλη ποικιλία από επώνυμα brands. Το προτείνω ανεπιφύλακτα.&rdquo;</p>
-          <span class="testimonial-author" data-el="Κατερίνα Α., Παγκράτι" data-en="Katerina A., Pagkrati">Κατερίνα Α., Pagkrati</span>
+          <span class="testimonial-author" data-el="Κατερίνα Α., Παγκράτι" data-en="Katerina A., Pagkrati">Κατερίνα Α., Παγκράτι</span>
         </div>
       </div>
     </section>
@@ -187,6 +219,13 @@
         <span data-el="Συνολική Αξία:" data-en="Total Value:">Συνολική Αξία:</span>
         <span id="totalPrice">€0.00</span>
       </div>
+
+      <!-- Promo Code Box -->
+      <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+        <input type="text" id="promoCode" placeholder="Κωδικός Έκπτωσης" data-el="Κωδικός Έκπτωσης" data-en="Discount Code" style="flex: 1; border: 1px solid var(--border-light); padding: 8px; border-radius: 6px; font-size: 0.8rem; outline: none; background: var(--bg-boutique);" />
+        <button onclick="applyPromoCode()" class="add-cart-btn" style="width: auto; padding: 8px 15px; margin-top: 0; font-size: 0.75rem;" data-el="Εφαρμογή" data-en="Apply">Εφαρμογή</button>
+      </div>
+      <div id="promoFeedback" class="text-xs font-semibold mb-3 hidden text-center"></div>
       
       <!-- Inquiry Form -->
       <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
@@ -209,75 +248,106 @@
       
       <div class="size-tabs">
         <h4 style="margin-top: 15px; margin-bottom: 5px; color: var(--color-rose);" data-el="Σουτιέν (EU vs UK/US)" data-en="Bras (EU vs UK/US)">Σουτιέν (EU vs UK/US)</h4>
-        <table class="size-table">
-          <thead>
-            <tr>
-              <th data-el="EU" data-en="EU">EU</th>
-              <th data-el="UK/US" data-en="UK/US">UK/US</th>
-              <th data-el="Underbust (cm) / Περιφέρεια (cm)" data-en="Underbust (cm)">Underbust (cm) / Περιφέρεια (cm)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>70</td>
-              <td>32</td>
-              <td>68-72</td>
-            </tr>
-            <tr>
-              <td>75</td>
-              <td>34</td>
-              <td>73-77</td>
-            </tr>
-            <tr>
-              <td>80</td>
-              <td>36</td>
-              <td>78-82</td>
-            </tr>
-            <tr>
-              <td>85</td>
-              <td>38</td>
-              <td>83-87</td>
-            </tr>
-            <tr>
-              <td>90</td>
-              <td>40</td>
-              <td>88-92</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="size-table-container">
+          <table class="size-table">
+            <thead>
+              <tr>
+                <th data-el="EU" data-en="EU">EU</th>
+                <th data-el="UK/US" data-en="UK/US">UK/US</th>
+                <th data-el="Underbust (cm) / Περιφέρεια (cm)" data-en="Underbust (cm)">Underbust (cm) / Περιφέρεια (cm)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>70</td>
+                <td>32</td>
+                <td>68-72</td>
+              </tr>
+              <tr>
+                <td>75</td>
+                <td>34</td>
+                <td>73-77</td>
+              </tr>
+              <tr>
+                <td>80</td>
+                <td>36</td>
+                <td>78-82</td>
+              </tr>
+              <tr>
+                <td>85</td>
+                <td>38</td>
+                <td>83-87</td>
+              </tr>
+              <tr>
+                <td>90</td>
+                <td>40</td>
+                <td>88-92</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
         <h4 style="margin-top: 20px; margin-bottom: 5px; color: var(--color-rose);" data-el="Σλιπ & Homewear" data-en="Slips & Homewear">Σλιπ & Homewear</h4>
-        <table class="size-table">
-          <thead>
-            <tr>
-              <th data-el="Size / Μέγεθος" data-en="Size">Size / Μέγεθος</th>
-              <th data-el="EU" data-en="EU">EU</th>
-              <th data-el="Hips (cm) / Περιφέρεια Γοφών (cm)" data-en="Hips (cm)">Hips (cm) / Περιφέρεια Γοφών (cm)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>S</td>
-              <td>36</td>
-              <td>90-94</td>
-            </tr>
-            <tr>
-              <td>M</td>
-              <td>38</td>
-              <td>95-98</td>
-            </tr>
-            <tr>
-              <td>L</td>
-              <td>40</td>
-              <td>99-102</td>
-            </tr>
-            <tr>
-              <td>XL</td>
-              <td>42</td>
-              <td>103-106</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="size-table-container">
+          <table class="size-table">
+            <thead>
+              <tr>
+                <th data-el="Size / Μέγεθος" data-en="Size">Size / Μέγεθος</th>
+                <th data-el="EU" data-en="EU">EU</th>
+                <th data-el="Hips (cm) / Περιφέρεια Γοφών (cm)" data-en="Hips (cm)">Hips (cm) / Περιφέρεια Γοφών (cm)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>S</td>
+                <td>36</td>
+                <td>90-94</td>
+              </tr>
+              <tr>
+                <td>M</td>
+                <td>38</td>
+                <td>95-98</td>
+              </tr>
+              <tr>
+                <td>L</td>
+                <td>40</td>
+                <td>99-102</td>
+              </tr>
+              <tr>
+                <td>XL</td>
+                <td>42</td>
+                <td>103-106</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Size Calculator Widget -->
+      <div class="size-calculator-box border-t border-espresso-800/10 mt-6 pt-5">
+        <h4 style="color: var(--color-rose); margin-bottom: 10px;" data-el="Υπολογιστής Μεγέθους Σουτιέν" data-en="Bra Size Calculator">Υπολογιστής Μεγέθους Σουτιέν</h4>
+        <div class="calculator-fields" style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 140px;">
+            <label style="font-size: 0.75rem; color: #78716c;" data-el="Περιφέρεια Θώρακα (cm)" data-en="Underbust (cm)">Περιφέρεια Θώρακα (cm)</label>
+            <input type="number" id="calcUnderbust" placeholder="π.χ. 75" style="width: 100%; border: 1px solid var(--border-light); padding: 8px; border-radius: 6px; font-size: 0.8rem; background: var(--bg-boutique); outline:none;" />
+          </div>
+          <div style="flex: 1; min-width: 140px;">
+            <label style="font-size: 0.75rem; color: #78716c;" data-el="Περιφέρεια Στήθους (cm)" data-en="Overbust (cm)">Περιφέρεια Στήθους (cm)</label>
+            <input type="number" id="calcOverbust" placeholder="π.χ. 90" style="width: 100%; border: 1px solid var(--border-light); padding: 8px; border-radius: 6px; font-size: 0.8rem; background: var(--bg-boutique); outline:none;" />
+          </div>
+        </div>
+        <button class="add-cart-btn" onclick="calculateSize()" style="padding: 10px; width: 100%; margin-top: 0;" data-el="Υπολογισμός Μεγέθους" data-en="Calculate My Size">Υπολογισμός Μεγέθους</button>
+        <div id="calcResult" class="mt-3 font-semibold text-center text-sm" style="color: var(--color-accent); display: none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Product Details Modal -->
+  <div id="productDetailsModal" class="size-guide-modal">
+    <div class="size-modal-inner" style="max-width: 700px;">
+      <button class="size-close-btn" onclick="closeProductDetails()">&times;</button>
+      <div id="productDetailsContent" class="product-details-layout">
+        <!-- Loaded dynamically -->
       </div>
     </div>
   </div>
